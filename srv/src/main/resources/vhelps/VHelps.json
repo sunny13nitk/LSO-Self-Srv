@@ -1,0 +1,20 @@
+{
+    "VHelpFields": [
+        {
+            "LOB": "Learning",
+            "fields": [
+                {
+                    "fieldName": "LSO_Country",
+                    "catgSpecific": "true",
+                    "catgListBean": "Catgs_LSO_Country",
+                    "fltListBean": "LSO_CountryByCatgFilter"
+                },
+                {
+                    "fieldName": "LSO_Language",
+                    "catgSpecific": "true",
+                    "catgListBean": "Catgs_LSO_Language"
+                }
+            ]
+        }
+    ]
+}

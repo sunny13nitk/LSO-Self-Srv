@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+   <!-- Required meta tags -->
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+   <title>Employee Self Service App</title>
+   <!-- Metro 4 -->
+   <link rel="stylesheet" href="https://cdn.metroui.org.ua/v4.3.2/css/metro-all.min.css">
+
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+</head>
+
+<body>
+
+   <div class="frame" style="padding: 20px; overflow: auto; background-color: #FFFFFF">
+
+      <div class="row flex-justify-center">
+
+         <!--Title Head - Begin -->
+         <div class="colspan-5">
+            <h2 style="color: #54627B; margin: 10px; margin-left: 20px">
+               <img th:src="@{/images/icon.png}" width="70" height="40" style="margin-left: 5px; margin-right: 10px">
+               <span class="mif-contacts-mail"></span> Employee Self Service(s)
+            </h2>
+         </div>
+
+         <!-- User Information Card -->
+         <div class="colspan-3 offset-1" th:if="${userInfo.userDetails != null}">
+
+            <div class="icon-box border bd-default">
+               <div class="icon bg-cyan fg-white"><span class="mif-user-check"></span></div>
+               <div class="content p-4">
+                  <div class="text-upper">
+                     <label style="color: #224563; font-weight: bold; font-size: 1.15em; margin-left: 7px"
+                        th:text="${userInfo.userDetails.userId}">
+                     </label>
+                  </div>
+                  <div class="text-upper text-bold text-lead">
+                     <label style="color: #224563; font-weight: bold; font-size: 1.15em; margin-left: 7px"
+                        th:text="${userInfo.userDetails.userName}">
+                     </label>
+                  </div>
+               </div>
+            </div>
+
+         </div>
+
+         <div class="colspan-2" style="padding: 20px;" th:if="${sessMsgs != null}">
+
+            <a href="#" class="button alert outline cycle " data-role="hint" role="button"
+               onclick="$('#info-box').data('infobox').open()" data-hint-position="bottom" data-cls-hint="fg-black"
+               data-hint-text="Session Alerts!">
+               <span class="mif-bell" style="margin-left: 0px">
+               </span>
+
+            </a>
+
+            <a href="#" class="button primary outline cycle " style="margin-right: 20px;" data-role="hint"
+               th:href="@{/poclocal/}" role="button" data-hint-position="bottom" data-cls-hint="fg-black"
+               data-hint-text="Refresh">
+               <span class="mif-refresh" style="margin-left: 0px">
+               </span>
+
+            </a>
+
+            <div class="row flex-justify-left">
+               <div class="info-box" id="info-box" data-role="infobox" data-width=800 data-height=800>
+                  <span class="button square closer"></span>
+                  <div class="info-box-content">
+
+                     <div class="remark success">
+                        <p>
+                           Alerts generated for <strong> current Session.</strong>
+                        </p>
+                     </div>
+
+                     <div class="cell-11">
+                        <table class="table  table-border compact striped">
+                           <thead>
+                              <tr>
+                                 <th style="text-align: center;">Messages</th>
+                              </tr>
+                           </thead>
+                           <tbody>
+                              <tr th:each="msg : ${sessMsgs}">
+
+                                 <td style="text-align: left" th:text="${msg}"></td>
+                              </tr>
+                           </tbody>
+                        </table>
+
+                     </div>
+
+                  </div>
+               </div>
+            </div>
+
+
+
+
+
+
+         </div>
+
+
+      </div>
+
+
+
+
+
+      <!--Table Row - Starts  -->
+      <div class="row" style="margin-top: 20px" th:if="${userInfo.cases != null}">
+
+         <div class="colspan-12">
+            <table class="table compact striped table-border row-hover mt-4 " id="t-inspector" data-role="table"
+               data-show-search="true" data-show-rows-steps="false" data-table-search-title="Filter Cases:"
+               data-search-min-length="1" data-search-threshold="300" data-rows="10"
+               data-search-fields="subject,statusDesc,id" data-horizontal-scroll="true"
+               data-info-wrapper=".my-info-wrapper" data-thousand-separator=","
+               data-pagination-wrapper=".my-pagination-wrapper">
+               <thead>
+                  <tr>
+
+                     <th data-name="id" data-format="number" class="sortable-column sort-desc">Case ID</th>
+
+                     <th data-name="statusDesc" data-cls-column=" text-left">Status</th>
+
+                     <th data-name="subject" data-cls-column=" text-left">Issue Description</th>
+
+                     <th data-name="formattedDate" data-format="number" data-cls-column=" text-left">Created On</th>
+
+                     <th data-cls-column=" text-left">Details</th>
+
+
+
+                  </tr>
+               </thead>
+               <tbody>
+
+
+                  <tr th:each="case : ${userInfo.cases}">
+
+
+                     <td style="text-align: center" th:text="${case.id}"></td>
+                     <td><span class=" tally yellow" th:text="${case.statusDesc}"></span></td>
+                     <td style="text-align: left" th:text="${case.subject}"></td>
+                     <td style="text-align: left" th:text="${case.formattedDate}"></td>
+
+
+                     <td>
+
+                        <a href="#" class="button primary mini rounded outline"
+                           th:href="@{'/poclocal/caseDetails/' + ${case.guid}}" role="button" data-role="hint"
+                           data-hint-position="right" data-cls-hint="fg-black" data-hint-text="Reply to Case">
+                           <span class="mif-reply icon" style="margin-left: 0px"></span> <span
+                              style="margin-left: 3px">Reply</span></a>
+                     </td>
+
+
+
+               </tbody>
+            </table>
+
+            <p class="h5  text-center my-info-wrapper "></p>
+            <div class="d-flex flex-justify-center my-pagination-wrapper"></div>
+
+         </div>
+      </div>
+      <!--Table Row - Ends -->
+
+
+      <div class="row flex-justify-center" style="margin-top: 40px" th:if="${userInfo.cases == null}">
+
+         <div class="remark primary ">
+            <h6>No Cases could be identified for you! You can however create a new Case/Service Request using options
+               as
+               below.</h6>
+         </div>
+      </div>
+
+
+   </div>
+
+   <!--Create Case Row - Starts  -->
+   <div class="row">
+      <div class="cell-2 offset-10" style="padding: 20px;">
+
+         <a href="#" class="button primary rounded outline" th:href="@{'/poclocal/createCase/'}" role="button">
+            Create Case
+         </a>
+
+      </div>
+   </div>
+   <!--Create Case Row - Ends  -->
+
+
+   </div>
+
+   <div class="slot" id="slot1" th:if="${rateLimitBreached == true}"></div>
+
+
+
+   <script>
+      function runToast()
+      {
+         var toast = Metro.toast.create("Rate Limit Exceeded!! ", function ()
+         {
+            alert('Rate Limit Exceeded!! You can only submit a maximum of 2 incidents in a 2 min slot for an Active Session.')
+         });
+
+      }
+
+      $(document).ready(function ()
+      {
+         $('div.slot').each(function (i, d)
+         {
+            runToast.call($(this));
+         });
+      });
+
+   </script>
+
+
+
+
+
+
+   <!-- Metro 4 -->
+   <script src="https://cdn.metroui.org.ua/v4.3.2/js/metro.min.js"></script>
+
+
+</body>
+
+</html>

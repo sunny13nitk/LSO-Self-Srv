@@ -1,0 +1,76 @@
+### Get Cases 
+GET http://localhost:9090/api/cases
+Accept: application/json 
+
+### Get ESS Portal View
+GET http://localhost:9090/api/ESS
+Accept: application/json 
+Authorization: Basic admin:pass_admin
+
+### Get Case Details in ESS Format
+GET http://localhost:9090/api/casesESS
+Accept: application/json 
+Authorization: Basic admin:pass_admin
+
+
+### Get # of Cases 
+GET http://localhost:9090/api/casesCount
+Accept: application/json 
+Authorization: Basic admin:pass_admin
+
+
+### Get Case Ids and GUIDS 
+GET http://localhost:9090/api/caseIds
+Accept: application/json 
+Authorization: Basic admin:pass_admin
+
+### Get Cases GUIDS Only
+GET http://localhost:9090/api/casesAnatomy
+Accept: application/json 
+Authorization: Basic admin:pass_admin
+
+### Get Account ID by Email
+GET http://localhost:9090/api/accByEmail/?email=sunny.bhardwaj@sap.com
+Accept: application/json 
+
+### Get Contact ID by Email
+GET http://localhost:9090/api/cpByEmail/?email=sunny.bhardwaj@sap.com
+Accept: application/json 
+
+
+### Get Accounts Base URL 
+GET http://localhost:9090/api/accURL/?email=ibnebatuta@gmail.com&userName=Ibne Batuta
+Accept: application/json 
+
+### Get Accounts Base URL 
+GET http://localhost:9090/esslocal/
+Accept: application/json 
+
+
+### Get Accounts Case Type(s) Config 
+GET http://localhost:9090/api/cfg
+Accept: application/json
+
+### Get Catg Tree by Case Type
+GET http://localhost:9090/api/cfgCatg/Learning
+Accept: application/json 
+
+
+### Create new Note
+GET http://localhost:9090/api/notesURL
+Accept: application/json 
+
+
+### Get Case configuration by Case Type 
+GET http://localhost:9090/api/caseConfig?caseType=ZLSS
+Accept: application/json 
+Authorization: Basic admin:pass_admin
+
+### URL Parsing
+GET http://localhost:9090/api/parseURL
+Accept: application/json 
+
+
+### Catalog Tree
+GET http://localhost:9090/api/catalogDetails?caseType=Learning
+Accept: application/json 

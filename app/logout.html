@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title></title>
+    <script>
+        const lxpLogoutConfig = {
+            "support.learning-dev.sap.com":
+                "https://lhub-home-approuter-d3v.cfapps.eu10.hana.ondemand.com/logout",
+            "support.learning-test.sap.com":
+                "https://lhub-home-approuter-t35t.cfapps.eu10.hana.ondemand.com/logout",
+            "support.learning.sap.com":
+                "https://learninghub.sap.com/logout",
+        };
+
+        Object.keys(lxpLogoutConfig).forEach((env) =>
+        {
+            if (~window.location.href.indexOf(env))
+            {
+                window.location.replace(lxpLogoutConfig[env]);
+            }
+        });
+    </script>
+</head>
+
+<body></body>
+
+</html>
