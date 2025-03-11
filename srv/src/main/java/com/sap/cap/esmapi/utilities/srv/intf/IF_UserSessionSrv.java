@@ -87,6 +87,8 @@ public interface IF_UserSessionSrv
     // @formatter:on
     public boolean SubmitCaseReply(TY_CaseEdit_Form caseReplyForm) throws EX_ESMAPI, IOException;
 
+    public boolean validateProcessRequestorEmail();
+
     public void clearFormErrors();
 
     public List<String> getFormErrors();
