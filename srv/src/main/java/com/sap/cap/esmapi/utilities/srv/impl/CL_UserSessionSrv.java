@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
@@ -856,6 +857,70 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
         {
             if (userSessInfo.getCurrentForm4Submission().getCaseForm() != null)
             {
+                // Validate Email Address for Affected User Email Address
+                if (StringUtils.hasText(userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail()))
+                {
+                    if (EmailValidator.getInstance().isValid(
+                            userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail().trim().toLowerCase()))
+                    {
+                        // Seek Ind. customer or Employee for Email Address
+                        // only in case the email is not same as that of current logged in user
+                        if (!userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail().trim().toLowerCase()
+                                .equals(userSessInfo.getUserDetails().getUsAccEmpl().getUserEmail().trim()
+                                        .toLowerCase()))
+                        {
+                            // For External User - Check if the Email Address is already a Customer
+                            if (userSessInfo.getUserDetails().getUsAccEmpl().isExternal())
+                            {
+                                // system would check this email to identify corresponding Individual Customer
+                                // only
+                                String indCustomerId = srvCloudApiSrv.getAccountIdByUserEmail(
+                                        userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail(),
+                                        userSessInfo.getDestinationProps());
+
+                                // Add try -catch since API call for diagnosis
+                                try
+                                {
+                                    if (StringUtils.hasText(indCustomerId))
+                                    {
+                                        this.userSessInfo.getCurrentForm4Submission().getCaseForm()
+                                                .setReporter(indCustomerId);
+                                        this.userSessInfo.getCurrentForm4Submission().getCaseForm()
+                                                .setReporterEmployee(false);
+                                    }
+                                    else
+                                    {
+                                        // Payload Error as Category level should be atleast 2
+                                        handleEmpCustomerNotFoundError(
+                                                userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail());
+                                        return false;
+                                    }
+                                }
+                                catch (Exception e)
+                                {
+                                    // Let the case persist without User Identification
+                                    // Still persist the error in the logs DB and system log
+                                    handleAPIFailure(new String[]
+                                    { GC_Constants.gc_API_IndCustomer,
+                                            userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail(),
+                                            userSessInfo.getUserDetails().getUsAccEmpl().getUserId() });
+                                }
+
+                            }
+                            else
+                            {
+
+                            }
+                        }
+
+                    }
+                    {
+                        // Invalid Email Address error handling
+                        handleInvalidEmailAddressError();
+                        return false;
+                    }
+                }
+
                 // Subject and Category are Mandatory fields
                 if (StringUtils.hasText(userSessInfo.getCurrentForm4Submission().getCaseForm().getSubject())
                         && StringUtils.hasText(userSessInfo.getCurrentForm4Submission().getCaseForm().getCatgDesc()))
@@ -966,6 +1031,28 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
         }
 
         return isValid;
+
+    }
+
+    private void handleAPIFailure(String[] params)
+    {
+
+        // ERR_API_FAILURE= Failure calling API - {0} for parameters -{1} for User -
+        // {2}.
+
+        String msg = msgSrc.getMessage("ERR_API_FAILURE", params, Locale.ENGLISH);
+        log.error(msg);
+
+        TY_Message logMsg = new TY_Message(userSessInfo.getUserDetails().getUsAccEmpl().getUserId(),
+                Timestamp.from(Instant.now()), EnumStatus.Error, EnumMessageType.ERR_SRVCLOUDAPI, params[0], msg);
+        // this.addMessagetoStack(logMsg); Do Not add to UI
+
+        // Instantiate and Fire the Event
+        EV_LogMessage logMsgEvent = new EV_LogMessage(this, logMsg);
+        applicationEventPublisher.publishEvent(logMsgEvent);
+
+        // Should be handled Centrally via Aspect
+        throw new EX_ESMAPI(msg);
 
     }
 
@@ -1956,6 +2043,24 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
         this.addFormErrors(msg);// For Form Display
     }
 
+    private void handleInvalidEmailAddressError()
+    {
+        String msg = msgSrc.getMessage("ERR_INVALID_EMAIL", null, Locale.ENGLISH);
+        log.error(msg); // System Log
+
+        // Logging Framework
+        TY_Message logMsg = new TY_Message(userSessInfo.getUserDetails().getUsAccEmpl().getUserId(),
+                Timestamp.from(Instant.now()), EnumStatus.Error, EnumMessageType.ERR_PAYLOAD,
+                userSessInfo.getUserDetails().getUsAccEmpl().getUserId(), msg);
+        userSessInfo.getMessagesStack().add(logMsg);
+
+        // Instantiate and Fire the Event : Syncronous processing
+        EV_LogMessage logMsgEvent = new EV_LogMessage(this, logMsg);
+        applicationEventPublisher.publishEvent(logMsgEvent);
+
+        this.addFormErrors(msg);// For Form Display
+    }
+
     private void handleAttachmentPersistError(TY_CaseFormAsync caseFormAsync, Exception e)
     {
         String msg;
@@ -1992,6 +2097,28 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
 
         // Instantiate and Fire the Event
         EV_LogMessage logMsgEvent = new EV_LogMessage((Object) caseFormAsync.getSubmGuid(), logMsg);
+        applicationEventPublisher.publishEvent(logMsgEvent);
+
+        // Should be handled Centrally via Aspect
+        throw new EX_ESMAPI(msg);
+    }
+
+    private void handleEmpCustomerNotFoundError(String emailAddress)
+    {
+        String msg;
+        // ERR_USER_NOTFOUND= We could not locate this user with email address -{0}.
+        // Please add their details to the description further checking.
+        msg = msgSrc.getMessage("ERR_USER_NOTFOUND", new Object[]
+        { emailAddress }, Locale.ENGLISH);
+
+        log.error(msg);
+        TY_Message logMsg = new TY_Message(userSessInfo.getUserDetails().getUsAccEmpl().getUserId(),
+                Timestamp.from(Instant.now()), EnumStatus.Error, EnumMessageType.ERR_ATTACHMENT,
+                userSessInfo.getUserDetails().getUsAccEmpl().getUserId(), msg);
+        this.addMessagetoStack(logMsg);
+
+        // Instantiate and Fire the Event
+        EV_LogMessage logMsgEvent = new EV_LogMessage(this, logMsg);
         applicationEventPublisher.publishEvent(logMsgEvent);
 
         // Should be handled Centrally via Aspect

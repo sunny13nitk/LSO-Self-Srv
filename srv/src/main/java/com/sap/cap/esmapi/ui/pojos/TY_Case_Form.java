@@ -22,6 +22,9 @@ public class TY_Case_Form
     private MultipartFile attachment;
     private String country;
     private String language;
+    private String addEmail; // accomodate additional email address for reporter
+    private String reporter;
+    private boolean reporterEmployee;
     private boolean countryMandatory;
     private boolean langMandatory;
     private boolean employee;

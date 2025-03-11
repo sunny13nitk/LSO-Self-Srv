@@ -63,5 +63,6 @@ public class GC_Constants
     public static final String gc_TokenAttrib_FirstName = "given name";
     public static final String gc_TokenAttrib_Email = "email";
     public static final String gc_TokenAttrib_scopes = "(Xsuaa) scopes";
+    public static final String gc_API_IndCustomer = "Individual Customer Search API";
 
 }
