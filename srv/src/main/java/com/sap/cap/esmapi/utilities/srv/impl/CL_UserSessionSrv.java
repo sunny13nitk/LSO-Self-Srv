@@ -863,6 +863,7 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                     if (EmailValidator.getInstance().isValid(
                             userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail().trim().toLowerCase()))
                     {
+                        log.info("Email address valid!");
                         // Seek Ind. customer or Employee for Email Address
                         // only in case the email is not same as that of current logged in user
                         if (!userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail().trim().toLowerCase()
@@ -874,6 +875,8 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                             {
                                 // system would check this email to identify corresponding Individual Customer
                                 // only
+                                log.info("External Scenario. Scanning for Individual Customer by email..."
+                                        + userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail());
                                 String indCustomerId = srvCloudApiSrv.getAccountIdByUserEmail(
                                         userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail(),
                                         userSessInfo.getDestinationProps());
@@ -883,6 +886,7 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                                 {
                                     if (StringUtils.hasText(indCustomerId))
                                     {
+                                        log.info("Individual Customer identified as " + indCustomerId);
                                         this.userSessInfo.getCurrentForm4Submission().getCaseForm()
                                                 .setReporter(indCustomerId);
                                         this.userSessInfo.getCurrentForm4Submission().getCaseForm()
@@ -903,7 +907,8 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                                     handleAPIFailure(new String[]
                                     { GC_Constants.gc_API_IndCustomer,
                                             userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail(),
-                                            userSessInfo.getUserDetails().getUsAccEmpl().getUserId() });
+                                            userSessInfo.getUserDetails().getUsAccEmpl().getUserId(),
+                                            e.getLocalizedMessage() });
                                 }
 
                             }
@@ -1038,7 +1043,7 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
     {
 
         // ERR_API_FAILURE= Failure calling API - {0} for parameters -{1} for User -
-        // {2}.
+        // {2}. Details : {3}.
 
         String msg = msgSrc.getMessage("ERR_API_FAILURE", params, Locale.ENGLISH);
         log.error(msg);
