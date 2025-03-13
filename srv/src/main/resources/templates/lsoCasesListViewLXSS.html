@@ -398,8 +398,8 @@
          <ul>
             <li><span>To ensure we address your inquiries and concerns effectively, select <a
                      href="https://learninghub.sap.com/help-center/faq/categoryintroduction" target="_blank"> one
-                  of these
-                  categories.</a> </span></li>
+                     of these
+                     categories.</a> </span></li>
             <li><span>Do not hesitate to add any relevant information and screenshots as necessary.</span></li>
          </ul>
          <p>SAP Learning Support Team</p>
@@ -530,9 +530,17 @@
                            data-hint-text="View Case Details">
                            View
                         </a>
-                        <a th:if="${case.confirmAllowed == true}" href="#" style="margin-left: 10px;"
-                           th:href="@{'/lso/confirmCase/' + ${case.id}}" role="button" data-role="hint" target="_blank"
-                           data-hint-position="right" data-cls-hint="fg-black" data-hint-text="Confirm Case">
+                        <a th:if="${case.confirmAllowed == true and userInfo.userDetails.isExternal() == true}" href="#"
+                           style="margin-left: 10px;" th:href="@{'/lso/confirmCase/' + ${case.id}}" role="button"
+                           data-role="hint" target="_blank" data-hint-position="right" data-cls-hint="fg-black"
+                           data-hint-text="Confirm Case">
+                           Confirm
+                        </a>
+
+                        <a th:if="${case.confirmAllowed == true and userInfo.userDetails.isExternal() != true}" href="#"
+                           style="margin-left: 10px;" th:href="@{'/lso/confirmCase/' + ${case.id}}" role="button"
+                           data-role="hint" data-hint-position="right" data-cls-hint="fg-black"
+                           data-hint-text="Confirm Case">
                            Confirm
                         </a>
                      </td>
