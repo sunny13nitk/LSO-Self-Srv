@@ -4,6 +4,7 @@ public class GC_Constants
 {
     public static final String equalsString = "=";
 
+    public static final String gc_basePath = "/lso/";
     public static final String gc_roleCustomer = "CRM000";
 
     public static final String gc_statusACTIVE = "ACTIVE";

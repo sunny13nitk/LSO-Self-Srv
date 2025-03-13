@@ -30,11 +30,13 @@ import com.sap.cap.esmapi.exceptions.EX_ESMAPI;
 import com.sap.cap.esmapi.ui.pojos.TY_CaseConfirmPOJO;
 import com.sap.cap.esmapi.ui.pojos.TY_CaseEdit_Form;
 import com.sap.cap.esmapi.ui.pojos.TY_Case_Form;
+import com.sap.cap.esmapi.utilities.constants.GC_Constants;
 import com.sap.cap.esmapi.utilities.enums.EnumCaseTypes;
 import com.sap.cap.esmapi.utilities.enums.EnumMessageType;
 import com.sap.cap.esmapi.utilities.pojos.TY_Message;
 import com.sap.cap.esmapi.utilities.pojos.TY_RLConfig;
 import com.sap.cap.esmapi.utilities.pojos.TY_UserESS;
+import com.sap.cap.esmapi.utilities.pojos.Ty_UserAccountEmployee;
 import com.sap.cap.esmapi.utilities.srv.intf.IF_SessAttachmentsService;
 import com.sap.cap.esmapi.utilities.srv.intf.IF_UserSessionSrv;
 import com.sap.cap.esmapi.utilities.uimodel.intf.IF_CountryLanguageVHelpAdj;
@@ -633,29 +635,45 @@ public class LSOController
     @GetMapping("/confirmCase/{caseID}")
     public ModelAndView confirmCase(@PathVariable String caseID, RedirectAttributes attributes)
     {
-
         String svyUrl = null;
+
         TY_CaseConfirmPOJO caseDetails;
+
         if (StringUtils.hasText(caseID) && userSessSrv != null)
         {
             log.info("Triggered Confirmation for case ID : " + caseID);
 
             try
             {
-                svyUrl = userSessSrv.getSurveyUrl4CaseId(caseID);
-                // Only now Proceed to Confirm the case
-                if (StringUtils.hasText(svyUrl))
-                {
+
+                Ty_UserAccountEmployee usAccConEmpl = userSessSrv.getUserDetails4mSession();
+
+                if (!usAccConEmpl.isExternal())
+                { // Internal User
+                    log.info("Internal employee detected. Skipping survey redirect for case ID: " + caseID);
+
                     caseDetails = userSessSrv.getCaseDetails4Confirmation(caseID);
-                    if (caseDetails != null)
+                    if (caseDetails != null && StringUtils.hasText(caseDetails.getETag()))
                     {
-                        if (StringUtils.hasText(caseDetails.getETag()))
+                        EV_CaseConfirmSubmit caseConfirmEvent = new EV_CaseConfirmSubmit(this, caseDetails);
+                        applicationEventPublisher.publishEvent(caseConfirmEvent);
+                    }
+                    return new ModelAndView(new RedirectView(GC_Constants.gc_basePath)); // Redirect for INTERNAL user -
+                                                                                         // Base Path
+                }
+                else
+                { // External User
+                    svyUrl = userSessSrv.getSurveyUrl4CaseId(caseID);
+
+                    if (StringUtils.hasText(svyUrl))
+                    {
+                        caseDetails = userSessSrv.getCaseDetails4Confirmation(caseID);
+                        if (caseDetails != null && StringUtils.hasText(caseDetails.getETag()))
                         {
-                            // Prepare Case Confirm Event and Trigger the same
-                            log.info("Etag Bound. Ready for patch....");
                             EV_CaseConfirmSubmit caseConfirmEvent = new EV_CaseConfirmSubmit(this, caseDetails);
                             applicationEventPublisher.publishEvent(caseConfirmEvent);
                         }
+                        return new ModelAndView(new RedirectView(svyUrl)); // Redirect for EXTERNAL user with survey URL
                     }
                 }
             }
@@ -677,8 +695,8 @@ public class LSOController
             }
 
         }
-
-        return new ModelAndView(new RedirectView(svyUrl));
+        return new ModelAndView(new RedirectView(GC_Constants.gc_basePath)); // Redirect for INTERNAL user -
+                                                                             // Base Path
     }
 
     @GetMapping("/errorConfirm")
