@@ -6,8 +6,12 @@ import java.time.Instant;
 import org.apache.tomcat.util.http.fileupload.impl.SizeLimitExceededException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.sap.cap.esmapi.events.event.EV_LogMessage;
@@ -70,4 +74,42 @@ public class GlobalExceptionHdlr
 
 	}
 
+	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	@ExceptionHandler
+	public ModelAndView handleInternalServerError(Exception e)
+	{
+		ModelAndView mv = new ModelAndView();
+		mv.setViewName("error");
+		mv.addObject("formError",
+				"Invalid Token! Access to app not possible. Try clearing browser history and certificate cache");
+		log.error("Invalid Token! Access to app not possible. Try clearing browser history and certificate cache : "
+				+ e.getLocalizedMessage());
+		log.error(e.getStackTrace().toString());
+		return mv;
+
+	}
+
+	@ResponseStatus(HttpStatus.UNAUTHORIZED)
+	@ExceptionHandler(BadCredentialsException.class)
+	public ModelAndView handle401(Exception e)
+	{
+		ModelAndView mv = new ModelAndView();
+		mv.setViewName("error");
+		mv.addObject("formError", "Bad Credentials 401 : Not able to Authorize" + e.getLocalizedMessage());
+		log.error(e.getStackTrace().toString());
+		return mv;
+
+	}
+
+	@ResponseStatus(HttpStatus.UNAUTHORIZED)
+	@ExceptionHandler(AuthenticationException.class)
+	public ModelAndView handle403(Exception e)
+	{
+		ModelAndView mv = new ModelAndView();
+		mv.setViewName("error");
+		mv.addObject("formError", "Missing Role(s) 403 : Not able to Authorize" + e.getLocalizedMessage());
+		log.error(e.getStackTrace().toString());
+		return mv;
+
+	}
 }
