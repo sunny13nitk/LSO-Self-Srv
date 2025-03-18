@@ -27,7 +27,6 @@ import com.sap.cap.esmapi.catg.srv.intf.IF_CatgSrv;
 import com.sap.cap.esmapi.events.event.EV_CaseConfirmSubmit;
 import com.sap.cap.esmapi.exceptions.EX_CaseAlreadyConfirmed;
 import com.sap.cap.esmapi.exceptions.EX_ESMAPI;
-import com.sap.cap.esmapi.rest.APIRestController;
 import com.sap.cap.esmapi.ui.pojos.TY_CaseConfirmPOJO;
 import com.sap.cap.esmapi.ui.pojos.TY_CaseEdit_Form;
 import com.sap.cap.esmapi.ui.pojos.TY_Case_Form;
@@ -54,7 +53,6 @@ import lombok.extern.slf4j.Slf4j;
 public class LSOController
 {
 
-    private final APIRestController APIRestController;
     @Autowired
     private IF_UserSessionSrv userSessSrv;
 
