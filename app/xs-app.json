@@ -38,7 +38,7 @@
       "cacheControl": "no-cache, no-store, must-revalidate"
     },
     {
-      "source": "^/common-navigation-api-public/(.*)$",
+      "source": "^/common-navigation-api/(.*)$",
       "target": "/common-navigation-api/$1",
       "destination": "common_navigation_samlauth",
       "authenticationType": "xsuaa"
