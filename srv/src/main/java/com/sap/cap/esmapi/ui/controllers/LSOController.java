@@ -95,11 +95,6 @@ public class LSOController
     private final String caseConfirmError = "alreadyConfirmed";
     private final String invalidToken = "invalid_token";
 
-    LSOController(APIRestController APIRestController)
-    {
-        this.APIRestController = APIRestController;
-    }
-
     @GetMapping("/")
     public String showCasesList(@AuthenticationPrincipal Token token, Model model)
     {
