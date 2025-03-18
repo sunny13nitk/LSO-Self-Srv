@@ -27,6 +27,7 @@ import com.sap.cap.esmapi.catg.srv.intf.IF_CatgSrv;
 import com.sap.cap.esmapi.events.event.EV_CaseConfirmSubmit;
 import com.sap.cap.esmapi.exceptions.EX_CaseAlreadyConfirmed;
 import com.sap.cap.esmapi.exceptions.EX_ESMAPI;
+import com.sap.cap.esmapi.rest.APIRestController;
 import com.sap.cap.esmapi.ui.pojos.TY_CaseConfirmPOJO;
 import com.sap.cap.esmapi.ui.pojos.TY_CaseEdit_Form;
 import com.sap.cap.esmapi.ui.pojos.TY_Case_Form;
@@ -52,6 +53,8 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/lso")
 public class LSOController
 {
+
+    private final APIRestController APIRestController;
     @Autowired
     private IF_UserSessionSrv userSessSrv;
 
@@ -90,77 +93,97 @@ public class LSOController
     private final String caseFormReplyLXSS = "caseFormReplyLSOLXSS";
     private final String lsoCaseListViewLXSS = "lsoCasesListViewLXSS";
     private final String caseConfirmError = "alreadyConfirmed";
+    private final String invalidToken = "invalid_token";
+
+    LSOController(APIRestController APIRestController)
+    {
+        this.APIRestController = APIRestController;
+    }
 
     @GetMapping("/")
     public String showCasesList(@AuthenticationPrincipal Token token, Model model)
     {
-
+        String vw = null;
         if (token != null && userInfo != null && userSessSrv != null)
         {
-            // Only Authenticated user via IDP
-            if (userInfo.isAuthenticated())
+
+            try
             {
-
-                // #AUTH checks to be done later after role collection(s) are published in
-                // CL_UserSessionSrv
-                TY_UserESS userDetails = new TY_UserESS();
-
-                if (userSessSrv != null)
+                // Only Authenticated user via IDP
+                if (userInfo.isAuthenticated())
                 {
-                    // Get User Info. from XSUAA TOken
-                    if (userSessSrv.getESSDetails(token, true) != null)
-                        // check User and Account Bound
-                        if (userSessSrv.getUserDetails4mSession() != null)
-                        {
 
-                            log.info("User Details Bound from Session!");
-                            if (StringUtils.hasText(userSessSrv.getUserDetails4mSession().getAccountId())
-                                    || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId()))
+                    // #AUTH checks to be done later after role collection(s) are published in
+                    // CL_UserSessionSrv
+                    TY_UserESS userDetails = new TY_UserESS();
+
+                    if (userSessSrv != null)
+                    {
+                        // Get User Info. from XSUAA TOken
+                        if (userSessSrv.getESSDetails(token, true) != null)
+                            // check User and Account Bound
+                            if (userSessSrv.getUserDetails4mSession() != null)
                             {
-                                if (!CollectionUtils.isEmpty(catgCusSrv.getCustomizations()))
+
+                                log.info("User Details Bound from Session!");
+                                if (StringUtils.hasText(userSessSrv.getUserDetails4mSession().getAccountId())
+                                        || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId()))
                                 {
-
-                                    Optional<TY_CatgCusItem> cusItemO = catgCusSrv.getCustomizations().stream()
-                                            .filter(g -> g.getCaseTypeEnum().toString()
-                                                    .equals(EnumCaseTypes.Learning.toString()))
-                                            .findFirst();
-                                    if (cusItemO.isPresent() && catgTreeSrv != null)
-                                    {
-                                        userDetails.setUserDetails(userSessSrv.getUserDetails4mSession());
-                                        log.info("Fetching Cases for User From Session : "
-                                                + userSessSrv.getUserDetails4mSession().toString());
-                                        userDetails.setCases(userSessSrv.getCases4User4mSession());
-                                        model.addAttribute("userInfo", userDetails);
-                                        model.addAttribute("caseTypeStr", EnumCaseTypes.Learning.toString());
-                                        // Rate Limit Simulation
-                                        model.addAttribute("rateLimitBreached",
-                                                userSessSrv.getCurrentRateLimitBreachedValue());
-
-                                        // Even if No Cases - spl. for Newly Create Acc - to enable REfresh button
-                                        model.addAttribute("sessMsgs", userSessSrv.getSessionMessages());
-
-                                        // Session Active Toast
-                                        model.addAttribute("submActive", userSessSrv.isCurrentSubmissionActive());
-
-                                    }
-
-                                    else
+                                    vw = lsoCaseListViewLXSS;
+                                    if (!CollectionUtils.isEmpty(catgCusSrv.getCustomizations()))
                                     {
 
-                                        throw new EX_ESMAPI(msgSrc.getMessage("ERR_CASE_TYPE_NOCFG", new Object[]
-                                        { EnumCaseTypes.Learning.toString() }, Locale.ENGLISH));
+                                        Optional<TY_CatgCusItem> cusItemO = catgCusSrv.getCustomizations().stream()
+                                                .filter(g -> g.getCaseTypeEnum().toString()
+                                                        .equals(EnumCaseTypes.Learning.toString()))
+                                                .findFirst();
+                                        if (cusItemO.isPresent() && catgTreeSrv != null)
+                                        {
+                                            userDetails.setUserDetails(userSessSrv.getUserDetails4mSession());
+                                            log.info("Fetching Cases for User From Session : "
+                                                    + userSessSrv.getUserDetails4mSession().toString());
+                                            userDetails.setCases(userSessSrv.getCases4User4mSession());
+                                            model.addAttribute("userInfo", userDetails);
+                                            model.addAttribute("caseTypeStr", EnumCaseTypes.Learning.toString());
+                                            // Rate Limit Simulation
+                                            model.addAttribute("rateLimitBreached",
+                                                    userSessSrv.getCurrentRateLimitBreachedValue());
+
+                                            // Even if No Cases - spl. for Newly Create Acc - to enable REfresh button
+                                            model.addAttribute("sessMsgs", userSessSrv.getSessionMessages());
+
+                                            // Session Active Toast
+                                            model.addAttribute("submActive", userSessSrv.isCurrentSubmissionActive());
+
+                                        }
+
+                                        else
+                                        {
+
+                                            throw new EX_ESMAPI(msgSrc.getMessage("ERR_CASE_TYPE_NOCFG", new Object[]
+                                            { EnumCaseTypes.Learning.toString() }, Locale.ENGLISH));
+                                        }
                                     }
+
                                 }
-
                             }
-                        }
 
+                    }
                 }
+
+            }
+            catch (Exception e)
+            {
+                throw new EX_ESMAPI(e.getLocalizedMessage());
             }
 
         }
+        else
+        {
+            vw = invalidToken;
+        }
 
-        return lsoCaseListViewLXSS;
+        return vw;
 
     }
 
