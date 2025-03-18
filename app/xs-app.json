@@ -29,7 +29,7 @@
       "destination": "srv-api",
       "authenticationType": "xsuaa",
       "cacheControl": "no-cache, no-store, must-revalidate"
-    },    
+    },
     {
       "source": "^/login(.*)",
       "target": "/login$1",
@@ -41,13 +41,7 @@
       "source": "^/common-navigation-api/(.*)$",
       "target": "/common-navigation-api/$1",
       "destination": "common_navigation_samlauth",
-      "authenticationType": "xsuaa" 
-    },
-    {
-      "source": "^/common-navigation-api-public/(.*)$",
-      "target": "/common-navigation-api/$1",
-      "destination": "common_navigation_proxy_public",
-      "authenticationType": "none"
+      "authenticationType": "xsuaa"
     },
     {
       "source": "^/assets/newlxp-components/(.*)$",
@@ -61,6 +55,5 @@
       "destination": "common_navigation_resources",
       "authenticationType": "none"
     }
-
   ]
 }
