@@ -1,19 +1,14 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 
-<head th:if="${#authorization.expression('isAuthenticated()')}">
+<head>
 
    <meta charset="utf-8">
    <meta http-equiv="refresh" content="0; url=/lso/" />
    <title>SAP Learning Self Service</title>
 </head>
 
-<head th:unless="${#authorization.expression('isAuthenticated()')}">
 
-   <meta charset="utf-8">
-   <meta http-equiv="refresh" content="0; url=/isr/" />
-   <title>SAP Learning Self Service - Invalid/Expired Token</title>
-</head>
 
 <body>
 
