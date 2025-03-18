@@ -83,6 +83,7 @@ public class AppSecurityConfig
                            authz
                                 .requestMatchers("/login/**").permitAll()
                                 .requestMatchers("/static/**").permitAll()
+                                .requestMatchers("/isr/**").permitAll()
                                 .requestMatchers("/web-component.js/**").permitAll()
                                 .requestMatchers("/lso/**").hasAnyAuthority(GC_Constants.gc_role_employee_lso, GC_Constants.gc_role_contractor_lso)
                                 .requestMatchers("/post/**").hasAnyAuthority(GC_Constants.gc_role_employee_lso, GC_Constants.gc_role_contractor_lso)
