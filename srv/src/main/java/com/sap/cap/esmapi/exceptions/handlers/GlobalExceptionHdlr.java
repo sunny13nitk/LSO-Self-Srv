@@ -81,9 +81,10 @@ public class GlobalExceptionHdlr
 		ModelAndView mv = new ModelAndView();
 		mv.setViewName("error");
 		mv.addObject("formError",
-				"Invalid Token! Access to app not possible. Try clearing browser history and certificate cache");
-		log.error("Invalid Token! Access to app not possible. Try clearing browser history and certificate cache : "
-				+ e.getLocalizedMessage());
+				"Invalid Token! Access to app not possible. Try clearing browser history and cookies. Try logging in via a private/Incognito window.");
+		log.error(
+				"Invalid Token! Access to app not possible. Try clearing browser history and cookies. Try logging in via a private/Incognito window."
+						+ e.getLocalizedMessage());
 		log.error(e.getStackTrace().toString());
 		return mv;
 
