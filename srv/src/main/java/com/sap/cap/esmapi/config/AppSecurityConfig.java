@@ -22,6 +22,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.logout.HeaderWriterLogoutHandler;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
@@ -83,11 +84,13 @@ public class AppSecurityConfig
                            authz
                                 .requestMatchers("/login/**").permitAll()
                                 .requestMatchers("/static/**").permitAll()
+                                .requestMatchers("/err/**").permitAll()
                                 .requestMatchers("/web-component.js/**").permitAll()
                                 .requestMatchers("/lso/**").hasAnyAuthority(GC_Constants.gc_role_employee_lso, GC_Constants.gc_role_contractor_lso)
                                 .requestMatchers("/post/**").hasAnyAuthority(GC_Constants.gc_role_employee_lso, GC_Constants.gc_role_contractor_lso)
                                 .requestMatchers("/*").authenticated()
                                 .anyRequest().denyAll())
+                                .exceptionHandling(ex->ex.accessDeniedHandler(accessDeniedHandler()))
                                 .csrf(csrf -> csrf.csrfTokenRepository(csrfTokenRepository()))
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt
@@ -98,6 +101,14 @@ public class AppSecurityConfig
 
     }
 
+
+    
+
+    @Bean
+    public AccessDeniedHandler accessDeniedHandler()
+    {
+        return new CustomAccessDeniedHandler();
+    }
 
     // Configure the CSRF token repository 
     private CsrfTokenRepository csrfTokenRepository() 
