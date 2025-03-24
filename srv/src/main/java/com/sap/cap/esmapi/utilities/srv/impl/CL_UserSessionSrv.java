@@ -1892,7 +1892,7 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                     {
                         // system would check this email to identify corresponding Individual Customer
                         // only
-                        log.info("External Scenario. Scanning for Individual Customer by email..."
+                        log.info("External Scenario. Scanning for Individual Customer for affected User by email..."
                                 + userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail());
                         // Add try -catch since API call for diagnosis
                         try
@@ -1909,7 +1909,7 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                             }
                             else
                             {
-                                // Payload Error as Category level should be atleast 2
+                                // Payload Error - Invalid Email
                                 handleEmpCustomerNotFoundError(
                                         userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail());
                                 return false;
@@ -1930,7 +1930,7 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                     else // Internal Scenario
                     {
 
-                        log.info("Internal Scenario. Scanning for Individual Customer by email..."
+                        log.info("Internal Scenario. Scanning for Individual Customer for affected User by email..."
                                 + userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail());
                         try
                         {
@@ -1945,6 +1945,25 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                             }
                             else // Seek an Employee with the email address
                             {
+                                log.info(
+                                        "Individual Customer not Identified for the affected User Email. Scanning for the Employee..");
+                                String employeeId = srvCloudApiSrv.getEmployeeIdByUserEmail(
+                                        userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail(),
+                                        userSessInfo.getDestinationProps());
+                                if (StringUtils.hasText(employeeId))
+                                {
+                                    log.info("Employee identified as " + employeeId);
+                                    this.userSessInfo.getCurrentForm4Submission().getCaseForm().setReporter(employeeId);
+                                    this.userSessInfo.getCurrentForm4Submission().getCaseForm()
+                                            .setReporterEmployee(true);
+                                }
+                                else
+                                {
+                                    // Payload Error - Invalid Email
+                                    handleEmpCustomerNotFoundError(
+                                            userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail());
+                                    return false;
+                                }
 
                             }
 
@@ -1963,12 +1982,13 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                     }
 
                 }
-                {
-                    // Invalid Email Address error handling
-                    handleInvalidEmailAddressError();
-                    return false;
-                }
             }
+            {
+                // Invalid Email Address error handling
+                handleInvalidEmailAddressError();
+                return false;
+            }
+
         }
         return isValid;
     }
@@ -2153,8 +2173,10 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
     private void handleEmpCustomerNotFoundError(String emailAddress)
     {
         String msg;
-        // ERR_USER_NOTFOUND= We could not locate this user with email address -{0}.
-        // Please add their details to the description further checking.
+        // ERR_USER_NOTFOUND = We could not locate this user with email address
+        // -{0}.Clear the email field
+        // in the form and please add their details to the description for further
+        // checking.
         msg = msgSrc.getMessage("ERR_USER_NOTFOUND", new Object[]
         { emailAddress }, Locale.ENGLISH);
 
