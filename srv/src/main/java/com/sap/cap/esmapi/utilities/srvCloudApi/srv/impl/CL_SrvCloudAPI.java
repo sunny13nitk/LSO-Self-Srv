@@ -66,7 +66,9 @@ import com.sap.cap.esmapi.utilities.pojos.TY_CaseDetails;
 import com.sap.cap.esmapi.utilities.pojos.TY_CaseESS;
 import com.sap.cap.esmapi.utilities.pojos.TY_CaseGuidId;
 import com.sap.cap.esmapi.utilities.pojos.TY_CasePatchInfo;
+import com.sap.cap.esmapi.utilities.pojos.TY_Case_CustomerReporter_SrvCloud;
 import com.sap.cap.esmapi.utilities.pojos.TY_Case_Customer_SrvCloud;
+import com.sap.cap.esmapi.utilities.pojos.TY_Case_EmployeeReporter_SrvCloud;
 import com.sap.cap.esmapi.utilities.pojos.TY_Case_Employee_SrvCloud;
 import com.sap.cap.esmapi.utilities.pojos.TY_Case_SrvCloud_Confirm;
 import com.sap.cap.esmapi.utilities.pojos.TY_Case_SrvCloud_Reply;
@@ -680,6 +682,126 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
                                                     if (accFieldName.equals("id"))
                                                     {
                                                         log.info("Account Id Added : "
+                                                                + accEnt.get(accFieldName).asText());
+                                                        accountID = accEnt.get(accFieldName).asText();
+                                                    }
+
+                                                }
+
+                                            }
+                                        }
+
+                                    }
+
+                                }
+                            }
+
+                        }
+
+                        catch (Exception e)
+                        {
+                            if (e != null)
+                            {
+                                log.error(e.getLocalizedMessage());
+                            }
+                        }
+
+                    }
+                }
+
+                finally
+                {
+
+                    try
+                    {
+                        httpClient.close();
+                    }
+                    catch (IOException e)
+                    {
+
+                        log.error(e.getLocalizedMessage());
+                    }
+
+                }
+
+            }
+
+        }
+        return accountID;
+    }
+
+    @Override
+    public String getEmployeeIdByUserEmail(String userEmail, TY_DestinationProps desProps) throws EX_ESMAPI
+    {
+
+        JsonNode jsonNode = null;
+        HttpResponse response = null;
+        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+        String accountID = null;
+        if (StringUtils.hasText(userEmail) && srvCloudUrls != null)
+        {
+            userEmail = '\'' + userEmail + '\''; // In Parmeter Form
+            if (StringUtils.hasText(srvCloudUrls.getEmpById()))
+            {
+
+                try
+                {
+                    String urlLink = srvCloudUrls.getEmpById() + userEmail;
+
+                    if (StringUtils.hasText(urlLink) && StringUtils.hasText(srvCloudUrls.getToken()))
+                    {
+
+                        try
+                        {
+
+                            URL url = new URL(urlLink);
+                            URI uri = new URI(url.getProtocol(), url.getUserInfo(), IDN.toASCII(url.getHost()),
+                                    url.getPort(), url.getPath(), url.getQuery(), url.getRef());
+                            String correctEncodedURL = uri.toASCIIString();
+
+                            HttpGet httpGet = new HttpGet(correctEncodedURL);
+                            httpGet.setHeader(HttpHeaders.AUTHORIZATION, srvCloudUrls.getToken());
+                            httpGet.addHeader("accept", "application/json");
+                            // Fire the Url
+                            response = httpClient.execute(httpGet);
+
+                            // verify the valid error code first
+                            int statusCode = response.getStatusLine().getStatusCode();
+                            if (statusCode != HttpStatus.SC_OK)
+                            {
+                                throw new RuntimeException("Failed with HTTP error code : " + statusCode);
+                            }
+
+                            // Try and Get Entity from Response
+                            org.apache.http.HttpEntity entity = response.getEntity();
+                            String apiOutput = EntityUtils.toString(entity);
+
+                            // Conerting to JSON
+                            ObjectMapper mapper = new ObjectMapper();
+                            jsonNode = mapper.readTree(apiOutput);
+                            if (jsonNode != null)
+                            {
+                                Iterator<Map.Entry<String, JsonNode>> payloadItr = jsonNode.fields();
+                                while (payloadItr.hasNext())
+                                {
+                                    Map.Entry<String, JsonNode> payloadEnt = payloadItr.next();
+                                    String payloadFieldName = payloadEnt.getKey();
+                                    if (payloadFieldName.equals("value"))
+                                    {
+                                        Iterator<JsonNode> accItr = payloadEnt.getValue().elements();
+                                        while (accItr.hasNext())
+                                        {
+                                            JsonNode accEnt = accItr.next();
+                                            if (accEnt != null)
+                                            {
+
+                                                Iterator<String> fieldNames = accEnt.fieldNames();
+                                                while (fieldNames.hasNext())
+                                                {
+                                                    String accFieldName = fieldNames.next();
+                                                    if (accFieldName.equals("id"))
+                                                    {
+                                                        log.info("Employee Id Added : "
                                                                 + accEnt.get(accFieldName).asText());
                                                         accountID = accEnt.get(accFieldName).asText();
                                                     }
@@ -4235,6 +4357,250 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
 
         return caseConfirmed;
 
+    }
+
+    @Override
+    public String createCase4EmployeeReporter(TY_Case_EmployeeReporter_SrvCloud caseEntity,
+            TY_DestinationProps desProps) throws EX_ESMAPI
+    {
+        String caseId = null;
+
+        if (StringUtils.hasText(caseEntity.getEmployee().getId()))
+        {
+            HttpClient httpclient = HttpClients.createDefault();
+            String casePOSTURL = getPOSTURL4BaseUrl(srvCloudUrls.getCasesUrl());
+            if (StringUtils.hasText(casePOSTURL))
+            {
+
+                HttpPost httpPost = new HttpPost(casePOSTURL);
+                httpPost.setHeader(HttpHeaders.AUTHORIZATION, srvCloudUrls.getToken());
+                httpPost.addHeader("Content-Type", "application/json");
+
+                ObjectMapper objMapper = new ObjectMapper();
+                try
+                {
+                    String requestBody = objMapper.writeValueAsString(caseEntity);
+                    log.info(requestBody);
+
+                    StringEntity entity = new StringEntity(requestBody, ContentType.APPLICATION_JSON);
+                    httpPost.setEntity(entity);
+
+                    // POST Case in Service Cloud
+                    try
+                    {
+                        // Fire the Url
+                        HttpResponse response = httpclient.execute(httpPost);
+                        // verify the valid error code first
+                        int statusCode = response.getStatusLine().getStatusCode();
+                        if (statusCode != HttpStatus.SC_CREATED)
+                        {
+                            HttpEntity entityResp = response.getEntity();
+                            String apiOutput = EntityUtils.toString(entityResp);
+                            log.info(apiOutput);
+                            throw new RuntimeException(
+                                    "Failed with HTTP error code : " + statusCode + " Details: " + apiOutput);
+
+                        }
+
+                        // Try and Get Entity from Response
+                        HttpEntity entityResp = response.getEntity();
+                        String apiOutput = EntityUtils.toString(entityResp);
+
+                        // Conerting to JSON
+                        ObjectMapper mapper = new ObjectMapper();
+                        JsonNode jsonNode = mapper.readTree(apiOutput);
+
+                        if (jsonNode != null)
+                        {
+
+                            JsonNode rootNode = jsonNode.path("value");
+                            if (rootNode != null)
+                            {
+
+                                log.info("Notes Bound!!");
+
+                                Iterator<Map.Entry<String, JsonNode>> payloadItr = jsonNode.fields();
+                                while (payloadItr.hasNext())
+                                {
+                                    log.info("Payload Iterator Bound");
+                                    Map.Entry<String, JsonNode> payloadEnt = payloadItr.next();
+                                    String payloadFieldName = payloadEnt.getKey();
+                                    log.info("Payload Field Scanned:  " + payloadFieldName);
+
+                                    if (payloadFieldName.equals("value"))
+                                    {
+                                        JsonNode caseEnt = payloadEnt.getValue();
+                                        log.info("New Case Entity Bound");
+                                        if (caseEnt != null)
+                                        {
+
+                                            log.info("Case Entity Bound - Reading Case...");
+                                            Iterator<String> fieldNames = caseEnt.fieldNames();
+                                            while (fieldNames.hasNext())
+                                            {
+                                                String caseFieldName = fieldNames.next();
+                                                log.info("Case Entity Field Scanned:  " + caseFieldName);
+                                                if (caseFieldName.equals("displayId"))
+                                                {
+                                                    log.info("Case ID Added : " + caseEnt.get(caseFieldName).asText());
+                                                    if (StringUtils.hasText(caseEnt.get(caseFieldName).asText()))
+                                                    {
+                                                        caseId = caseEnt.get(caseFieldName).asText();
+
+                                                    }
+                                                    break;
+                                                }
+
+                                            }
+
+                                        }
+
+                                    }
+
+                                }
+                            }
+                        }
+
+                    }
+                    catch (IOException e)
+                    {
+                        throw new EX_ESMAPI(msgSrc.getMessage("ERR_NOTES_POST", new Object[]
+                        { e.getLocalizedMessage() }, Locale.ENGLISH));
+                    }
+                }
+                catch (JsonProcessingException e)
+                {
+                    throw new EX_ESMAPI(msgSrc.getMessage("ERR_NEW_NOTES_JSON", new Object[]
+                    { e.getLocalizedMessage() }, Locale.ENGLISH));
+                }
+
+            }
+
+        }
+
+        return caseId;
+    }
+
+    @Override
+    public String createCase4CustomerReporter(TY_Case_CustomerReporter_SrvCloud caseEntity,
+            TY_DestinationProps desProps) throws EX_ESMAPI
+    {
+        String caseId = null;
+
+        if (StringUtils.hasText(caseEntity.getAccount().getId()))
+        {
+            HttpClient httpclient = HttpClients.createDefault();
+            String casePOSTURL = getPOSTURL4BaseUrl(srvCloudUrls.getCasesUrl());
+            if (StringUtils.hasText(casePOSTURL))
+            {
+
+                HttpPost httpPost = new HttpPost(casePOSTURL);
+                httpPost.setHeader(HttpHeaders.AUTHORIZATION, srvCloudUrls.getToken());
+                httpPost.addHeader("Content-Type", "application/json");
+
+                ObjectMapper objMapper = new ObjectMapper();
+                try
+                {
+                    String requestBody = objMapper.writeValueAsString(caseEntity);
+                    log.info(requestBody);
+
+                    StringEntity entity = new StringEntity(requestBody, ContentType.APPLICATION_JSON);
+                    httpPost.setEntity(entity);
+
+                    // POST Case in Service Cloud
+                    try
+                    {
+                        // Fire the Url
+                        HttpResponse response = httpclient.execute(httpPost);
+                        // verify the valid error code first
+                        int statusCode = response.getStatusLine().getStatusCode();
+                        if (statusCode != HttpStatus.SC_CREATED)
+                        {
+                            HttpEntity entityResp = response.getEntity();
+                            String apiOutput = EntityUtils.toString(entityResp);
+                            log.info(apiOutput);
+                            throw new RuntimeException(
+                                    "Failed with HTTP error code : " + statusCode + " Details: " + apiOutput);
+
+                        }
+
+                        // Try and Get Entity from Response
+                        HttpEntity entityResp = response.getEntity();
+                        String apiOutput = EntityUtils.toString(entityResp);
+
+                        // Conerting to JSON
+                        ObjectMapper mapper = new ObjectMapper();
+                        JsonNode jsonNode = mapper.readTree(apiOutput);
+
+                        if (jsonNode != null)
+                        {
+
+                            JsonNode rootNode = jsonNode.path("value");
+                            if (rootNode != null)
+                            {
+
+                                log.info("Notes Bound!!");
+
+                                Iterator<Map.Entry<String, JsonNode>> payloadItr = jsonNode.fields();
+                                while (payloadItr.hasNext())
+                                {
+                                    log.info("Payload Iterator Bound");
+                                    Map.Entry<String, JsonNode> payloadEnt = payloadItr.next();
+                                    String payloadFieldName = payloadEnt.getKey();
+                                    log.info("Payload Field Scanned:  " + payloadFieldName);
+
+                                    if (payloadFieldName.equals("value"))
+                                    {
+                                        JsonNode caseEnt = payloadEnt.getValue();
+                                        log.info("New Case Entity Bound");
+                                        if (caseEnt != null)
+                                        {
+
+                                            log.info("Case Entity Bound - Reading Case...");
+                                            Iterator<String> fieldNames = caseEnt.fieldNames();
+                                            while (fieldNames.hasNext())
+                                            {
+                                                String caseFieldName = fieldNames.next();
+                                                log.info("Case Entity Field Scanned:  " + caseFieldName);
+                                                if (caseFieldName.equals("displayId"))
+                                                {
+                                                    log.info("Case ID Added : " + caseEnt.get(caseFieldName).asText());
+                                                    if (StringUtils.hasText(caseEnt.get(caseFieldName).asText()))
+                                                    {
+                                                        caseId = caseEnt.get(caseFieldName).asText();
+
+                                                    }
+                                                    break;
+                                                }
+
+                                            }
+
+                                        }
+
+                                    }
+
+                                }
+                            }
+                        }
+
+                    }
+                    catch (IOException e)
+                    {
+                        throw new EX_ESMAPI(msgSrc.getMessage("ERR_NOTES_POST", new Object[]
+                        { e.getLocalizedMessage() }, Locale.ENGLISH));
+                    }
+                }
+                catch (JsonProcessingException e)
+                {
+                    throw new EX_ESMAPI(msgSrc.getMessage("ERR_NEW_NOTES_JSON", new Object[]
+                    { e.getLocalizedMessage() }, Locale.ENGLISH));
+                }
+
+            }
+
+        }
+
+        return caseId;
     }
 
     private String getPOSTURL4BaseUrl(String urlBase)

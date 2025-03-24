@@ -2,6 +2,8 @@ package com.sap.cap.esmapi.ui.pojos;
 
 import org.springframework.web.multipart.MultipartFile;
 
+import com.sap.cap.esmapi.utilities.enums.EnumPFCT;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
