@@ -1983,6 +1983,7 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
 
                 }
             }
+            else
             {
                 // Invalid Email Address error handling
                 handleInvalidEmailAddressError();
