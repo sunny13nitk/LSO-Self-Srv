@@ -2190,8 +2190,7 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
         EV_LogMessage logMsgEvent = new EV_LogMessage(this, logMsg);
         applicationEventPublisher.publishEvent(logMsgEvent);
 
-        // Should be handled Centrally via Aspect
-        throw new EX_ESMAPI(msg);
+        this.addFormErrors(msg);// For Form Display
     }
 
     private void handleAttachmentPersistError(TY_CaseEditFormAsync caseFormAsync, Exception e)
