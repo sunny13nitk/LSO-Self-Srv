@@ -285,9 +285,21 @@ public class LSOController
                                                                                                                  // Notes
                 caseForm.setSubject(userSessSrv.getCurrentForm4Submission().getCaseForm().getSubject()); // Curr Subject
 
+                if (StringUtils.hasText(userSessSrv.getCurrentForm4Submission().getCaseForm().getAddEmail())) // Affected
+                                                                                                              // User
+                                                                                                              // email
+                {
+                    caseForm.setAddEmail(userSessSrv.getCurrentForm4Submission().getCaseForm().getAddEmail());
+                }
+
                 if (StringUtils.hasText(userSessSrv.getCurrentForm4Submission().getCaseForm().getCountry()))
                 {
                     caseForm.setCountry(userSessSrv.getCurrentForm4Submission().getCaseForm().getCountry());
+                }
+
+                if (StringUtils.hasText(userSessSrv.getCurrentForm4Submission().getCaseForm().getLanguage()))
+                {
+                    caseForm.setLanguage(userSessSrv.getCurrentForm4Submission().getCaseForm().getLanguage());
                 }
 
                 if (StringUtils.hasText(userSessSrv.getCurrentForm4Submission().getCaseForm().getLanguage()))
