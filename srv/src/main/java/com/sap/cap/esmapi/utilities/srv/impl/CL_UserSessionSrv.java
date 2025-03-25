@@ -1879,7 +1879,7 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
         if (StringUtils.hasText(userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail()))
         {
             if (EmailValidator.getInstance()
-                    .isValid(userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail().trim().toLowerCase()))
+                    .isValid(userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail()))
             {
                 log.info("Email address valid!");
                 // Seek Ind. customer or Employee for Email Address
