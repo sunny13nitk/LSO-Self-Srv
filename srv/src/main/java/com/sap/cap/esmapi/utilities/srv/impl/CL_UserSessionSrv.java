@@ -1982,12 +1982,14 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                     }
 
                 }
-                {
-                    // Invalid Email Address error handling
-                    handleInvalidEmailAddressError();
-                    return false;
-                }
             }
+            else
+            {
+                // Invalid Email Address error handling
+                handleInvalidEmailAddressError();
+                return false;
+            }
+
         }
         return isValid;
     }
