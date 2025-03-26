@@ -93,60 +93,17 @@ public class EV_HDLR_CaseFormSubmit
 
                                                 if (!evCaseFormSubmit.getPayload().getCaseForm().isEmployee())
                                                 {
+                                                        newCaseEntity4Customer = new TY_Case_Customer_SrvCloud();
+                                                        // Account must be present
                                                         if (StringUtils.hasText(evCaseFormSubmit.getPayload()
-                                                                        .getCaseForm().getReporter()))
+                                                                        .getCaseForm().getAccId()))
                                                         {
-                                                                log.info("External User -- Reporter as Ind. Customer Scenario");
-                                                                // Only Individual Customer(s) as Reporters for External
-                                                                // Scenario
-                                                                createCase4IndCustomerReporter(evCaseFormSubmit,
-                                                                                desProps, cusItemO);
-                                                        }
-                                                        else
-                                                        {
-                                                                log.info("External User -- Ind. Customer Scenario");
-                                                                createCase4IndCustomer(evCaseFormSubmit, desProps,
-                                                                                cusItemO);
-                                                        }
-
-                                                }
-                                                else // Case Create for an Employee
-                                                {
-                                                        if (StringUtils.hasText(evCaseFormSubmit.getPayload()
-                                                                        .getCaseForm().getReporter()))
-                                                        {
-
-                                                                log.info("Internal User -- Reporter Exists Scenario");
-                                                                createCase4EmployeeReporter(evCaseFormSubmit, desProps,
-                                                                                cusItemO);
-
-                                                        }
-                                                        else
-                                                        {
-                                                                createCase4Employee(evCaseFormSubmit, desProps,
-                                                                                cusItemO);
-                                                        }
-
-                                                }
-                                        }
-
-                                }
-                        }
-                }
-
-        }
-
-        private void createCase4Employee(EV_CaseFormSubmit evCaseFormSubmit, TY_DestinationProps desProps,
-                        Optional<TY_CatgCusItem> cusItemO)
-        {
-                TY_Case_Employee_SrvCloud newCaseEntity4Employee;
-                newCaseEntity4Employee = new TY_Case_Employee_SrvCloud();
-                // Account must be present
-                if (StringUtils.hasText(evCaseFormSubmit.getPayload().getCaseForm().getAccId()))
-                {
-                        newCaseEntity4Employee.setEmployee(new TY_Employee_CaseCreate(
-                                        evCaseFormSubmit.getPayload().getCaseForm().getAccId())); // Account
-                                                                                                  // ID
+                                                                newCaseEntity4Customer
+                                                                                .setAccount(new TY_Account_CaseCreate(
+                                                                                                evCaseFormSubmit.getPayload()
+                                                                                                                .getCaseForm()
+                                                                                                                .getAccId())); // Account
+                                                                                                                               // ID
 
                         // Case Txn. Type
                         newCaseEntity4Employee
