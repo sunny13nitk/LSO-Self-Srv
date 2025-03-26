@@ -93,12 +93,43 @@ public class EV_HDLR_CaseFormSubmit
 
                                                 if (!evCaseFormSubmit.getPayload().getCaseForm().isEmployee())
                                                 {
-                                                        createCase4IndCustomer(evCaseFormSubmit, desProps, cusItemO);
+                                                        if (StringUtils.hasText(evCaseFormSubmit.getPayload()
+                                                                        .getCaseForm().getReporter()))
+                                                        {
+                                                                // Only Individual Customer(s) as Reporters for External
+                                                                // Scenario
+                                                                createCase4IndCustomerReporter(evCaseFormSubmit,
+                                                                                desProps, cusItemO);
+                                                        }
+                                                        else
+                                                        {
+                                                                createCase4IndCustomer(evCaseFormSubmit, desProps,
+                                                                                cusItemO);
+                                                        }
 
                                                 }
                                                 else // Case Create for an Employee
                                                 {
-                                                        createCase4Employee(evCaseFormSubmit, desProps, cusItemO);
+                                                        if (StringUtils.hasText(evCaseFormSubmit.getPayload()
+                                                                        .getCaseForm().getReporter()))
+                                                        {
+                                                                if (evCaseFormSubmit.getPayload().getCaseForm()
+                                                                                .isReporterEmployee())
+                                                                {
+                                                                        createCase4EmployeeReporter(evCaseFormSubmit,
+                                                                                        desProps, cusItemO);
+                                                                }
+                                                                else
+                                                                {
+                                                                        createCase4IndCustomerReporter(evCaseFormSubmit,
+                                                                                        desProps, cusItemO);
+                                                                }
+                                                        }
+                                                        else
+                                                        {
+                                                                createCase4Employee(evCaseFormSubmit, desProps,
+                                                                                cusItemO);
+                                                        }
 
                                                 }
                                         }
