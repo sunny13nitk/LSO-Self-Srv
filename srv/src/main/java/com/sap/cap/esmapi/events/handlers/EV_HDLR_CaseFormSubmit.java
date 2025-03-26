@@ -96,6 +96,7 @@ public class EV_HDLR_CaseFormSubmit
                                                         if (StringUtils.hasText(evCaseFormSubmit.getPayload()
                                                                         .getCaseForm().getReporter()))
                                                         {
+                                                                log.info("External User -- Reporter as Ind. Customer Scenario");
                                                                 // Only Individual Customer(s) as Reporters for External
                                                                 // Scenario
                                                                 createCase4IndCustomerReporter(evCaseFormSubmit,
@@ -103,6 +104,7 @@ public class EV_HDLR_CaseFormSubmit
                                                         }
                                                         else
                                                         {
+                                                                log.info("External User -- Ind. Customer Scenario");
                                                                 createCase4IndCustomer(evCaseFormSubmit, desProps,
                                                                                 cusItemO);
                                                         }
@@ -113,17 +115,11 @@ public class EV_HDLR_CaseFormSubmit
                                                         if (StringUtils.hasText(evCaseFormSubmit.getPayload()
                                                                         .getCaseForm().getReporter()))
                                                         {
-                                                                if (evCaseFormSubmit.getPayload().getCaseForm()
-                                                                                .isReporterEmployee())
-                                                                {
-                                                                        createCase4EmployeeReporter(evCaseFormSubmit,
-                                                                                        desProps, cusItemO);
-                                                                }
-                                                                else
-                                                                {
-                                                                        createCase4IndCustomerReporter(evCaseFormSubmit,
-                                                                                        desProps, cusItemO);
-                                                                }
+
+                                                                log.info("Internal User -- Reporter Exists Scenario");
+                                                                createCase4EmployeeReporter(evCaseFormSubmit, desProps,
+                                                                                cusItemO);
+
                                                         }
                                                         else
                                                         {
