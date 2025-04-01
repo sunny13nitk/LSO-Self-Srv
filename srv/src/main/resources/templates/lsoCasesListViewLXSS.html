@@ -196,7 +196,7 @@
 
       .all-cases-title {
          font-size: 28px;
-         margin: 52px 0;
+         margin-left: 52px 0;
          font-family: BentonSans-Regular, sans-serif;
       }
 
@@ -488,27 +488,20 @@
 
       </div>
 
-      <div class="row flex-justify-center mt-10" th:if="${userInfo.cases == null}">
-         <div class="remark primary ">
-            <h6>No Cases could be identified for you! You can however create a new Case/Service Request using Create
-               Case button.</h6>
-         </div>
-      </div>
-
-      <!--Create Case Row - Starts  -->
-      <div class="row flex-justify-end">
-         <a href="#" class="create-case-btn ds-button ds-button--primary" th:href="@{'/lso/createCase/'}" role="button">
-            Create Case
-         </a>
-      </div>
-      <!--Create Case Row - Ends  -->
-
       <!--Table Row - Starts  -->
-      <div class="row mt-5" th:if="${userInfo.cases != null}">
-         <h1 class="all-cases-title">
-            All Cases
-         </h1>
-         <div class="colspan-12">
+      <div class="row mt-5">
+         <div class="colspan-10">
+            <h1 class="all-cases-title">All Cases</h1>
+         </div>
+         <div class="colspan-2">
+            <a href="#" class="create-case-btn ds-button ds-button--primary" th:href="@{'/lso/createCase/'}"
+               role="button" style="margin-top: 5px;">
+               Create Case
+            </a>
+         </div>
+
+
+         <div class="colspan-12" th:if="${userInfo.cases != null}">
             <table class="table compact table-border row-hover" id="t-inspector" data-role="table"
                data-show-search="true" data-show-rows-steps="false" data-table-search-title="Filter Cases:"
                data-search-min-length="1" data-search-threshold="300" data-rows="10"
@@ -564,6 +557,13 @@
 
             <p class="h5 text-center info-wrapper"></p>
             <div class="d-flex flex-justify-center pagination-wrapper"></div>
+         </div>
+
+         <div class="row flex-justify-center mt-10" th:if="${userInfo.cases == null}">
+            <div class="remark primary ">
+               <h6>No Cases could be identified for you! You can however create a new Case/Service Request using Create
+                  Case button.</h6>
+            </div>
          </div>
       </div>
       <!--Table Row - Ends -->
