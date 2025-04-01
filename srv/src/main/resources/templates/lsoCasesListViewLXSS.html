@@ -493,6 +493,14 @@
          <h1 class="all-cases-title">
             All Cases
          </h1>
+         <!--Create Case Row - Starts  -->
+         <div class="row flex-justify-end">
+            <a href="#" class="create-case-btn ds-button ds-button--primary" th:href="@{'/lso/createCase/'}"
+               role="button">
+               Create Case
+            </a>
+         </div>
+         <!--Create Case Row - Ends  -->
          <div class="colspan-12">
             <table class="table compact table-border row-hover" id="t-inspector" data-role="table"
                data-show-search="true" data-show-rows-steps="false" data-table-search-title="Filter Cases:"
@@ -560,13 +568,7 @@
          </div>
       </div>
 
-      <!--Create Case Row - Starts  -->
-      <div class="row">
-         <a href="#" class="create-case-btn ds-button ds-button--primary" th:href="@{'/lso/createCase/'}" role="button">
-            Create Case
-         </a>
-      </div>
-      <!--Create Case Row - Ends  -->
+
    </div>
 
 
