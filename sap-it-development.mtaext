@@ -52,6 +52,8 @@ modules:
       keep-existing-routes: true
       disk-quota: 1024M
       memory: 256M
+    properties:
+      COOKIE_BACKWARD_COMPATIBILITY: true 
     routes:  
       - route: "lso_ssrv_app-dev.cfapps.eu10-004.hana.ondemand.com"
     requires:

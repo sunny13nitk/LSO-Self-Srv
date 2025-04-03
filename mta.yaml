@@ -50,6 +50,8 @@ modules:
       keep-existing-routes: true
       disk-quota: 1024M
       memory: 256M
+    properties:
+      COOKIE_BACKWARD_COMPATIBILITY: true
     requires:
       - name: iESM-destination-services
       - name: srv-api
@@ -85,4 +87,4 @@ resources:
       path: ./destination-dev.json
     type: org.cloudfoundry.managed-service
   - name: dynatrace-service
-    type: org.cloudfoundry.existing-service    
+    type: org.cloudfoundry.existing-service

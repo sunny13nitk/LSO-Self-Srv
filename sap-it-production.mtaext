@@ -54,6 +54,8 @@ modules:
       memory: 512M
       routes:
         - route: "lso_ssrv-app.cfapps.eu10-004.hana.ondemand.com"
+    properties:
+      COOKIE_BACKWARD_COMPATIBILITY: true        
     requires:
       - name: srv-api
         group: destinations
