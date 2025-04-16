@@ -7,7 +7,11 @@
       "target": "/lso",
       "destination": "srv-api",
       "authenticationType": "xsuaa",
-      "cacheControl": "no-cache, no-store, must-revalidate"
+      "cacheControl": "no-cache, no-store, must-revalidate",
+      "scope": [
+      "$XSAPPNAME.EmployeesRole",
+      "$XSAPPNAME.ExternalsRole"
+      ]
     },
     {
       "source": "^/post",
@@ -15,7 +19,11 @@
       "destination": "srv-api",
       "authenticationType": "xsuaa",
       "cacheControl": "no-cache, no-store, must-revalidate",
-      "csrfProtection": false
+      "csrfProtection": false,
+      "scope": [
+        "$XSAPPNAME.EmployeesRole",
+        "$XSAPPNAME.ExternalsRole"
+        ]
     },
     {
       "source": "^/logout",
