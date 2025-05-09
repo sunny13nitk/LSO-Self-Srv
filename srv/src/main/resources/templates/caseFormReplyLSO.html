@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+   <!-- Required meta tags -->
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+   <title>SAP Learning Self Service App</title>
+   <!-- Metro 4 -->
+   <link rel="stylesheet" href="https://cdn.metroui.org.ua/v4.3.2/css/metro-all.min.css">
+
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+
+<body>
+
+   <div class="frame" style="padding: 20px;  overflow: auto; background-color: #FFFFFF">
+
+      <div class="row flex-justify-center">
+
+         <!--Title Head - Begin -->
+         <div class="colspan-5">
+            <h2 style="color: #54627B; margin: 10px; margin-left: 20px">
+               <span class="mif-contacts-mail"></span> SAP Learning Self Service(s)
+            </h2>
+         </div>
+
+         <!-- User Information Card -->
+         <div class="colspan-3 offset-2" th:if="${userInfo.userDetails != null}">
+
+            <div class="icon-box border bd-default">
+               <div class="icon bg-cyan fg-white"><span class="mif-user-check"></span></div>
+               <div class="content p-4">
+                  <div class="text-upper">
+                     <label style="color: #224563; font-weight: bold; font-size: 1.15em; margin-left: 7px"
+                        th:text="${userInfo.userDetails.userId}">
+                     </label>
+                  </div>
+                  <div class="text-upper text-bold text-lead">
+                     <label style="color: #224563; font-weight: bold; font-size: 1.15em; margin-left: 7px"
+                        th:text="${userInfo.userDetails.userName}">
+                     </label>
+                  </div>
+               </div>
+            </div>
+
+         </div>
+
+
+      </div>
+
+      <!-- Form Row - Begin  -->
+
+      <div class="row flex-justify-center" th:if="${caseEditForm.getCaseDetails().caseId != null}">
+
+
+         <!--Error Messages Row - Starts -->
+
+         <div class="col-xs-15">
+            <div th:if="${formErrors != null}">
+               <!-- Check for Form error -->
+               <div th:if="${formErrors.size() > 0}" data-role="panel"
+                  data-title-caption="Case Form Validation Error(s)" data-collapsed="true" data-collapsible="true"
+                  data-cls-panel="shadow-3" data-cls-title="bg-lightRed fg-white"
+                  data-cls-content="bg-lightRed fg-white">
+
+                  <div class="cell-11">
+                     <table class="table  table compact">
+                        <tbody>
+                           <tr th:each="msg : ${formErrors}">
+
+                              <td style="text-align: left; padding: 8px;" th:text="${msg}"></td>
+                           </tr>
+                        </tbody>
+                     </table>
+
+                  </div>
+               </div>
+
+
+            </div>
+         </div>
+
+         <!--Error Messages Row - Ends -->
+
+         <!-- Form - Begin -->
+
+
+         <div class="colspan-10 " style="margin-top: 5px; padding: 2px">
+            <div class="card">
+               <!-- Top Row -->
+
+               <div class="row d-flex flex-justify-left">
+                  <div class="cell-2">
+
+                     <h4 style="color: #54627B; margin: 10px; margin-top: 27px; vertical-align: bottom;">Case ID :
+                        <span style="color: #B1365B; vertical-align: bottom;"
+                           th:text="${caseEditForm.getCaseDetails().caseId}"></span>
+                     </h4>
+                  </div>
+
+                  <div class="cell-9">
+                     <span class="remark dark" th:if="${caseEditForm.getCaseDetails().description != null}"
+                        th:text="${caseEditForm.getCaseDetails().description }">
+                     </span>
+                  </div>
+
+                  <!-- Customize Button - Col Start -->
+                  <div class="cell -1" style="margin-left: 10px; margin-top: 27px">
+                     <a href="#" class="button primary rounded outline" th:href="@{/lso/}" role="button"> <span
+                           class="mif-backward icon" style="margin-left: 0px"></span> <span
+                           style="margin-left: 3px">Back</span>
+                     </a>
+                  </div>
+                  <!-- Customize Button - Col End -->
+
+
+               </div>
+
+               <!-- Form -->
+               <form th:object="${caseEditForm}" enctype="multipart/form-data" th:action="@{/lso/saveCaseReply}"
+                  method="post">
+
+                  <!-- Hidden Fields - Carried over in Form to Controller -->
+                  <input type="hidden" th:field="*{caseDetails.caseId}" />
+                  <input type="hidden" th:field="*{caseDetails.caseGuid}" />
+                  <input type="hidden" th:field="*{caseDetails.caseType}" />
+                  <input type="hidden" th:field="*{caseDetails.origin}" />
+                  <input type="hidden" th:field="*{caseDetails.status}" />
+                  <input type="hidden" th:field="*{caseDetails.description}" />
+                  <input type="hidden" th:field="*{caseDetails.eTag}" />
+
+                  <!-- <input type="hidden" th:field="*{caseDetails.statusTransitionCFG}" /> -->
+                  <!-- Hidden Fields - Carried over in Form to Controller -->
+
+                  <h6 style="color: #325254; background-color: aliceBlue; padding: 10px; margin: 10px;">Past
+                     Interactions
+                     (<span th:text="*{caseDetails.notes.size()}"></span>) -
+                     Latest First
+                  </h6>
+
+
+                  <div th:if="*{caseDetails.statusTransitionCFG.transCfg.editAllowed == true}"
+                     class="colspan-9 offset-1" style="margin-top: 15px; margin-bottom: 10px">
+                     <label>Reply</label>
+
+                     <p id="chars-counter" style="margin-top: -1px">You enter 0 char(s)</p>
+                     <textarea data-role="textarea" data-prepend="<span class='mif-leanpub mif-3x'></span>"
+                        data-cls-prepend="bg-light" th:field="*{reply}" data-chars-counter="#chars-counter"
+                        data-chars-counter-template="You enter $1 char(s)"
+                        data-clear-button-icon="<span class='mif-cross fg-black'></span>">
+                     </textarea>
+
+                     <small class="text-muted">Enter your response here. </small>
+                  </div>
+
+                  <!-- Notes Iterations - Begin -->
+                  <div th:each="note,iterStat: *{caseDetails.notes}">
+
+                     <div style="margin-top: 10px;"></div>
+                     <div th:if="${note != null && iterStat.index == 0}" data-role="panel"
+                        data-title-caption="Interaction" data-cls-panel="shadow-1"
+                        data-title-icon="<span class='mif-apps'></span>" data-collapsed="false" data-collapsible="true"
+                        data-cls-title="bg-lightGray fg-black" data-cls-content="bg-transparent fg-black"
+                        class="colspan-9 offset-1">
+
+                        <div th:if="${note.content != null}">
+                           <div>
+
+                              <h6 style="color: #325254" th:if="${note.createdByName != null}">
+                                 <span style="margin-left: 10px;" class="mif-user fg-blue"></span>
+                                 <span style="margin-left: 5px;"
+                                    th:text="${#strings.arraySplit(note.createdByName,' ')[0]  + ' , SAP Learning Support Team' }"></span>
+                                 <span style="margin-left: 20px;" class="mif-alarm-on fg-blue"></span>
+                                 <span style="margin-left: 5px;"
+                                    th:text="${#temporals.format(note.timestamp, 'yyyy-MM-dd HH:mm:ss')}"></span>
+                              </h6>
+
+
+                           </div>
+
+                           <div th:utext="${note.content}">
+
+                           </div>
+
+                           <!-- </div> -->
+
+                        </div>
+
+                     </div>
+
+                     <div th:if="${note != null && iterStat.index > 0}" data-role="panel"
+                        data-title-caption="Interaction" data-cls-panel="shadow-1"
+                        data-title-icon="<span class='mif-apps'></span>" data-collapsed="true" data-collapsible="true"
+                        data-cls-title="bg-lightGray fg-black" data-cls-content="bg-transparent fg-black"
+                        class="colspan-9 offset-1">
+
+                        <div th:if="${note.content != null}">
+                           <!-- <div class="row colspan-9 offset-1"> -->
+                           <div>
+
+                              <h6 style="color: #325254" th:if="${note.createdByName != null}">
+                                 <span style="margin-left: 10px;" class="mif-user fg-blue"></span>
+                                 <span style="margin-left: 5px;"
+                                    th:text="${#strings.arraySplit(note.createdByName,' ')[0]  + ' , SAP Learning Support Team' }"></span>
+                                 <span style="margin-left: 20px;" class="mif-alarm-on fg-blue"></span>
+                                 <span style="margin-left: 5px;"
+                                    th:text="${#temporals.format(note.timestamp, 'yyyy-MM-dd HH:mm:ss')}"></span>
+                              </h6>
+
+
+                           </div>
+
+                           <div th:utext="${note.content}">
+
+                           </div>
+
+                           <!-- </div> -->
+
+                        </div>
+
+                     </div>
+
+                  </div>
+
+                  <div th:if="*{caseDetails.statusTransitionCFG.transCfg.editAllowed == true}"
+                     class="colspan-9 offset-1" style="margin-top: 15px; margin-bottom: 10px">
+                     <label>Attachment(s) - Choose the File and Upload to Attach to the Case</label>
+
+                     <div class="row" style="margin-top: 10px;">
+
+                        <div class="cell-10 flex-align-self-start">
+                           <input type="file" data-role="file" name="attachment" th:field="*{attachment}"
+                              data-mode="drop">
+
+                           <small class="text-muted">Max file size allowed : <span style="color: #B1365B"
+                                 th:text="${attSize}"></span> MB! </small>
+                        </div>
+
+                        <div class="cell-1 flex-align-self-end">
+                           <button class="button rounded primary outline" name="action" value="upload"
+                              style="margin-top: 70px">
+                              <span class="mif-file-upload" style="margin-left: 0px"> </span> <span
+                                 style="margin-left: 3px">Upload</span>
+                           </button>
+
+
+                        </div>
+
+                        <div class="colspan-9 offset-1" style="margin-top: 5px; margin-bottom: 10px"
+                           th:if="${attachments != null}">
+                           <div th:if="${attachments.size() > 0}">
+
+                              <table class="table  table-border compact striped">
+                                 <thead>
+                                    <tr>
+                                       <th style="text-align: center;">File(s)</th>
+                                       <th data-cls-column=" text-left">Action(s)</th>
+                                    </tr>
+                                 </thead>
+                                 <tbody>
+                                    <tr th:each="file : ${attachments}">
+
+                                       <td style="text-align: left" th:text="${file}"></td>
+                                       <td>
+                                          <a href="#" class="button alert mini rounded outline"
+                                             th:href="@{'/lso/caseReply/removeAttachment/' + ${file}}" role="button"
+                                             data-role="hint" data-hint-position="right" data-cls-hint="fg-black"
+                                             data-hint-text="Remove Attachment">
+                                             <span class="mif-bin icon" style="margin-left: 0px"></span> <span
+                                                style="margin-left: 3px">Delete</span></a>
+                                       </td>
+                                    </tr>
+                                 </tbody>
+                              </table>
+                           </div>
+                        </div>
+
+
+
+                     </div>
+
+
+                     <div th:if="*{caseDetails.statusTransitionCFG.transCfg.editAllowed == true}"
+                        class="d-flex flex-row-r" style="margin-top: 30px; margin-bottom: 10px; margin-right: 20px;">
+                        <button class="button rounded " style="color: #004466; background: #00ffb3" data-role="hint"
+                           data-hint-position="top" data-cls-hint="fg-black" data-hint-text="Submit Reply" name="action"
+                           value="saveCaseEdit">
+                           <span class="mif-reply_all" style="margin-left: 0px"> </span> <span
+                              style="margin-left: 3px">Reply</span>
+                        </button>
+
+
+                        <a href="#" class="button rounded "
+                           style="color: #004466; background: #FF004C; margin-left: 10px; margin-right: 20px;"
+                           data-role="hint" th:href="@{/lso/}" role="button" data-hint-position="top"
+                           data-cls-hint="fg-black" data-hint-text="Cancel Case Submission.">
+                           <span class="mif-cancel" style="margin-left: 0px">
+                           </span>
+                           <span style="margin-left: 3px">Cancel
+                           </span>
+                        </a>
+
+
+                     </div>
+
+               </form>
+
+
+            </div>
+         </div>
+
+
+
+
+
+
+
+
+      </div>
+
+      <!-- Form Row - Ends -->
+
+
+
+
+
+
+
+   </div>
+
+
+
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+   <script th:inline="javascript">
+
+      $('#dropDown').change(function ()
+      {
+         $('#refresh').prop('disabled', $(this).val() === "")
+      });
+
+   </script>
+
+   <!-- Metro 4 -->
+   <script src="https://cdn.metroui.org.ua/v4.3.2/js/metro.min.js"></script>
+</body>
+
+</html>

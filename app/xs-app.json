@@ -1,0 +1,67 @@
+{
+  "welcomeFile": "index.html",
+  "authenticationMethod": "route",
+  "routes": [
+    {
+      "source": "^/lso",
+      "target": "/lso",
+      "destination": "srv-api",
+      "authenticationType": "xsuaa",
+      "cacheControl": "no-cache, no-store, must-revalidate",
+      "scope": [
+      "$XSAPPNAME.EmployeesRole",
+      "$XSAPPNAME.ExternalsRole"
+      ]
+    },
+    {
+      "source": "^/post",
+      "target": "/post",
+      "destination": "srv-api",
+      "authenticationType": "xsuaa",
+      "cacheControl": "no-cache, no-store, must-revalidate",
+      "csrfProtection": false,
+      "scope": [
+        "$XSAPPNAME.EmployeesRole",
+        "$XSAPPNAME.ExternalsRole"
+        ]
+    },
+    {
+      "source": "^/logout",
+      "target": "/logout",
+      "destination": "srv-api",
+      "authenticationType": "none"
+    },
+    {
+      "source": "^/api",
+      "target": "/api",
+      "destination": "srv-api",
+      "authenticationType": "xsuaa",
+      "cacheControl": "no-cache, no-store, must-revalidate"
+    },
+    {
+      "source": "^/login(.*)",
+      "target": "/login$1",
+      "destination": "srv-api",
+      "authenticationType": "xsuaa",
+      "cacheControl": "no-cache, no-store, must-revalidate"
+    },
+    {
+      "source": "^/common-navigation-api/(.*)$",
+      "target": "/common-navigation-api/$1",
+      "destination": "common_navigation_samlauth",
+      "authenticationType": "xsuaa"
+    },
+    {
+      "source": "^/assets/newlxp-components/(.*)$",
+      "target": "/assets/newlxp-components/$1",
+      "destination": "common_navigation_resources",
+      "authenticationType": "none"
+    },
+    {
+      "source": "^/web-components.js$",
+      "target": "/web-components.js",
+      "destination": "common_navigation_resources",
+      "authenticationType": "none"
+    }
+  ]
+}

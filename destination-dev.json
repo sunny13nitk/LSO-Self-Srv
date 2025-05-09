@@ -1,0 +1,20 @@
+{
+    "HTML5Runtime_enabled": true,
+    "version": "1.0.0",
+    "init_data": {
+        "instance": {
+            "existing_destinations_policy": "ignore",
+            "destinations": [
+                {
+                    "Name": "common_navigation_resources",
+                    "Description": "common_navigation_resources",
+                    "Authentication": "NoAuthentication",
+                    "ProxyType": "Internet",
+                    "Type": "HTTP",
+                    "URL": "https://newlxp-components-prod.cfapps.eu10.hana.ondemand.com/"
+                  
+                }
+            ]
+        }
+    }
+}

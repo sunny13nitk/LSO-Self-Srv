@@ -1,0 +1,58 @@
+{
+  "xsappname": "lso-selfsrv",
+  "oauth2-configuration": {
+    "credential-types": [
+      "instance-secret",
+      "binding-secret"
+    ],
+    "redirect-uris": [
+      "https://*.cfapps.eu10-004.hana.ondemand.com/login/callback",
+      "https://*.cfapps.eu10-004.hana.ondemand.com/**"
+    ]
+  },
+  "tenant-mode": "dedicated",
+  "scopes": [
+    {
+      "name": "$XSAPPNAME.EmployeesRole",
+      "description": "LSO Self Service - Employees"
+    },
+    {
+      "name": "$XSAPPNAME.ExternalsRole",
+      "description": "LSO Self Service - Externals"
+    }
+  ],
+  "role-templates": [
+    {
+      "name": "LSOSSRV-EMP",
+      "description": "generated",
+      "scope-references": [
+        "$XSAPPNAME.EmployeesRole"
+      ]
+    },
+    {
+      "name": "LSOSSRV-CTR",
+      "description": "generated",
+      "scope-references": [
+        "$XSAPPNAME.ExternalsRole"
+      ]
+    }
+  ],
+  "role-collections": [
+    {
+      "name": "SVC_ESM_EMPLOYEE_LSO_SELFSRV",
+      "description": "LSO Portal Access for Employees - I/D/C Users",
+      "role-template-references": [
+        "$XSAPPNAME.LSOSSRV-EMP"
+      ]
+    },
+    {
+      "name": "SVC_ESM_CONTRACTOR_LSO_SELFSRV",
+      "description": "LSO Externals - P/S Users",
+      "role-template-references": [
+        "$XSAPPNAME.LSOSSRV-CTR"
+      ]
+    }
+  ],
+  "attributes": [],
+  "authorities-inheritance": false
+}

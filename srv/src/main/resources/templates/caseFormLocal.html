@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+   <!-- Required meta tags -->
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+   <title>Employee Self Service App</title>
+   <!-- Metro 4 -->
+   <link rel="stylesheet" href="https://cdn.metroui.org.ua/v4.3.2/css/metro-all.min.css">
+
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+
+<body>
+
+   <div class="frame" style="padding: 20px;  overflow: auto; background-color: #FFFFFF">
+
+      <div class="row flex-justify-center">
+
+         <!--Title Head - Begin -->
+         <div class="colspan-5">
+            <h2 style="color: #54627B; margin: 10px; margin-left: 20px">
+               <span class="mif-contacts-mail"></span> Employee Self Service(s)
+            </h2>
+         </div>
+
+         <!-- User Information Card -->
+         <div class="colspan-3 offset-2" th:if="${userInfo.userDetails != null}">
+
+            <div class="icon-box border bd-default">
+               <div class="icon bg-cyan fg-white"><span class="mif-user-check"></span></div>
+               <div class="content p-4">
+                  <div class="text-upper">
+                     <label style="color: #224563; font-weight: bold; font-size: 1.15em; margin-left: 7px"
+                        th:text="${userInfo.userDetails.userId}">
+                     </label>
+                  </div>
+                  <div class="text-upper text-bold text-lead">
+                     <label style="color: #224563; font-weight: bold; font-size: 1.15em; margin-left: 7px"
+                        th:text="${userInfo.userDetails.userName}">
+                     </label>
+                  </div>
+               </div>
+            </div>
+
+         </div>
+
+
+      </div>
+
+      <!-- Form Row - Begin  -->
+
+      <div class="row flex-justify-center" th:if="${caseForm.getAccId() != null}">
+
+
+         <!--Error Messages Row - Starts -->
+
+         <div class="col-xs-15">
+            <div th:if="${formError != null}">
+
+               <!-- Check for Form error -->
+
+               <div class="remark alert" style="padding-top: 10px; margin: 2px">
+                  <label th:text="'Error Creating Case : ' + ${formError}"></label>
+               </div>
+            </div>
+         </div>
+
+         <!--Error Messages Row - Ends -->
+
+         <!-- Form - Begin -->
+
+
+         <div class="colspan-10 offset-1" style="margin-top: 5px">
+            <div class="card">
+
+               <h6 style="color: #54627B; margin-left: 10px">Create new Case.
+                  <span style="color: #B1365B" th:text="${caseTypeStr}"></span> !
+               </h6>
+               <form th:object="${caseForm}" enctype="multipart/form-data" th:action="@{/esslocal/saveCase}"
+                  method="post">
+
+
+                  <input type="hidden" th:field="*{accId}" />
+                  <input type="hidden" th:field="*{caseTxnType}" />
+                  <div class="colspan-9 offset-1" style="margin-top: 15px; margin-bottom: 10px;">
+                     <label>Subject </label> <input class="metro-input input-large" type="text" data-role="input"
+                        data-prepend="<span style = 'padding-top:7px' class='mif-event-available mif-3x'></span>"
+                        title="" th:field="*{subject}" />
+                     <small class="text-muted">Enter
+                        Issue Main Description. </small>
+                  </div>
+
+                  <div class="colspan-9 offset-1" style="margin-top: 5px; margin-bottom: 10px"
+                     th:if="${catgsList != null}">
+                     <label>Service Category </label>
+                     <select name="catgDesc" data-role="select" th:field="*{catgDesc}" data-cls-option="fg-grayMouse"
+                        data-cls-selected-item="bg-teal fg-white" data-random-color="true">
+
+                        <option th:each="catg : ${catgsList}" th:value="${catg.id}" th:selected="${catg.id}"
+                           th:text="${catg.parentName != null} ? ${catg.parentName} + '>' +${catg.name}: ${catg.name}">
+
+                        </option>
+
+
+                     </select>
+                     <small class="text-muted">Select Service Category from dropdown. </small>
+
+                  </div>
+                  
+
+                  <div class="colspan-9 offset-1" style="margin-top: 35px; margin-bottom: 10px">
+                     <label>Description</label>
+                     <p id="chars-counter" style="margin-top: -1px">You enter 0 char(s)</p>
+                     <textarea data-role="textarea" data-prepend="<span class='mif-leanpub mif-3x'></span>"
+                        data-cls-prepend="bg-light" th:field="*{description}" data-chars-counter="#chars-counter"
+                        data-chars-counter-template="You enter $1 char(s)"
+                        data-clear-button-icon="<span class='mif-cross fg-black'></span>">
+                           </textarea>
+                     <small class="text-muted">Enter Issue Description in detail. </small>
+                  </div>
+
+                  <div class="colspan-9 offset-1" style="margin-top: 5px; margin-bottom: 10px">
+                     <label>Attachment</label>
+                     <input type="file" data-role="file" name="attachment" th:field="*{attachment}" data-mode="drop">
+
+                  </div>
+
+
+
+                  <div class="d-flex flex-row-r" style="margin-top: 30px; margin-bottom: 10px; margin-right: 20px;">
+                     <button class="button rounded " style="color: #004466; background: #00ffb3" data-role="hint"
+                        data-hint-position="top" data-cls-hint="fg-black" data-hint-text="Submit the Case">
+                        <span class="mif-beenhere" style="margin-left: 0px"> </span> <span
+                           style="margin-left: 3px">Submit</span>
+                     </button>
+
+
+                     <a href="#" class="button rounded "
+                        style="color: #004466; background: #FF004C; margin-left: 10px; margin-right: 20px;"
+                        data-role="hint" th:href="@{/esslocal/}" role="button" data-hint-position="top"
+                        data-cls-hint="fg-black" data-hint-text="Cancel Case Submission.">
+                        <span class="mif-cancel" style="margin-left: 0px">
+                        </span>
+                        <span style="margin-left: 3px">Cancel
+                        </span>
+                     </a>
+
+
+                  </div>
+               </form>
+            </div>
+         </div>
+
+
+
+
+
+
+
+
+      </div>
+
+      <!-- Form Row - Ends -->
+
+
+
+
+
+
+
+   </div>
+
+
+
+
+
+   <!-- Metro 4 -->
+   <script src="https://cdn.metroui.org.ua/v4.3.2/js/metro.min.js"></script>
+</body>
+
+</html>

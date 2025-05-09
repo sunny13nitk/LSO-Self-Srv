@@ -1,0 +1,38 @@
+﻿guildlvl1,guidlvl2,description
+a1e4bd81-9a45-40dc-b3e9-0ca708b43888,,SAP Certification
+df7e52a4-1424-4439-9422-59c3c1acd1be,,SAP Learning Journey Service
+4f47b457-ed1f-412b-ac4b-5e02da39813e,,SAP Learning
+8ff6b6db-e3a7-426f-be8f-6247e441eea5,,SAP Learning Hub
+7079a6e8-3be6-460a-99ac-843eccae03b6,,SAP Learning System Access
+ef6d3a35-e363-49da-9035-bf604839c57f,,SAP Virtual Event Services
+a1e4bd81-9a45-40dc-b3e9-0ca708b43888,d50f08ca-3450-4371-8dc2-3ea879eb073e,SAP Certification>>Booking & Consulting
+a1e4bd81-9a45-40dc-b3e9-0ca708b43888,ef741f2c-e989-4658-aed5-5642db322539,SAP Certification>>Badge Expired
+a1e4bd81-9a45-40dc-b3e9-0ca708b43888,550c971a-0992-43ce-a862-92420d9e6874,SAP Certification>>Digital Badge Missing
+a1e4bd81-9a45-40dc-b3e9-0ca708b43888,d6059e8a-96ac-459b-bb9c-e98e70561889,SAP Certification>>Downtime
+a1e4bd81-9a45-40dc-b3e9-0ca708b43888,cc1db2dc-584e-4714-8d33-5107990097b7,SAP Certification>>Exam Content
+a1e4bd81-9a45-40dc-b3e9-0ca708b43888,d0ade545-9cc1-4bb6-8b94-c84612f435ae,SAP Certification>>Other
+a1e4bd81-9a45-40dc-b3e9-0ca708b43888,009d849f-ab00-441b-a23f-14031e036354,"SAP Certification>>Registration, Login & Access"
+df7e52a4-1424-4439-9422-59c3c1acd1be,e31b073d-20ba-4e7d-8223-c6f7b748c18a,SAP Learning Journey Service>>Creation
+df7e52a4-1424-4439-9422-59c3c1acd1be,ee4baeb4-b920-4e84-a9d0-779105674e17,SAP Learning Journey Service>>Deletion
+df7e52a4-1424-4439-9422-59c3c1acd1be,af0d704e-0288-498b-8d44-b78c21d37dee,SAP Learning Journey Service>>Maintenance
+df7e52a4-1424-4439-9422-59c3c1acd1be,02ad6c9a-4e1b-47e9-9acb-91589c1d60fd,SAP Learning Journey Service>>Other
+4f47b457-ed1f-412b-ac4b-5e02da39813e,b75cd6ab-c612-4204-9f8a-e3b65f38f2b2,SAP Learning>>Course Content
+4f47b457-ed1f-412b-ac4b-5e02da39813e,88192edb-a78a-4eb1-a53c-59b74eb04ea4,SAP Learning>>Free Learning Journeys
+4f47b457-ed1f-412b-ac4b-5e02da39813e,b5e23957-4eed-4d9a-b413-2880acbb67bc,SAP Learning>>Other
+4f47b457-ed1f-412b-ac4b-5e02da39813e,851945e9-05ee-4747-8ac3-b504832b936b,"SAP Learning>>Registration, Login & Access"
+8ff6b6db-e3a7-426f-be8f-6247e441eea5,74c4d475-a38a-4912-a5e9-198a7142c4c4,SAP Learning Hub>>Booking & Consulting
+8ff6b6db-e3a7-426f-be8f-6247e441eea5,ab5ce84a-8b7f-42f7-816a-392d10f61553,SAP Learning Hub>>Customer Configuration
+8ff6b6db-e3a7-426f-be8f-6247e441eea5,633e6da6-c829-4c0f-8626-d4464ae41eec,SAP Learning Hub>>Content
+8ff6b6db-e3a7-426f-be8f-6247e441eea5,b6bc9e18-cdf9-44eb-ad4d-44549f9baf6c,SAP Learning Hub>>Demo Access
+8ff6b6db-e3a7-426f-be8f-6247e441eea5,bf5dd3dd-d9e0-41d0-b4b8-cf926eba6043,SAP Learning Hub>>Domain Creation
+8ff6b6db-e3a7-426f-be8f-6247e441eea5,6b4f9e37-c58d-40de-bc3e-29c72a74b7ac,SAP Learning Hub>>Downtime
+7079a6e8-3be6-460a-99ac-843eccae03b6,1f42c304-914b-4633-a3f4-ac05873591fa,SAP Learning System Access>>Ariba Systems
+7079a6e8-3be6-460a-99ac-843eccae03b6,d6b89d44-636a-474f-b520-1edde838eebc,SAP Learning System Access>>Booking & Consulting
+7079a6e8-3be6-460a-99ac-843eccae03b6,57ffd132-5c6a-42a6-95ce-fd1d96992343,SAP Learning System Access>>Course Related
+7079a6e8-3be6-460a-99ac-843eccae03b6,e8d314bc-564f-4f8a-b910-c7a068eaa865,SAP Learning System Access>>Fieldglass
+7079a6e8-3be6-460a-99ac-843eccae03b6,57ddf5e2-cd72-43d6-b267-8cfd1fce2644,SAP Learning System Access>>Other
+ef6d3a35-e363-49da-9035-bf604839c57f,adaae592-f666-4477-946f-6a0a2e88b958,SAP Virtual Event Services>>Cancellation
+ef6d3a35-e363-49da-9035-bf604839c57f,937b1fa9-d305-45de-ac23-44b1b2d20f0f,SAP Virtual Event Services>>Completion Tracking
+ef6d3a35-e363-49da-9035-bf604839c57f,a55f2b77-a9e9-46bb-909d-e81137cecf16,SAP Virtual Event Services>>Event Change Request
+ef6d3a35-e363-49da-9035-bf604839c57f,3c745356-cc0c-4a90-b88c-217061d7ac2d,SAP Virtual Event Services>>Enrollement/Registration Access
+ef6d3a35-e363-49da-9035-bf604839c57f,c839d74e-cc7a-4673-acdb-fb067a3548c9,SAP Virtual Event Services>>Item Retirement
