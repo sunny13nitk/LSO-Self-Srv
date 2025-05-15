@@ -21,6 +21,7 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import com.sap.cap.esmapi.catg.pojos.TY_CatgCus;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgCusItem;
+import com.sap.cap.esmapi.catg.pojos.TY_CatgDetails;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgTemplates;
 import com.sap.cap.esmapi.catg.srv.intf.IF_CatalogSrv;
 import com.sap.cap.esmapi.catg.srv.intf.IF_CatgSrv;
@@ -85,6 +86,9 @@ public class LSOController
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
+
+    @Autowired
+    private IF_CatalogSrv catalogSrv;
 
     private final String caseListVWRedirect = "redirect:/lso/";
     private final String caseFormViewLXSS = "caseFormLSOLXSS";
@@ -790,6 +794,17 @@ public class LSOController
 
                         }
 
+                        // Also set the Category Description in Upper Case
+                        // Get the Category Description for the Category ID from Case Form
+                        TY_CatgDetails catgDetails = catalogSrv.getCategoryDetails4Catg(caseForm.getCatgDesc(),
+                                EnumCaseTypes.Learning, true);
+                        if (catgDetails != null)
+                        {
+                            caseForm.setCatgText(catgDetails.getCatDesc());
+                            log.info("Catg. Text for Category ID : " + caseForm.getCatgDesc() + " is : "
+                                    + catgDetails.getCatDesc());
+                        }
+                       
                         if (vhlpUISrv != null)
                         {
                             model.addAllAttributes(coLaDDLBSrv.adjustCountryLanguageDDLB(caseForm.getCountry(),
