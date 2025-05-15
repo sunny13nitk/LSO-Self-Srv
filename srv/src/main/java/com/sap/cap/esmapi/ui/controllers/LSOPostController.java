@@ -13,7 +13,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.sap.cap.esmapi.catg.pojos.TY_CatgCus;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgCusItem;
+import com.sap.cap.esmapi.catg.pojos.TY_CatgDetails;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgTemplates;
 import com.sap.cap.esmapi.catg.srv.intf.IF_CatalogSrv;
 import com.sap.cap.esmapi.catg.srv.intf.IF_CatgSrv;
@@ -41,7 +41,6 @@ import com.sap.cap.esmapi.utilities.uimodel.intf.IF_CountryLanguageVHelpAdj;
 import com.sap.cap.esmapi.vhelps.srv.intf.IF_VHelpLOBUIModelSrv;
 import com.sap.cds.services.request.UserInfo;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
 @Controller
@@ -513,6 +512,16 @@ public class LSOPostController
                     userSessSrv.setPreviousCategory(caseForm.getCatgDesc());
                     caseForm.setCatgChange(true);
                     log.info("Category changed by User ...");
+                    // Also set the Category Description in Upper Case
+                    // Get the Category Description for the Category ID from Case Form
+                    TY_CatgDetails catgDetails = catalogTreeSrv.getCategoryDetails4Catg(caseForm.getCatgDesc(),
+                            EnumCaseTypes.Learning, true);
+                    if (catgDetails != null)
+                    {
+                        caseForm.setCatgText(catgDetails.getCatDesc());
+                        log.info("Catg. Text for Category ID : " + caseForm.getCatgDesc() + " is : "
+                                + catgDetails.getCatDesc());
+                    }
                 }
             }
             else
@@ -543,5 +552,4 @@ public class LSOPostController
 
     }
 
-   
 }
