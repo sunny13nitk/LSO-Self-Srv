@@ -624,12 +624,7 @@
             console.log("Category - Changed " + catgChange);
             console.log("Category - Text : " + catgText);
 
-            const dialog = Metro.dialog.create({
-               title: "Important Message",
-               content: "<p>This is an important message.</p>",
-               actionsAlign: "center",
-               overlayClickClose: true
-            });
+
 
             $.ajax({
                type: "POST",
@@ -643,6 +638,13 @@
                   {
                      console.log("Reloading Case Form for Selected Category");
                      console.log(catgChanged);
+                     console.log("Category - Text : " + catgText);
+                     const dialog = Metro.dialog.create({
+                        title: "Important Message" + catgText,
+                        content: "<p>This is an important message.</p> ",
+                        actionsAlign: "center",
+                        overlayClickClose: true
+                     });
                      window.location.href = '/lso/refreshForm4SelCatg'; // redirect     //this would be GET
                   }
                }
