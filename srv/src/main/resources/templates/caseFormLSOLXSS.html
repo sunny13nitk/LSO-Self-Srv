@@ -620,6 +620,13 @@
             console.log("Catg. Bound..")
             console.log(value);
             console.log("Category - Changed " + catgChange);
+            
+            const dialog = Metro.dialog.create({
+               title: "Important Message",
+               content: "<p>This is an important message.</p>",
+               actionsAlign: "center",
+               overlayClickClose: true
+            });
 
             $.ajax({
                type: "POST",
@@ -639,12 +646,7 @@
 
             });
 
-            const dialog = Metro.dialog.create({
-               title: "Important Message",
-               content: "<p>This is an important message.</p>",
-               actionsAlign: "center",
-               overlayClickClose: true
-            });
+            
          }
       }
 
