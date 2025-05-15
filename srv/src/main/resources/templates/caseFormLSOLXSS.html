@@ -615,13 +615,14 @@
          var catgChange = formData.get('catgChange');
          console.log("Category - Changed " + catgChange);
          var catgDesc = formData.get('catgDesc');
-         console.log("Category - Selected " + catgDesc);
+         console.log("Category - Text : " + catgText);
 
          if (Boolean(value) && catgChange)
          {
             console.log("Catg. Bound..")
             console.log(value);
             console.log("Category - Changed " + catgChange);
+            console.log("Category - Text : " + catgText);
 
             const dialog = Metro.dialog.create({
                title: "Important Message",

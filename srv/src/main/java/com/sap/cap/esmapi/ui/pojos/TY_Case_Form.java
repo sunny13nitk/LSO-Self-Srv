@@ -2,8 +2,6 @@ package com.sap.cap.esmapi.ui.pojos;
 
 import org.springframework.web.multipart.MultipartFile;
 
-import com.sap.cap.esmapi.utilities.enums.EnumPFCT;
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,6 +30,7 @@ public class TY_Case_Form
     private boolean employee;
     private boolean external;
     private boolean catgChange;
+    private String catgText;
 
     @Override
     public String toString()
