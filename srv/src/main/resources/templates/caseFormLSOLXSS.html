@@ -620,11 +620,42 @@
             // File was selected, proceed with server event trigger
             // triggerServerEvent(inputElement.files);
             console.log("File selected: " + inputElement.files[0].name);
+            // File was selected, proceed with server event trigger
+            triggerServerEvent(inputElement.files);
+
          } else
          {
             // No file selected, handle as needed
             console.log("No file selected.");
          }
+      }
+
+      function triggerServerEvent(files)
+      {
+         // // Example: Send the file data to a server
+         // const formData = new FormData();
+         // for (let i = 0; i < files.length; i++)
+         // {
+         //    formData.append('file', files[i]);
+         // }
+
+         var formData = new FormData($("#caseForm")[0]);
+         console.log("Before File(s) Upload " + formData);
+         $.ajax({
+            type: "POST",
+            url: "/post/uploadAJAX",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response)
+            {
+               console.log("File(s) Upload Success");
+               console.log(response);
+               // Handle the response from the server if needed
+            },
+
+
+         });
       }
       function getCatgSel(selectObject)
       {
