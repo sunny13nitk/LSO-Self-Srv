@@ -612,7 +612,7 @@
       {
          var value = selectObject.value;
          var formData = new FormData($("#caseForm")[0]);
-
+         const dialog = null;
          var catgChange = formData.get('catgChange');
          console.log("Category - Changed " + catgChange);
          var catgText = formData.get('catgText');
@@ -624,12 +624,33 @@
             console.log(value);
             console.log("Category - Changed " + catgChange);
             console.log("Category - Text : " + catgText);
-            const dialog = Metro.dialog.create({
-               title: "Important Message",
-               content: "<p>This is an important message.</p> ",
-               actionsAlign: "center",
-               overlayClickClose: true
-            });
+
+            if (catgText !== null && catgText !== '')
+            {
+               switch (catgText)
+               {
+                  case "LEARNING AND CERTIFICATION ADVICE":
+                     dialog = Metro.dialog.create({
+                        title: "Category - Learning and Certification Advice",
+                        content: "<p>this category could be used for Learning related Issues.</p> ",
+                        actionsAlign: "center",
+                        overlayClickClose: true
+                     });
+                     break;
+                  case "BOOKING & ORDER":
+                     dialog = Metro.dialog.create({
+                        title: "Category - Booking & Order",
+                        content: "<p>this category could be used for Booking related Issues.</p> ",
+                        actionsAlign: "center",
+                        overlayClickClose: true
+                     });
+                     break;
+                  default:
+                     console.log("Unknown Category - " + catgText);
+               }
+
+            }
+
 
 
             $.ajax({
