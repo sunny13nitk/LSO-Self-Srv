@@ -424,10 +424,14 @@
 
                         <div class="cell-10 flex-align-self-start">
                            <input type="file" data-role="file" name="attachment" th:field="*{attachment}"
-                              data-mode="drop">
+                              data-mode="drop" onchange="handleFileSelection(this)">
 
                            <small class="text-muted">Max file size allowed : <span style="color: #B1365B"
                                  th:text="${attSize}"></span> MB! </small>
+
+                           <small class="text-muted" style="margin-left: 320px;">Allowed file type(s) : <span
+                                 style="color: slategray; margin: 10px;">pdf|docx|doc|txt|csv|xlsx|xls|mp4|msg|png|jpg|jpeg</span>
+                           </small>
                         </div>
 
                         <div class="cell-1 flex-align-self-end">
@@ -608,6 +612,20 @@
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
    <script th:inline="javascript">
 
+
+      function handleFileSelection(inputElement)
+      {
+         if (inputElement.files.length > 0)
+         {
+            // File was selected, proceed with server event trigger
+            // triggerServerEvent(inputElement.files);
+            console.log("File selected: " + inputElement.files[0].name);
+         } else
+         {
+            // No file selected, handle as needed
+            console.log("No file selected.");
+         }
+      }
       function getCatgSel(selectObject)
       {
          var value = selectObject.value;
@@ -629,7 +647,7 @@
                switch (catgText)
                {
                   case "LEARNING AND CERTIFICATION ADVICE":
-                    const dialog1 = Metro.dialog.create({
+                     const dialog1 = Metro.dialog.create({
                         title: "Category - Learning and Certification Advice",
                         content: "<p>this category could be used for Learning related Issues.</p> ",
                         actionsAlign: "center",
@@ -637,7 +655,7 @@
                      });
                      break;
                   case "BOOKING & ORDER":
-                    const dialog2 = Metro.dialog.create({
+                     const dialog2 = Metro.dialog.create({
                         title: "Category - Booking & Order",
                         content: "<p>this category could be used for Booking related Issues.</p> ",
                         actionsAlign: "center",
