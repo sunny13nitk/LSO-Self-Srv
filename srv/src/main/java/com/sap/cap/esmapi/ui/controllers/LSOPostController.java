@@ -228,6 +228,98 @@ public class LSOPostController
 
     }
 
+    @PostMapping(value = "/uploadAJAX")
+    public String uploadFileAttachments(@ModelAttribute("caseForm") TY_Case_Form caseForm, Model model)
+    {
+        String viewName = caseFormViewLXSS;
+
+        List<String> attMsgs = Collections.emptyList();
+
+        if (caseForm != null && attSrv != null && userSessSrv != null)
+        {
+
+            log.info("Processing of Case Attachment Upload Form - UI layer :Begins....");
+            if (caseForm.getAttachment() != null)
+            {
+                if (StringUtils.hasText(caseForm.getAttachment().getOriginalFilename()))
+                {
+                    // Clear Attachment Service Session Messages for subsequent roundtip
+                    attSrv.clearSessionMessages();
+                    if (!attSrv.addAttachment(caseForm.getAttachment()))
+                    {
+                        // Attachment to Local Storage Persistence Error
+                        attMsgs = attSrv.getSessionMessages();
+
+                    }
+
+                }
+
+            }
+
+            // Clear form for New Attachment as Current Attachment already in Container
+            caseForm.setAttachment(null);
+
+            Optional<TY_CatgCusItem> cusItemO = catgCusSrv.getCustomizations().stream()
+                    .filter(g -> g.getCaseTypeEnum().toString().equals(EnumCaseTypes.Learning.toString())).findFirst();
+            if (cusItemO.isPresent() && catgTreeSrv != null)
+            {
+
+                model.addAttribute("caseTypeStr", EnumCaseTypes.Learning.toString());
+
+                // Populate User Details
+                TY_UserESS userDetails = new TY_UserESS();
+                if (userSessSrv != null)
+                {
+                    log.info("User Bound in Session..");
+                }
+                userDetails.setUserDetails(userSessSrv.getUserDetails4mSession());
+                model.addAttribute("userInfo", userDetails);
+
+                if (userSessSrv.getUserDetails4mSession().isEmployee())
+                {
+                    caseForm.setEmployee(true);
+                }
+
+                // Scan for Template Load
+                TY_CatgTemplates catgTemplate = catalogTreeSrv.getTemplates4Catg(caseForm.getCatgDesc(),
+                        EnumCaseTypes.Learning);
+                if (catgTemplate != null)
+                {
+
+                    // Set Questionnaire for Category
+                    caseForm.setTemplate(catgTemplate.getQuestionnaire());
+
+                }
+
+                if (vhlpUISrv != null)
+                {
+                    model.addAllAttributes(coLaDDLBSrv.adjustCountryLanguageDDLB(caseForm.getCountry(),
+                            vhlpUISrv.getVHelpUIModelMap4LobCatg(EnumCaseTypes.Learning, caseForm.getCatgDesc())));
+                }
+
+                model.addAttribute("caseForm", caseForm);
+                // also Place the form in Session
+                userSessSrv.setCaseFormB4Submission(caseForm);
+
+                model.addAttribute("formErrors", attMsgs);
+
+                // also Upload the Catg. Tree as per Case Type
+                model.addAttribute("catgsList",
+                        catalogTreeSrv.getCaseCatgTree4LoB(EnumCaseTypes.Learning).getCategories());
+
+                model.addAttribute("attachments", attSrv.getAttachmentNames());
+
+                // Attachment file Size
+                model.addAttribute("attSize", rlConfig.getAllowedSizeAttachmentMB());
+            }
+
+            log.info("Processing of Case Attachment Upload Form - UI layer :Ends....");
+        }
+
+        return viewName;
+
+    }
+
     @PostMapping(value = "/saveCase", params = "action=catgChange")
     public String refreshCaseForm4Catg(@RequestParam(name = "_csrf") String csrfToken,
             @ModelAttribute("caseForm") TY_Case_Form caseForm, Model model)
