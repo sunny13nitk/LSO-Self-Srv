@@ -647,12 +647,25 @@
             data: formData,
             processData: false,
             contentType: false,
-            success: function (response)
+            success: function (attUploaded)
             {
-               console.log("File(s) Upload Success");
-               console.log(response);
+               if (attUploaded === true)
+               {
+                  console.log("File(s) Upload Success");
+                  window.location.href = '/lso/refreshForm4AttUpload'; // redirect     //this would be GET
+               }
+               else
+               {
+                  console.log("File(s) Upload Failed");
+                  window.location.href = '/lso/refreshForm4AttUpload'; // redirect     //this would be GET
+               }
                // Handle the response from the server if needed
             },
+            error: function (error)
+            {
+               console.error("Error uploading file(s):", error);
+               window.location.href = '/lso/refreshForm4AttUpload'; // redirect     //this would be GET
+            }
 
 
          });

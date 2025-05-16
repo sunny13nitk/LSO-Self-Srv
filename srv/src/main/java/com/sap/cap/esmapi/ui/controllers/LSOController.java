@@ -804,7 +804,7 @@ public class LSOController
                             log.info("Catg. Text for Category ID : " + caseForm.getCatgDesc() + " is : "
                                     + catgDetails.getCatDesc());
                         }
-                       
+
                         if (vhlpUISrv != null)
                         {
                             model.addAllAttributes(coLaDDLBSrv.adjustCountryLanguageDDLB(caseForm.getCountry(),
@@ -839,6 +839,58 @@ public class LSOController
         }
 
         return caseFormViewLXSS;
+    }
+
+    @GetMapping("/refreshForm4AttUpload")
+    public String getMethodName(Model model)
+    {
+        String viewName = caseFormViewLXSS;
+
+        if (attSrv != null && userSessSrv != null)
+        {
+            Optional<TY_CatgCusItem> cusItemO = catgCusSrv.getCustomizations().stream()
+                    .filter(g -> g.getCaseTypeEnum().toString().equals(EnumCaseTypes.Learning.toString())).findFirst();
+            if (cusItemO.isPresent() && catgTreeSrv != null)
+            {
+
+                TY_Case_Form caseForm = userSessSrv.getCaseFormB4Submission();
+
+                model.addAttribute("caseTypeStr", EnumCaseTypes.Learning.toString());
+
+                // Populate User Details
+                TY_UserESS userDetails = new TY_UserESS();
+                if (userSessSrv != null)
+                {
+                    log.info("User Bound in Session..");
+                }
+                userDetails.setUserDetails(userSessSrv.getUserDetails4mSession());
+                model.addAttribute("userInfo", userDetails);
+
+                if (vhlpUISrv != null)
+                {
+                    model.addAllAttributes(coLaDDLBSrv.adjustCountryLanguageDDLB(caseForm.getCountry(),
+                            vhlpUISrv.getVHelpUIModelMap4LobCatg(EnumCaseTypes.Learning, caseForm.getCatgDesc())));
+                }
+                model.addAttribute("caseForm", caseForm);
+                // also Place the form in Session
+                userSessSrv.setCaseFormB4Submission(caseForm);
+
+                model.addAttribute("formErrors", attSrv.getSessionMessages());
+
+                // also Upload the Catg. Tree as per Case Type
+                model.addAttribute("catgsList",
+                        catalogTreeSrv.getCaseCatgTree4LoB(EnumCaseTypes.Learning).getCategories());
+
+                model.addAttribute("attachments", attSrv.getAttachmentNames());
+
+                // Attachment file Size
+                model.addAttribute("attSize", rlConfig.getAllowedSizeAttachmentMB());
+
+            }
+
+        }
+        return viewName;
+
     }
 
 }
