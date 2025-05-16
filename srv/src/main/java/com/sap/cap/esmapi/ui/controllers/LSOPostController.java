@@ -167,6 +167,7 @@ public class LSOPostController
             // Clear form for New Attachment as Current Attachment already in Container
             caseForm.setAttachment(null);
             caseForm.setCatgChange(false);
+            caseForm.setCatgText(null);
 
             Optional<TY_CatgCusItem> cusItemO = catgCusSrv.getCustomizations().stream()
                     .filter(g -> g.getCaseTypeEnum().toString().equals(EnumCaseTypes.Learning.toString())).findFirst();
@@ -261,6 +262,7 @@ public class LSOPostController
             // Clear form for New Attachment as Current Attachment already in Container
             caseForm.setAttachment(null);
             caseForm.setCatgChange(false);
+            caseForm.setCatgText(null);
             if (userSessSrv.getUserDetails4mSession().isEmployee())
             {
                 caseForm.setEmployee(true);
@@ -516,6 +518,7 @@ public class LSOPostController
                         // Set Questionnaire for Category
                         caseForm.setTemplate(catgTemplate.getQuestionnaire());
                         caseForm.setCatgChange(false);
+                        caseForm.setCatgText(null);
 
                     }
 
