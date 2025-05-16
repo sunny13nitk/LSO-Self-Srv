@@ -612,7 +612,6 @@
       {
          var value = selectObject.value;
          var formData = new FormData($("#caseForm")[0]);
-         const dialog = null;
          var catgChange = formData.get('catgChange');
          console.log("Category - Changed " + catgChange);
          var catgText = formData.get('catgText');
@@ -630,7 +629,7 @@
                switch (catgText)
                {
                   case "LEARNING AND CERTIFICATION ADVICE":
-                     dialog = Metro.dialog.create({
+                    const dialog1 = Metro.dialog.create({
                         title: "Category - Learning and Certification Advice",
                         content: "<p>this category could be used for Learning related Issues.</p> ",
                         actionsAlign: "center",
@@ -638,7 +637,7 @@
                      });
                      break;
                   case "BOOKING & ORDER":
-                     dialog = Metro.dialog.create({
+                    const dialog2 = Metro.dialog.create({
                         title: "Category - Booking & Order",
                         content: "<p>this category could be used for Booking related Issues.</p> ",
                         actionsAlign: "center",
