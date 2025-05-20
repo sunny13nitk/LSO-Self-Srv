@@ -248,6 +248,7 @@ public class LSOPostController
                     {
                         // Attachment to Local Storage Persistence Error
                         uploadSuccess = false;
+                        userSessSrv.addFormErrors(caseFormErrorRedirect);
 
                     }
                     else
@@ -608,6 +609,59 @@ public class LSOPostController
         }
 
         return catgChanged;
+
+    }
+
+    @PostMapping(value = "/uploadAJAXReply")
+    public boolean uploadFileAttachmentsReply(@ModelAttribute("caseEditForm") TY_CaseEdit_Form caseReplyForm)
+    {
+        boolean uploadSuccess = false;
+
+        if (caseReplyForm != null && userSessSrv != null)
+        {
+            log.info("Processing of Case Attachment Upload Form - UI layer :Begins....");
+            if (StringUtils.hasText(caseReplyForm.getCaseDetails().getCaseGuid()))
+            {
+                // Get Case Details
+                TY_CaseEdit_Form caseEditForm = userSessSrv
+                        .getCaseDetails4Edit(caseReplyForm.getCaseDetails().getCaseGuid());
+
+                // Super Impose Reply from User Form 4m Session
+                caseEditForm.setReply(caseReplyForm.getReply());
+
+                // Clear form for New Attachment as Current Attachment already in Container
+                caseEditForm.setAttachment(null);
+
+                if (caseReplyForm.getAttachment() != null)
+                {
+                    if (StringUtils.hasText(caseReplyForm.getAttachment().getOriginalFilename()))
+                    {
+                        // Clear Attachment Service Session Messages for subsequent roundtip
+                        attSrv.clearSessionMessages();
+                        if (!attSrv.addAttachment(caseReplyForm.getAttachment()))
+                        {
+                            // Attachment to Local Storage Persistence Error
+                            // attMsgs = attSrv.getSessionMessages();
+                            uploadSuccess = false;
+                            userSessSrv.addFormErrors(caseFormReplyErrorRedirect);
+                            log.error("Attachment to Local Storage Persistence Error");
+
+                        }
+                        else
+                        {
+                            uploadSuccess = true;
+                        }
+
+                    }
+
+                }
+                userSessSrv.setCaseEditFormB4Submission(caseEditForm);
+
+            }
+
+        }
+
+        return uploadSuccess;
 
     }
 

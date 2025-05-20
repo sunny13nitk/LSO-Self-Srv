@@ -417,7 +417,7 @@
                   <div class="colspan-9 offset-1" style="margin-top: 15px; margin-bottom: 10px;">
                      <label style="color: #007db8;font-family: Arial, Helvetica, sans-serif;">Email of affected user
                         (optional) </label>
-                     <input class="alert metro-input" type="text" data-role="input" title="" th:field="*{addEmail}"  />
+                     <input class="alert metro-input" type="text" data-role="input" title="" th:field="*{addEmail}" />
                   </div>
 
                   <div class="colspan-9 offset-1" style="margin-top: 15px; margin-bottom: 10px">
@@ -641,7 +641,7 @@
          // }
 
          var formData = new FormData($("#caseForm")[0]);
-         console.log("Before File(s) Upload " + formData);
+
          $.ajax({
             type: "POST",
             url: "/post/uploadAJAX",
