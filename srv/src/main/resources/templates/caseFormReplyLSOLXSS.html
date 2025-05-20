@@ -365,8 +365,8 @@
                </div>
 
                <!-- Form -->
-               <form th:object="${caseEditForm}" enctype="multipart/form-data" th:action="@{/post/saveCaseReply}"
-                  method="post">
+               <form id="caseEditForm" th:object="${caseEditForm}" enctype="multipart/form-data"
+                  th:action="@{/post/saveCaseReply}" method="post">
 
                   <!-- Hidden Fields - Carried over in Form to Controller -->
                   <input type="hidden" th:field="*{caseDetails.caseId}" />
