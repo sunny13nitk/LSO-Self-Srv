@@ -1,5 +1,7 @@
 package com.sap.cap.esmapi.ui.controllers;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -842,7 +844,7 @@ public class LSOController
     }
 
     @GetMapping("/refreshForm4AttUpload")
-    public String getMethodName(Model model)
+    public String refreshCaseFormPostAttachmentUpload(Model model)
     {
         String viewName = caseFormViewLXSS;
 
@@ -889,6 +891,39 @@ public class LSOController
             }
 
         }
+        return viewName;
+
+    }
+
+    @GetMapping("/refreshFormReply4AttUpload")
+    public String refreshCaseReplyFormPostAttachmentUpload(Model model)
+    {
+        String viewName = caseFormReplyLXSS;
+        List<String> attMsgs = Collections.emptyList();
+        TY_CaseEdit_Form caseEditForm = null;
+        if (userSessSrv != null)
+        {
+            caseEditForm = userSessSrv.getCaseEditFormB4Submission();
+            if (caseEditForm != null)
+            {
+                // Populate User Details
+                TY_UserESS userDetails = new TY_UserESS();
+                userDetails.setUserDetails(userSessSrv.getUserDetails4mSession());
+                model.addAttribute("userInfo", userDetails);
+
+                // Attachment to Local Storage Persistence Error
+                attMsgs = attSrv.getSessionMessages();
+
+                model.addAttribute("caseEditForm", caseEditForm);
+
+                model.addAttribute("formErrors", attMsgs);
+
+                model.addAttribute("attachments", attSrv.getAttachmentNames());
+                // Attachment file Size
+                model.addAttribute("attSize", rlConfig.getAllowedSizeAttachmentMB());
+            }
+        }
+
         return viewName;
 
     }
