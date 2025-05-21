@@ -365,8 +365,8 @@
                </div>
 
                <!-- Form -->
-               <form th:object="${caseEditForm}" enctype="multipart/form-data" th:action="@{/post/saveCaseReply}"
-                  method="post">
+               <form id="caseEditForm" th:object="${caseEditForm}" enctype="multipart/form-data"
+                  th:action="@{/post/saveCaseReply}" method="post">
 
                   <!-- Hidden Fields - Carried over in Form to Controller -->
                   <input type="hidden" th:field="*{caseDetails.caseId}" />
@@ -560,20 +560,24 @@
 
                         <div class="cell-10 flex-align-self-start">
                            <input type="file" data-role="file" name="attachment" th:field="*{attachment}"
-                              data-mode="drop">
+                              data-mode="drop" onchange="handleFileSelection(this)">
 
                            <small class="text-muted">Max file size allowed : <span style="color: #B1365B"
                                  th:text="${attSize}"></span> MB! </small>
+
+                           <small class="text-muted" style="margin-left: 320px;">Allowed file type(s) : <span
+                                 style="color: slategray; margin: 10px;">pdf|docx|doc|txt|csv|xlsx|xls|mp4|msg|png|jpg|jpeg</span>
+                           </small>
                         </div>
-                        <!-- Upload Button -->
-                        <div class="cell-1 flex-align-self-end">
+
+                        <!-- <div class="cell-1 flex-align-self-end">
                            <button class="button rounded primary outline" name="action" value="upload"
                               style="margin-top: 70px">
                               <span class="mif-file-upload" style="margin-left: 0px"> </span> <span
                                  style="margin-left: 3px">Upload</span>
                            </button>
-
-                           <!--  -->
+ 
+<!--  -->
                         </div>
 
                         <div class="colspan-9 offset-1" style="margin-top: 5px; margin-bottom: 10px"
@@ -805,6 +809,60 @@
       })
          .catch((error) => console.error(error))
 
+
+
+
+      function handleFileSelection(inputElement)
+      {
+         if (inputElement.files.length > 0)
+         {
+            // File was selected, proceed with server event trigger
+            // triggerServerEvent(inputElement.files);
+            console.log("File selected: " + inputElement.files[0].name);
+            // File was selected, proceed with server event trigger
+            triggerServerEvent(inputElement.files);
+
+         } else
+         {
+            // No file selected, handle as needed
+            console.log("No file selected.");
+         }
+      }
+
+      function triggerServerEvent(files)
+      {
+
+         var formData = new FormData($("#caseEditForm")[0]);
+
+         $.ajax({
+            type: "POST",
+            url: "/post/uploadAJAXReply",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (attUploaded)
+            {
+               if (attUploaded === true)
+               {
+                  console.log("File(s) Upload Success");
+                  window.location.href = '/lso/refreshFormReply4AttUpload'; // redirect     //this would be GET
+               }
+               else
+               {
+                  console.log("File(s) Upload Failed");
+                  window.location.href = '/lso/refreshFormReply4AttUpload'; // redirect     //this would be GET
+               }
+               // Handle the response from the server if needed
+            },
+            error: function (error)
+            {
+               console.error("Error uploading file(s):", error);
+               window.location.href = '/lso/refreshFormReply4AttUpload'; // redirect     //this would be GET
+            }
+
+
+         });
+      }
    </script>
 
    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
