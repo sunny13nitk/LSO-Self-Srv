@@ -13,7 +13,6 @@ import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +21,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.sap.cap.esmapi.catg.pojos.TY_CatgCus;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgCusItem;
+import com.sap.cap.esmapi.catg.pojos.TY_CatgDetails;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgTemplates;
 import com.sap.cap.esmapi.catg.srv.intf.IF_CatalogSrv;
 import com.sap.cap.esmapi.catg.srv.intf.IF_CatgSrv;
@@ -41,7 +41,6 @@ import com.sap.cap.esmapi.utilities.uimodel.intf.IF_CountryLanguageVHelpAdj;
 import com.sap.cap.esmapi.vhelps.srv.intf.IF_VHelpLOBUIModelSrv;
 import com.sap.cds.services.request.UserInfo;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
 @Controller
@@ -167,6 +166,8 @@ public class LSOPostController
 
             // Clear form for New Attachment as Current Attachment already in Container
             caseForm.setAttachment(null);
+            caseForm.setCatgChange(false);
+            caseForm.setCatgText(null);
 
             Optional<TY_CatgCusItem> cusItemO = catgCusSrv.getCustomizations().stream()
                     .filter(g -> g.getCaseTypeEnum().toString().equals(EnumCaseTypes.Learning.toString())).findFirst();
@@ -227,6 +228,61 @@ public class LSOPostController
 
         return viewName;
 
+    }
+
+    @PostMapping(value = "/uploadAJAX")
+    public boolean uploadFileAttachments(@ModelAttribute("caseForm") TY_Case_Form caseForm, Model model)
+    {
+        Boolean uploadSuccess = false;
+        if (caseForm != null && attSrv != null && userSessSrv != null)
+        {
+
+            log.info("Processing of Case Attachment Upload Form - UI layer :Begins....");
+            if (caseForm.getAttachment() != null)
+            {
+                if (StringUtils.hasText(caseForm.getAttachment().getOriginalFilename()))
+                {
+                    // Clear Attachment Service Session Messages for subsequent roundtip
+                    attSrv.clearSessionMessages();
+                    if (!attSrv.addAttachment(caseForm.getAttachment()))
+                    {
+                        // Attachment to Local Storage Persistence Error
+                        uploadSuccess = false;
+
+                    }
+                    else
+                    {
+                        uploadSuccess = true;
+                    }
+
+                }
+
+            }
+
+            // Clear form for New Attachment as Current Attachment already in Container
+            caseForm.setAttachment(null);
+            caseForm.setCatgChange(false);
+            caseForm.setCatgText(null);
+            if (userSessSrv.getUserDetails4mSession().isEmployee())
+            {
+                caseForm.setEmployee(true);
+            }
+            // Scan for Template Load
+            TY_CatgTemplates catgTemplate = catalogTreeSrv.getTemplates4Catg(caseForm.getCatgDesc(),
+                    EnumCaseTypes.Learning);
+            if (catgTemplate != null)
+            {
+
+                // Set Questionnaire for Category
+                caseForm.setTemplate(catgTemplate.getQuestionnaire());
+
+            }
+            userSessSrv.setCaseFormB4Submission(caseForm);
+
+            log.info("Processing of Case Attachment Upload Form - UI layer :Ends....");
+        }
+
+        return uploadSuccess;
     }
 
     @PostMapping(value = "/saveCase", params = "action=catgChange")
@@ -461,6 +517,8 @@ public class LSOPostController
 
                         // Set Questionnaire for Category
                         caseForm.setTemplate(catgTemplate.getQuestionnaire());
+                        caseForm.setCatgChange(false);
+                        caseForm.setCatgText(null);
 
                     }
 
@@ -513,6 +571,16 @@ public class LSOPostController
                     userSessSrv.setPreviousCategory(caseForm.getCatgDesc());
                     caseForm.setCatgChange(true);
                     log.info("Category changed by User ...");
+                    // Also set the Category Description in Upper Case
+                    // Get the Category Description for the Category ID from Case Form
+                    TY_CatgDetails catgDetails = catalogTreeSrv.getCategoryDetails4Catg(caseForm.getCatgDesc(),
+                            EnumCaseTypes.Learning, true);
+                    if (catgDetails != null)
+                    {
+                        caseForm.setCatgText(catgDetails.getCatDesc());
+                        log.info("Catg. Text for Category ID : " + caseForm.getCatgDesc() + " is : "
+                                + catgDetails.getCatDesc());
+                    }
                 }
             }
             else
@@ -543,5 +611,4 @@ public class LSOPostController
 
     }
 
-   
 }
