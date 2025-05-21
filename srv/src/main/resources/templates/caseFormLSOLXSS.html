@@ -417,7 +417,7 @@
                   <div class="colspan-9 offset-1" style="margin-top: 15px; margin-bottom: 10px;">
                      <label style="color: #007db8;font-family: Arial, Helvetica, sans-serif;">Email of affected user
                         (optional) </label>
-                     <input class="alert metro-input" type="text" data-role="input" title="" th:field="*{addEmail}"  />
+                     <input class="alert metro-input" type="text" data-role="input" title="" th:field="*{addEmail}" />
                   </div>
 
                   <div class="colspan-9 offset-1" style="margin-top: 15px; margin-bottom: 10px">
@@ -425,76 +425,75 @@
 
                         <div class="cell-10 flex-align-self-start">
                            <input type="file" data-role="file" name="attachment" th:field="*{attachment}"
-                              data-mode="drop" onchange="handleFileSelection(this)">
+                              data-mode="drop">
 
                            <small class="text-muted">Max file size allowed : <span style="color: #B1365B"
                                  th:text="${attSize}"></span> MB! </small>
-<<<<<<< HEAD
-                        </div> 
-=======
-
-                           <small class="text-muted" style="margin-left: 320px;">Allowed file type(s) : <span
-                                 style="color: slategray; margin: 10px;">pdf|docx|doc|txt|csv|xlsx|xls|mp4|msg|png|jpg|jpeg</span>
-                           </small>
                         </div>
->>>>>>> 3f54ac61c948d3a18a893c3dc8adfe1a3e7e5c5d
-
-                        <!-- <div class="cell-1 flex-align-self-end">
-                           <button class="button rounded primary outline" name="action" value="upload"
-                              style="margin-top: 70px">
-                              <span class="mif-file-upload" style="margin-left: 0px"> </span> <span
-                                 style="margin-left: 3px">Upload</span>
-                           </button>
 
 
-                        </div> -->
+                        <!-- <small class="text-muted" style="margin-left: 320px;">Allowed file type(s) : <span
+                              style="color: slategray; margin: 10px;">pdf|docx|doc|txt|csv|xlsx|xls|mp4|msg|png|jpg|jpeg</span>
+                        </small> -->
                      </div>
 
-                     <div class="colspan-9 offset-1" style="margin-top: 5px; margin-bottom: 10px"
-                        th:if="${attachments != null}">
-                        <div th:if="${attachments.size() > 0}">
 
-                           <table class="table  table-border compact striped">
-                              <thead>
-                                 <tr>
-                                    <th style="text-align: center;">File(s)</th>
-                                    <th data-cls-column=" text-left">Action(s)</th>
-                                 </tr>
-                              </thead>
-                              <tbody>
-                                 <tr th:each="file : ${attachments}">
+                     <div class="cell-1 flex-align-self-end">
+                        <button class="button rounded primary outline" name="action" value="upload"
+                           style="margin-top: 70px">
+                           <span class="mif-file-upload" style="margin-left: 0px"> </span> <span
+                              style="margin-left: 3px">Upload</span>
+                        </button>
 
-                                    <td style="text-align: left" th:text="${file}"></td>
-                                    <td>
-                                       <a href="#" class="button alert mini rounded outline"
-                                          th:href="@{'/lso/removeAttachment/' + ${file}}" role="button" data-role="hint"
-                                          data-hint-position="right" data-cls-hint="fg-black"
-                                          data-hint-text="Remove Attachment">
-                                          <span class="mif-bin icon" style="margin-left: 0px"></span> <span
-                                             style="margin-left: 3px">Delete</span></a>
-                                    </td>
-                                 </tr>
-                              </tbody>
-                           </table>
-                        </div>
+
                      </div>
                   </div>
 
-                  <div class="case-form-footer-btn pb-4" style="margin-left: 500px; margin-top: 25px;">
-                     <button id="SubmitCaseBtn" class="ds-button ds-button--primary" name="action" value="saveCase"
-                        role="button">
-                        Submit
-                     </button>
-                     <a href="#" class="ds-button ds-button--secondary" th:href="@{/lso/}" role="button">
-                        Cancel
-                     </a>
+                  <div class="colspan-9 offset-1" style="margin-top: 5px; margin-bottom: 10px"
+                     th:if="${attachments != null}">
+                     <div th:if="${attachments.size() > 0}">
+
+                        <table class="table  table-border compact striped">
+                           <thead>
+                              <tr>
+                                 <th style="text-align: center;">File(s)</th>
+                                 <th data-cls-column=" text-left">Action(s)</th>
+                              </tr>
+                           </thead>
+                           <tbody>
+                              <tr th:each="file : ${attachments}">
+
+                                 <td style="text-align: left" th:text="${file}"></td>
+                                 <td>
+                                    <a href="#" class="button alert mini rounded outline"
+                                       th:href="@{'/lso/removeAttachment/' + ${file}}" role="button" data-role="hint"
+                                       data-hint-position="right" data-cls-hint="fg-black"
+                                       data-hint-text="Remove Attachment">
+                                       <span class="mif-bin icon" style="margin-left: 0px"></span> <span
+                                          style="margin-left: 3px">Delete</span></a>
+                                 </td>
+                              </tr>
+                           </tbody>
+                        </table>
+                     </div>
                   </div>
-               </form>
             </div>
+
+            <div class="case-form-footer-btn pb-4" style="margin-left: 500px; margin-top: 25px;">
+               <button id="SubmitCaseBtn" class="ds-button ds-button--primary" name="action" value="saveCase"
+                  role="button">
+                  Submit
+               </button>
+               <a href="#" class="ds-button ds-button--secondary" th:href="@{/lso/}" role="button">
+                  Cancel
+               </a>
+            </div>
+            </form>
          </div>
       </div>
+   </div>
 
-      <!-- Form Row - Ends -->
+   <!-- Form Row - Ends -->
 
    </div>
    <newlxp-footer></newlxp-footer>
