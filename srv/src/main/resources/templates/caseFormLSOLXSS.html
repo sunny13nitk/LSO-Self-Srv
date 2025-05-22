@@ -691,6 +691,7 @@
             {
                dialog1.close();
                dialog2.close();
+
                switch (catgText)
                {
                   case "LEARNING AND CERTIFICATION ADVICE":
@@ -701,6 +702,8 @@
                         actionsAlign: "center",
                         overlayClickClose: true
                      });
+                     dialog1.open();
+
                      break;
                   case "BOOKING & ORDER":
 
@@ -710,6 +713,7 @@
                         actionsAlign: "center",
                         overlayClickClose: true
                      });
+                     dialog2.open();
                      break;
                   default:
                      console.log("Unknown Category - " + catgText);
