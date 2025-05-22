@@ -694,7 +694,7 @@
                switch (catgText)
                {
                   case "LEARNING AND CERTIFICATION ADVICE":
-
+                     console.log("Category - Learning and Certification Advice");
                      const dialog1 = Metro.dialog.create({
                         title: "Category - Learning and Certification Advice",
                         content: "<p>this category could be used for Learning related Issues.</p> ",
@@ -704,10 +704,21 @@
 
                      break;
                   case "BOOKING & ORDER":
-
+                     console.log("Category - Booking & Order");
                      const dialog2 = Metro.dialog.create({
                         title: "Category - Booking & Order",
                         content: "<p>this category could be used for Booking related Issues.</p> ",
+                        actionsAlign: "center",
+                        overlayClickClose: true
+                     });
+
+                     break;
+
+                  case "TECHNICAL QUERIES":
+                     console.log("Category - Technical Queries");
+                     const dialog3 = Metro.dialog.create({
+                        title: "Category - Technical Queries",
+                        content: "<p>this category could be used for Technical related Issues.</p> ",
                         actionsAlign: "center",
                         overlayClickClose: true
                      });
