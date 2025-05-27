@@ -16,7 +16,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.validator.routines.EmailValidator;
@@ -70,6 +69,7 @@ import com.sap.cap.esmapi.utilities.srvCloudApi.srv.intf.IF_SrvCloudAPI;
 import com.sap.cap.esmapi.vhelps.pojos.TY_KeyValue;
 import com.sap.cap.esmapi.vhelps.srv.intf.IF_VHelpLOBUIModelSrv;
 import com.sap.cds.services.request.UserInfo;
+import com.sap.cloud.sdk.cloudplatform.connectivity.Destination;
 import com.sap.cloud.sdk.cloudplatform.connectivity.DestinationAccessor;
 import com.sap.cloud.sdk.cloudplatform.connectivity.exception.DestinationAccessException;
 import com.sap.cloud.security.token.Token;
