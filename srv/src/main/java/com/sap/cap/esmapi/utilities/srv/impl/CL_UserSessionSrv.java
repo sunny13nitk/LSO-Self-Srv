@@ -2183,7 +2183,7 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
 
         log.error(msg);
         TY_Message logMsg = new TY_Message(userSessInfo.getUserDetails().getUsAccEmpl().getUserId(),
-                Timestamp.from(Instant.now()), EnumStatus.Error, EnumMessageType.ERR_ATTACHMENT,
+                Timestamp.from(Instant.now()), EnumStatus.Error, EnumMessageType.ERR_INVALID_ADDUSER,
                 userSessInfo.getUserDetails().getUsAccEmpl().getUserId(), msg);
         this.addMessagetoStack(logMsg);
 
