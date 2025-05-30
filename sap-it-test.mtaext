@@ -27,6 +27,7 @@ modules:
       - name: lsossrv-xsuaa
       - name: lsossrv-hdi-container
       - name: iESM-destination-services
+      - name: xotel-agent-ext-java # xotel agent for java
 
   # HANA DB HDI Container Deployer
   - name: lsossrv-hana-db
@@ -66,7 +67,6 @@ modules:
           strictSSL: true
       - name: lsossrv-xsuaa    
       - name: dynatrace-service # dynatrace monitoring service binding
-      - name: xotel-agent-ext-java # xotel agent binding
     provides:
       - name: app-api
         properties:
