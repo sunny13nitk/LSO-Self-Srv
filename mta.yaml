@@ -63,6 +63,7 @@ modules:
           strictSSL: true
       - name: lsossrv-xsuaa
       - name: dynatrace-service # dynatrace monitoring service binding
+      - name: xotel-agent-ext-java # xotel agent binding
     provides:
       - name: app-api
         properties:
@@ -87,4 +88,6 @@ resources:
       path: ./destination-dev.json
     type: org.cloudfoundry.managed-service
   - name: dynatrace-service
+    type: org.cloudfoundry.existing-service
+  - name: xotel-agent-ext-java
     type: org.cloudfoundry.existing-service
