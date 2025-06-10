@@ -687,113 +687,113 @@
             console.log("Category - Changed " + catgChange);
             console.log("Category - Text : " + catgText);
 
-            if (catgText !== null && catgText !== '')
-            {
+            // if (catgText !== null && catgText !== '')
+            // {
 
 
-               switch (catgText)
-               {
-                  case "LEARNING AND CERTIFICATION ADVICE":
-                     console.log("Learning and Certification Advice");
-                     const dialog1 = Metro.dialog.create({
-                        title: "Learning and Certification Advice",
-                        content: "<p>Business support for learners regarding information about the learning portal and learning portfolio, learning path, on-demand public courses/3 to Run, learning method, certifications, course schedule, training delivery & training center</p> ",
-                        actionsAlign: "center",
-                        overlayClickClose: true
-                     });
+            //    switch (catgText)
+            //    {
+            //       case "LEARNING AND CERTIFICATION ADVICE":
+            //          console.log("Learning and Certification Advice");
+            //          const dialog1 = Metro.dialog.create({
+            //             title: "Learning and Certification Advice",
+            //             content: "<p>Business support for learners regarding information about the learning portal and learning portfolio, learning path, on-demand public courses/3 to Run, learning method, certifications, course schedule, training delivery & training center</p> ",
+            //             actionsAlign: "center",
+            //             overlayClickClose: true
+            //          });
 
-                     break;
-                  case "BOOKING & ORDER":
-                     console.log("Booking & Order");
-                     const dialog2 = Metro.dialog.create({
-                        title: "Booking & Order",
-                        content: "<p>Business support for learners regarding booking/order requests, consequent billing activities, activation code redemption & preferred card, etc.</p> ",
-                        actionsAlign: "center",
-                        overlayClickClose: true
-                     });
+            //          break;
+            //       case "BOOKING & ORDER":
+            //          console.log("Booking & Order");
+            //          const dialog2 = Metro.dialog.create({
+            //             title: "Booking & Order",
+            //             content: "<p>Business support for learners regarding booking/order requests, consequent billing activities, activation code redemption & preferred card, etc.</p> ",
+            //             actionsAlign: "center",
+            //             overlayClickClose: true
+            //          });
 
-                     break;
+            //          break;
 
-                  case "TECHNICAL QUERIES":
-                     console.log("Technical Queries");
-                     const dialog3 = Metro.dialog.create({
-                        title: "Technical Queries",
-                        content: "<p>Technical Support for learners regarding access, content and functionality</p> ",
-                        actionsAlign: "center",
-                        overlayClickClose: true
-                     });
-                     break;
-
-
-                  case "PRACTICE SYSTEMS":
-                     console.log("Practice Systems");
-                     const dialog4 = Metro.dialog.create({
-                        title: "Practice Systems",
-                        content: "<p>Help instructors and learners regarding access and login, system performance, how-to questions, user guides, exercises & demos, etc.</p> ",
-                        actionsAlign: "center",
-                        overlayClickClose: true
-                     });
-                     break;
-
-                  case "TRAINING RESELLER PARTNER SUPPORT":
-                     console.log("TRAINING RESELLER PARTNER SUPPORT");
-                     const dialog5 = Metro.dialog.create({
-                        title: "Training Reseller Partner Support",
-                        content: "<p>Support for SAP Education Resellers regarding onboarding, high level training, booking/order requests, activation code redemption, Manage My Partnership, account setup & contract management, etc.</p> ",
-                        actionsAlign: "center",
-                        overlayClickClose: true
-                     });
-                     break;
-
-                  case "LEARNING VIRTUAL CLASS SUPPORT":
-                     console.log("LEARNING VIRTUAL CLASS SUPPORT");
-                     const dialog6 = Metro.dialog.create({
-                        title: "Learning Virtual Class Support",
-                        content: "<p>Support for SAP Learning Class Virtual delivery for the registered learners (e-material, virtual room link)</p> ",
-                        actionsAlign: "center",
-                        overlayClickClose: true
-                     });
-                     break;
+            //       case "TECHNICAL QUERIES":
+            //          console.log("Technical Queries");
+            //          const dialog3 = Metro.dialog.create({
+            //             title: "Technical Queries",
+            //             content: "<p>Technical Support for learners regarding access, content and functionality</p> ",
+            //             actionsAlign: "center",
+            //             overlayClickClose: true
+            //          });
+            //          break;
 
 
-                  case "VIRTUAL EVENT SERVICES":
-                     console.log("VIRTUAL EVENT SERVICES");
-                     const dialog7 = Metro.dialog.create({
-                        title: "Virtual Event Services",
-                        content: "<p>Provides logistics and support for broader events, virtual trainings or workshops published on SAP Learning Hub and learning.sap.com to support any enablement activities.</p> ",
-                        actionsAlign: "center",
-                        overlayClickClose: true
-                     });
-                     break;
+            //       case "PRACTICE SYSTEMS":
+            //          console.log("Practice Systems");
+            //          const dialog4 = Metro.dialog.create({
+            //             title: "Practice Systems",
+            //             content: "<p>Help instructors and learners regarding access and login, system performance, how-to questions, user guides, exercises & demos, etc.</p> ",
+            //             actionsAlign: "center",
+            //             overlayClickClose: true
+            //          });
+            //          break;
 
-                  case "PRACTICE SYSTEM DELIVERY (SAP INTERNAL)":
-                     console.log("PRACTICE SYSTEM DELIVERY (SAP INTERNAL)");
-                     const dialog8 = Metro.dialog.create({
-                        title: "Practice System Delivery (SAP Internal)",
-                        content: "<p>This is intended for our SAP internal colleagues who require additional support for training system landscapes.</p> ",
-                        actionsAlign: "center",
-                        overlayClickClose: true
-                     });
-                     break;
+            //       case "TRAINING RESELLER PARTNER SUPPORT":
+            //          console.log("TRAINING RESELLER PARTNER SUPPORT");
+            //          const dialog5 = Metro.dialog.create({
+            //             title: "Training Reseller Partner Support",
+            //             content: "<p>Support for SAP Education Resellers regarding onboarding, high level training, booking/order requests, activation code redemption, Manage My Partnership, account setup & contract management, etc.</p> ",
+            //             actionsAlign: "center",
+            //             overlayClickClose: true
+            //          });
+            //          break;
 
-                  case "DEMO OR INTERACTIVE LEARNING":
-                     console.log("DEMO OR INTERACTIVE LEARNING");
-                     const dialog9 = Metro.dialog.create({
-                        title: "Demo or Interactive Learning",
-                        content: "<p>Support for technical issues experienced on the interactive learning components as part of a Learning Journey.</p> ",
-                        actionsAlign: "center",
-                        overlayClickClose: true
-                     });
-                     break;   
+            //       case "LEARNING VIRTUAL CLASS SUPPORT":
+            //          console.log("LEARNING VIRTUAL CLASS SUPPORT");
+            //          const dialog6 = Metro.dialog.create({
+            //             title: "Learning Virtual Class Support",
+            //             content: "<p>Support for SAP Learning Class Virtual delivery for the registered learners (e-material, virtual room link)</p> ",
+            //             actionsAlign: "center",
+            //             overlayClickClose: true
+            //          });
+            //          break;
+
+
+            //       case "VIRTUAL EVENT SERVICES":
+            //          console.log("VIRTUAL EVENT SERVICES");
+            //          const dialog7 = Metro.dialog.create({
+            //             title: "Virtual Event Services",
+            //             content: "<p>Provides logistics and support for broader events, virtual trainings or workshops published on SAP Learning Hub and learning.sap.com to support any enablement activities.</p> ",
+            //             actionsAlign: "center",
+            //             overlayClickClose: true
+            //          });
+            //          break;
+
+            //       case "PRACTICE SYSTEM DELIVERY (SAP INTERNAL)":
+            //          console.log("PRACTICE SYSTEM DELIVERY (SAP INTERNAL)");
+            //          const dialog8 = Metro.dialog.create({
+            //             title: "Practice System Delivery (SAP Internal)",
+            //             content: "<p>This is intended for our SAP internal colleagues who require additional support for training system landscapes.</p> ",
+            //             actionsAlign: "center",
+            //             overlayClickClose: true
+            //          });
+            //          break;
+
+            //       case "DEMO OR INTERACTIVE LEARNING":
+            //          console.log("DEMO OR INTERACTIVE LEARNING");
+            //          const dialog9 = Metro.dialog.create({
+            //             title: "Demo or Interactive Learning",
+            //             content: "<p>Support for technical issues experienced on the interactive learning components as part of a Learning Journey.</p> ",
+            //             actionsAlign: "center",
+            //             overlayClickClose: true
+            //          });
+            //          break;   
 
 
 
-                  default:
-                     console.log("Unknown Category - " + catgText);
-                     break;
-               }
+            //       default:
+            //          console.log("Unknown Category - " + catgText);
+            //          break;
+            //    }
 
-            }
+            // }
 
 
 
