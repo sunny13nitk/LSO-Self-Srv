@@ -4158,8 +4158,13 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                                                                 }
                                                                 else if (StringUtils.hasText(type))
                                                                 {
+                                                                    //BITFRCEC-1448 - filter out email attachments too
                                                                     if (!type.equals(
-                                                                            GC_Constants.gc_AttachmentTypeInternal))
+                                                                            GC_Constants.gc_AttachmentTypeInternal)
+                                                                            && !type.equals(
+                                                                                    GC_Constants.gc_AttachmentTypeEmail)
+
+                                                                    )
                                                                     {
                                                                         prevAtt.add(new TY_PreviousAttachments(id,
                                                                                 title, fileSize, createdByName,

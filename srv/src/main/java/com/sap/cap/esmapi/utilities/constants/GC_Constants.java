@@ -53,6 +53,7 @@ public class GC_Constants
     public static final String gc_role_contractor_lso = "ExternalsRole"; // P/S User(s)
 
     public static final String gc_AttachmentTypeInternal = "ZINT"; // Internal Attachment Type
+    public static final String gc_AttachmentTypeEmail = "10002"; // Internal Attachment Type
 
     public static final String gc_Dest_SrvCloud_Internals = "BTP_SVC_INT";// Service Cloud Destination for Internal
                                                                           // (I/D/C) Users
