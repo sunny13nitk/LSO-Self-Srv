@@ -6,7 +6,9 @@ import java.util.Locale;
 import java.util.Optional;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -25,6 +27,8 @@ import com.sap.cap.esmapi.catg.pojos.TY_CatgCus;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgCusItem;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgDetails;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgTemplates;
+import com.sap.cap.esmapi.catg.pojos.TY_SplCatg;
+import com.sap.cap.esmapi.catg.pojos.TY_SplCatgCus;
 import com.sap.cap.esmapi.catg.srv.intf.IF_CatalogSrv;
 import com.sap.cap.esmapi.catg.srv.intf.IF_CatgSrv;
 import com.sap.cap.esmapi.events.event.EV_CaseConfirmSubmit;
@@ -33,6 +37,7 @@ import com.sap.cap.esmapi.exceptions.EX_ESMAPI;
 import com.sap.cap.esmapi.ui.pojos.TY_CaseConfirmPOJO;
 import com.sap.cap.esmapi.ui.pojos.TY_CaseEdit_Form;
 import com.sap.cap.esmapi.ui.pojos.TY_Case_Form;
+import com.sap.cap.esmapi.ui.srv.intf.IF_SplCatgMVSrv;
 import com.sap.cap.esmapi.utilities.constants.GC_Constants;
 import com.sap.cap.esmapi.utilities.enums.EnumCaseTypes;
 import com.sap.cap.esmapi.utilities.enums.EnumMessageType;
@@ -91,6 +96,15 @@ public class LSOController
 
     @Autowired
     private IF_CatalogSrv catalogSrv;
+
+    @Autowired
+    private IF_SplCatgMVSrv splCatgMVSrv;
+
+    @Autowired
+    private TY_SplCatgCus splCatgCus;
+
+    @Autowired
+    private ApplicationContext appCtxt;
 
     private final String caseListVWRedirect = "redirect:/lso/";
     private final String caseFormViewLXSS = "caseFormLSOLXSS";
@@ -750,6 +764,55 @@ public class LSOController
 
             if (caseForm != null)
             {
+                // Check for Special Category Customizations
+                if (splCatgCus != null)
+                {
+                    log.info("Checking Special Category Customizations for Category ID : " + caseForm.getCatgDesc());
+                    if (CollectionUtils.isNotEmpty(splCatgCus.getSplCatgCus()))
+                    {
+                        Optional<TY_SplCatg> splCatgCusO = splCatgCus.getSplCatgCus().stream()
+                                .filter(e -> e.getCatg().equals(caseForm.getCatgDesc())).findFirst();
+
+                        if (splCatgCusO.isPresent())
+                        {
+                            log.info(
+                                    "Special Category Customization Found for Category ID : " + caseForm.getCatgDesc());
+                            // Adjust the Case Form Context as per Special Category Customizations
+                            String splCatgSrv = splCatgCusO.get().getSrv();
+                            if (StringUtils.hasText(splCatgSrv))
+                            {
+                                log.info("Checking Special Category Service : " + splCatgSrv);
+                                if (appCtxt != null)
+                                {
+                                    try
+                                    {
+                                        IF_SplCatgMVSrv splCatgService = (IF_SplCatgMVSrv) appCtxt.getBean(splCatgSrv);
+                                        if (splCatgService != null)
+                                        {
+                                            log.info("Invoking Special Category Service : " + splCatgSrv);
+                                            ModelAndView splCatgMV = splCatgService.getSplCatgModelAndView(caseForm);
+                                            if (splCatgMV != null)
+                                            {
+                                                log.info("Special Category Service ModelAndView Retrieved : "
+                                                        + splCatgMV.getViewName());
+                                                // Merge Model Attributes
+                                                model.addAllAttributes(splCatgMV.getModel());
+                                                // Override View Name
+                                                return splCatgMV.getViewName();
+                                            }
+                                        }
+                                    }
+                                    catch (BeansException be)
+                                    {
+                                        log.error("Special Category Service Bean Not Found: " + splCatgSrv, be);
+                                    }
+                                }
+                            }
+
+                        }
+                    }
+                }
+
                 userSessSrv.setCaseFormB4Submission(null);
 
                 // Normal Scenario - Catg. chosen Not relevant for Notes Template and/or
