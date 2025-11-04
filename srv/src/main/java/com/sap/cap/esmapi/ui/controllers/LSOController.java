@@ -771,7 +771,7 @@ public class LSOController
                     if (CollectionUtils.isNotEmpty(splCatgCus.getSplCatgCus()))
                     {
                         Optional<TY_SplCatg> splCatgCusO = splCatgCus.getSplCatgCus().stream()
-                                .filter(e -> e.getCatg().equals(caseForm.getCatgDesc())).findFirst();
+                                .filter(e -> e.getCatg().equals(caseForm.getCatgText().toUpperCase())).findFirst();
 
                         if (splCatgCusO.isPresent())
                         {
