@@ -767,7 +767,7 @@ public class LSOController
                 // Check for Special Category Customizations
                 if (splCatgCus != null)
                 {
-                    log.info("Checking Special Category Customizations for Category : " + caseForm.getCatgText().toUpperCase());
+                    log.info("Checking Special Category Customizations for Category : " + caseForm.getCatgDesc().toUpperCase());
                     if (CollectionUtils.isNotEmpty(splCatgCus.getSplCatgCus()))
                     {
                         Optional<TY_SplCatg> splCatgCusO = splCatgCus.getSplCatgCus().stream()
