@@ -6,6 +6,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.sap.cap.esmapi.catg.pojos.TY_CatgCus;
+import com.sap.cap.esmapi.catg.pojos.TY_CatgDetails;
 import com.sap.cap.esmapi.catg.srv.intf.IF_CatalogSrv;
 import com.sap.cap.esmapi.exceptions.EX_ESMAPI;
 import com.sap.cap.esmapi.ui.pojos.TY_Case_Form;
@@ -28,6 +29,8 @@ public class CL_SplCatgMVSrv implements IF_SplCatgMVSrv
     private final TY_CatgCus catgCusSrv;
 
     private final IF_CatalogSrv catalogTreeSrv;
+
+    private final IF_CatalogSrv catalogSrv;
 
     private final String gc_desc = "SAP Certification Special Accomodation Request";
 
@@ -54,6 +57,17 @@ public class CL_SplCatgMVSrv implements IF_SplCatgMVSrv
             if (CollectionUtils.isNotEmpty(userSessSrv.getFormErrors()))
             {
                 userSessSrv.clearFormErrors();
+            }
+
+            // Also set the Category Description in Upper Case
+            // Get the Category Description for the Category ID from Case Form
+            TY_CatgDetails catgDetails = catalogSrv.getCategoryDetails4Catg(caseForm.getCatgDesc(),
+                    EnumCaseTypes.Learning, true);
+            if (catgDetails != null)
+            {
+                caseForm.setCatgText(catgDetails.getCatDesc());
+                log.info(
+                        "Catg. Text for Category ID : " + caseForm.getCatgDesc() + " is : " + catgDetails.getCatDesc());
             }
 
             // also Upload the Catg. Tree as per Case Type
