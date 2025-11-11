@@ -767,7 +767,19 @@ public class LSOController
                 // Check for Special Category Customizations
                 if (splCatgCus != null)
                 {
-                    log.info("Checking Special Category Customizations for Category : " + caseForm.getCatgDesc().toUpperCase());
+                    log.info("Checking Special Category Customizations for Category ID : " + caseForm.getCatgDesc());
+                    log.info("Getting Text for the Category IDfrom customizing...");
+                    // Also set the Category Description in Upper Case
+                    // Get the Category Description for the Category ID from Case Form
+                    TY_CatgDetails catgDetails = catalogSrv.getCategoryDetails4Catg(caseForm.getCatgDesc(),
+                            EnumCaseTypes.Learning, true);
+                    if (catgDetails != null)
+                    {
+                        caseForm.setCatgText(catgDetails.getCatDesc());
+                        log.info("Catg. Text for Category ID : " + caseForm.getCatgDesc() + " is : "
+                                + catgDetails.getCatDesc());
+                    }
+
                     if (CollectionUtils.isNotEmpty(splCatgCus.getSplCatgCus()))
                     {
                         Optional<TY_SplCatg> splCatgCusO = splCatgCus.getSplCatgCus().stream()
@@ -775,8 +787,8 @@ public class LSOController
 
                         if (splCatgCusO.isPresent())
                         {
-                            log.info(
-                                    "Special Category Customization Found for Category : " + caseForm.getCatgText().toUpperCase());
+                            log.info("Special Category Customization Found for Category : "
+                                    + caseForm.getCatgText().toUpperCase());
                             // Adjust the Case Form Context as per Special Category Customizations
                             String splCatgSrv = splCatgCusO.get().getSrv();
                             if (StringUtils.hasText(splCatgSrv))
@@ -859,16 +871,17 @@ public class LSOController
 
                         }
 
-                        // Also set the Category Description in Upper Case
-                        // Get the Category Description for the Category ID from Case Form
-                        TY_CatgDetails catgDetails = catalogSrv.getCategoryDetails4Catg(caseForm.getCatgDesc(),
-                                EnumCaseTypes.Learning, true);
-                        if (catgDetails != null)
-                        {
-                            caseForm.setCatgText(catgDetails.getCatDesc());
-                            log.info("Catg. Text for Category ID : " + caseForm.getCatgDesc() + " is : "
-                                    + catgDetails.getCatDesc());
-                        }
+                        // // Also set the Category Description in Upper Case
+                        // // Get the Category Description for the Category ID from Case Form
+                        // TY_CatgDetails catgDetails =
+                        // catalogSrv.getCategoryDetails4Catg(caseForm.getCatgDesc(),
+                        // EnumCaseTypes.Learning, true);
+                        // if (catgDetails != null)
+                        // {
+                        // caseForm.setCatgText(catgDetails.getCatDesc());
+                        // log.info("Catg. Text for Category ID : " + caseForm.getCatgDesc() + " is : "
+                        // + catgDetails.getCatDesc());
+                        // }
 
                         if (vhlpUISrv != null)
                         {
