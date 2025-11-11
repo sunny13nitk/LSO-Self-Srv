@@ -31,6 +31,11 @@ public class TY_Case_Form
     private boolean external;
     private boolean catgChange;
     private String catgText;
+    private String appId; // Exam form Extensions
+    private boolean extraTime;
+    private boolean exambreak;
+    private boolean extramonitor;
+    private boolean extraperson;
 
     @Override
     public String toString()
