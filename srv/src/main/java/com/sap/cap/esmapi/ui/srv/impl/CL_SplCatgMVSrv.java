@@ -74,7 +74,7 @@ public class CL_SplCatgMVSrv implements IF_SplCatgMVSrv
             modelVw.addObject("catgsList", catalogTreeSrv.getCaseCatgTree4LoB(EnumCaseTypes.Learning).getCategories());
 
             caseForm.setTemplate(null);
-            caseForm.setDescription(gc_desc);
+            caseForm.setSubject(gc_desc);
 
             modelVw.addObject("caseForm", caseForm);
 

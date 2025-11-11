@@ -871,18 +871,6 @@ public class LSOController
 
                         }
 
-                        // // Also set the Category Description in Upper Case
-                        // // Get the Category Description for the Category ID from Case Form
-                        // TY_CatgDetails catgDetails =
-                        // catalogSrv.getCategoryDetails4Catg(caseForm.getCatgDesc(),
-                        // EnumCaseTypes.Learning, true);
-                        // if (catgDetails != null)
-                        // {
-                        // caseForm.setCatgText(catgDetails.getCatDesc());
-                        // log.info("Catg. Text for Category ID : " + caseForm.getCatgDesc() + " is : "
-                        // + catgDetails.getCatDesc());
-                        // }
-
                         if (vhlpUISrv != null)
                         {
                             model.addAllAttributes(coLaDDLBSrv.adjustCountryLanguageDDLB(caseForm.getCountry(),
