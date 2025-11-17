@@ -3,12 +3,10 @@ package com.sap.cap.esmapi.ui.pojos;
 import org.springframework.web.multipart.MultipartFile;
 
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class TY_Case_Form
@@ -36,12 +34,5 @@ public class TY_Case_Form
     private boolean exambreak;
     private boolean extramonitor;
     private boolean extraperson;
-
-    @Override
-    public String toString()
-    {
-        return "TY_Case_Form [accId=" + accId + ", caseTxnType=" + caseTxnType + ", catgDesc=" + catgDesc
-                + ", description=" + description + ", subject=" + subject + "]";
-    }
 
 }
