@@ -642,6 +642,7 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
         log.info("Getting Text for the Category ID from customizing...");
         if (splCatgCus != null)
         {
+            log.info("Special Category Customizations maintained in the System...");
             if (CollectionUtils.isEmpty(splCatgCus.getSplCatgCus()))
             {
                 log.info("No Special Category Customizations maintained in the System...");
@@ -673,6 +674,11 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                     }
                 }
             }
+        }
+        else
+        {
+            log.info("No Special Category Customizations maintained in the System...");
+            splCatgSeek.setFound(false);
         }
         return splCatgSeek;
 
