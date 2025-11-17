@@ -659,18 +659,19 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                 if (catgDetails != null)
                 {
                     log.info("Catg. Text for Category ID : " + caseFormCatgDesc + " is : " + catgDetails.getCatDesc());
-                }
-                if (CollectionUtils.isNotEmpty(splCatgCus.getSplCatgCus()))
-                {
-                    Optional<TY_SplCatg> splCatgCusO = splCatgCus.getSplCatgCus().stream()
-                            .filter(e -> e.getCatg().equals(caseFormCatgDesc.toUpperCase())).findFirst();
 
-                    if (splCatgCusO.isPresent())
+                    if (CollectionUtils.isNotEmpty(splCatgCus.getSplCatgCus()))
                     {
-                        log.info("Special Category Customization Found for Category : "
-                                + caseFormCatgDesc.toUpperCase());
-                        splCatgSeek.setFound(true);
-                        splCatgSeek.setSplCatgCus(splCatgCusO.get());
+                        Optional<TY_SplCatg> splCatgCusO = splCatgCus.getSplCatgCus().stream()
+                                .filter(e -> e.getCatg().equals(catgDetails.getCatDesc())).findFirst();
+
+                        if (splCatgCusO.isPresent())
+                        {
+                            log.info("Special Category Customization Found for Category : "
+                                    + caseFormCatgDesc.toUpperCase());
+                            splCatgSeek.setFound(true);
+                            splCatgSeek.setSplCatgCus(splCatgCusO.get());
+                        }
                     }
                 }
             }
