@@ -640,26 +640,42 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
         TY_SplCatg_Seek splCatgSeek = new TY_SplCatg_Seek();
         log.info("Checking Special Category Customizations for Category ID at Case submission : " + caseFormCatgDesc);
         log.info("Getting Text for the Category ID from customizing...");
-        // Also set the Category Description in Upper Case
-        // Get the Category Description for the Category ID from Case Form
-        TY_CatgDetails catgDetails = catalogSrv.getCategoryDetails4Catg(caseFormCatgDesc, EnumCaseTypes.Learning, true);
-        if (catgDetails != null)
+        if (splCatgCus != null)
         {
-            log.info("Catg. Text for Category ID : " + caseFormCatgDesc + " is : " + catgDetails.getCatDesc());
-        }
-        if (CollectionUtils.isNotEmpty(splCatgCus.getSplCatgCus()))
-        {
-            Optional<TY_SplCatg> splCatgCusO = splCatgCus.getSplCatgCus().stream()
-                    .filter(e -> e.getCatg().equals(caseFormCatgDesc.toUpperCase())).findFirst();
-
-            if (splCatgCusO.isPresent())
+            if (CollectionUtils.isEmpty(splCatgCus.getSplCatgCus()))
             {
-                log.info("Special Category Customization Found for Category : " + caseFormCatgDesc.toUpperCase());
-                splCatgSeek.setFound(true);
-                splCatgSeek.setSplCatgCus(splCatgCusO.get());
+                log.info("No Special Category Customizations maintained in the System...");
+                splCatgSeek.setFound(false);
+                return splCatgSeek;
+            }
+            else
+            {
+
+                // Also set the Category Description in Upper Case
+                // Get the Category Description for the Category ID from Case Form
+                TY_CatgDetails catgDetails = catalogSrv.getCategoryDetails4Catg(caseFormCatgDesc,
+                        EnumCaseTypes.Learning, true);
+                if (catgDetails != null)
+                {
+                    log.info("Catg. Text for Category ID : " + caseFormCatgDesc + " is : " + catgDetails.getCatDesc());
+                }
+                if (CollectionUtils.isNotEmpty(splCatgCus.getSplCatgCus()))
+                {
+                    Optional<TY_SplCatg> splCatgCusO = splCatgCus.getSplCatgCus().stream()
+                            .filter(e -> e.getCatg().equals(caseFormCatgDesc.toUpperCase())).findFirst();
+
+                    if (splCatgCusO.isPresent())
+                    {
+                        log.info("Special Category Customization Found for Category : "
+                                + caseFormCatgDesc.toUpperCase());
+                        splCatgSeek.setFound(true);
+                        splCatgSeek.setSplCatgCus(splCatgCusO.get());
+                    }
+                }
             }
         }
         return splCatgSeek;
+
     }
 
     @Override
