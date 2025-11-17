@@ -790,7 +790,7 @@ public class LSOController
                             log.info("Special Category Customization Found for Category : "
                                     + caseForm.getCatgText().toUpperCase());
                             // Adjust the Case Form Context as per Special Category Customizations
-                            String splCatgSrv = splCatgCusO.get().getSrv();
+                            String splCatgSrv = splCatgCusO.get().getMvsrv();
                             if (StringUtils.hasText(splCatgSrv))
                             {
                                 log.info("Checking Special Category Service : " + splCatgSrv);

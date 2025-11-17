@@ -19,7 +19,9 @@ import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.validator.routines.EmailValidator;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -31,6 +33,9 @@ import com.sap.cap.esmapi.catg.pojos.TY_CatalogItem;
 import com.sap.cap.esmapi.catg.pojos.TY_CatalogTree;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgCus;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgCusItem;
+import com.sap.cap.esmapi.catg.pojos.TY_CatgDetails;
+import com.sap.cap.esmapi.catg.pojos.TY_SplCatg;
+import com.sap.cap.esmapi.catg.pojos.TY_SplCatgCus;
 import com.sap.cap.esmapi.catg.srv.intf.IF_CatalogSrv;
 import com.sap.cap.esmapi.events.event.EV_LogMessage;
 import com.sap.cap.esmapi.exceptions.EX_CaseAlreadyConfirmed;
@@ -44,7 +49,9 @@ import com.sap.cap.esmapi.ui.pojos.TY_CaseEditFormAsync;
 import com.sap.cap.esmapi.ui.pojos.TY_CaseEdit_Form;
 import com.sap.cap.esmapi.ui.pojos.TY_CaseFormAsync;
 import com.sap.cap.esmapi.ui.pojos.TY_Case_Form;
+import com.sap.cap.esmapi.ui.pojos.TY_SplCatg_Seek;
 import com.sap.cap.esmapi.ui.srv.intf.IF_ESS_UISrv;
+import com.sap.cap.esmapi.ui.srv.intf.IF_SplCatgSubmSrv;
 import com.sap.cap.esmapi.utilities.constants.GC_Constants;
 import com.sap.cap.esmapi.utilities.enums.EnumCaseTypes;
 import com.sap.cap.esmapi.utilities.enums.EnumMessageType;
@@ -128,6 +135,12 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
 
     @Autowired
     private IF_DestinationService destSrv;
+
+    @Autowired
+    private TY_SplCatgCus splCatgCus;
+
+    @Autowired
+    private ApplicationContext appCtxt;
 
     // Properties
     private TY_UserSessionInfo userSessInfo;
@@ -407,6 +420,55 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
 
         if (caseForm != null && !CollectionUtils.isEmpty(catgCusSrv.getCustomizations()) && vHlpModelSrv != null)
         {
+
+            /*
+             * Check for Special Category in the Form and delegate to specific Service that
+             * works on exactly like this method just with different behaviors for Special
+             * Category Case Form
+             */
+            TY_SplCatg_Seek splCatgSeek = isSplCatg(caseForm.getCatgDesc());
+            if (splCatgSeek.isFound())
+            {
+                log.info(
+                        "Special Category Identified at Case Form Submission : Scanning for Special Category Service...");
+                if (splCatgSeek.getSplCatgCus() != null
+                        && StringUtils.hasText(splCatgSeek.getSplCatgCus().getFormsubmsrv()))
+                {
+                    log.info("Special Category Service Identified : " + splCatgSeek.getSplCatgCus().getFormsubmsrv());
+                    // Delegate to Special Category Service
+                    try
+                    {
+
+                        IF_SplCatgSubmSrv splCatgSubmSrv = (IF_SplCatgSubmSrv) appCtxt
+                                .getBean(splCatgSeek.getSplCatgCus().getFormsubmsrv());
+                        try
+                        {
+                            return splCatgSubmSrv.submitCaseForm(caseForm);
+                        }
+                        catch (EX_ESMAPI e)
+                        {
+                            log.error("Error in Special Category Case Form Submission via Service : "
+                                    + splCatgSeek.getSplCatgCus().getFormsubmsrv() + " : " + e.getLocalizedMessage());
+                            return false;
+                        }
+
+                    }
+                    catch (BeansException be)
+                    {
+                        log.error("Special Category Service Bean Not Found: "
+                                + splCatgSeek.getSplCatgCus().getFormsubmsrv() + " : " + be.getLocalizedMessage());
+                    }
+                }
+                else
+                {
+                    log.error("No Special Category Service defined for Form Submission for Category : "
+                            + caseForm.getCatgDesc());
+                    return false;
+                }
+
+                return false; // Temporary : To be replaced with actual call to Special Category Service
+            }
+
             // Push Form data to Session
             TY_CaseFormAsync caseFormAsync = new TY_CaseFormAsync();
 
@@ -571,6 +633,33 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
         }
 
         return isSubmitted;
+    }
+
+    private TY_SplCatg_Seek isSplCatg(String caseFormCatgDesc)
+    {
+        TY_SplCatg_Seek splCatgSeek = new TY_SplCatg_Seek();
+        log.info("Checking Special Category Customizations for Category ID at Case submission : " + caseFormCatgDesc);
+        log.info("Getting Text for the Category ID from customizing...");
+        // Also set the Category Description in Upper Case
+        // Get the Category Description for the Category ID from Case Form
+        TY_CatgDetails catgDetails = catalogSrv.getCategoryDetails4Catg(caseFormCatgDesc, EnumCaseTypes.Learning, true);
+        if (catgDetails != null)
+        {
+            log.info("Catg. Text for Category ID : " + caseFormCatgDesc + " is : " + catgDetails.getCatDesc());
+        }
+        if (CollectionUtils.isNotEmpty(splCatgCus.getSplCatgCus()))
+        {
+            Optional<TY_SplCatg> splCatgCusO = splCatgCus.getSplCatgCus().stream()
+                    .filter(e -> e.getCatg().equals(caseFormCatgDesc.toUpperCase())).findFirst();
+
+            if (splCatgCusO.isPresent())
+            {
+                log.info("Special Category Customization Found for Category : " + caseFormCatgDesc.toUpperCase());
+                splCatgSeek.setFound(true);
+                splCatgSeek.setSplCatgCus(splCatgCusO.get());
+            }
+        }
+        return splCatgSeek;
     }
 
     @Override
@@ -857,6 +946,7 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
         {
             if (userSessInfo.getCurrentForm4Submission().getCaseForm() != null)
             {
+
                 /*
                  * Validate and Process REquestor Email
                  */

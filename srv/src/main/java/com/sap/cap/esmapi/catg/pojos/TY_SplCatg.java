@@ -14,5 +14,10 @@ public class TY_SplCatg
     @CsvBindByPosition(position = 0)
     private String catg;
     @CsvBindByPosition(position = 1)
-    private String srv;
+    private String mvsrv;
+    @CsvBindByPosition(position = 2)
+    private String formsubmsrv;
+    @CsvBindByPosition(position = 3)
+    private String casecreatesrv;
+
 }
