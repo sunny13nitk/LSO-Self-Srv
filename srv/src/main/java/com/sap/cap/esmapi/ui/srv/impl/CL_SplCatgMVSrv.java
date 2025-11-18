@@ -62,13 +62,6 @@ public class CL_SplCatgMVSrv implements IF_SplCatgMVSrv
                 if (CollectionUtils.isNotEmpty(userSessSrv.getFormErrors()))
                 {
                     List<String> errorsCaseForm = new ArrayList<String>();
-                    log.info("Populating errors from SP Catg MV service");
-
-                    for (String err : userSessSrv.getFormErrors())
-                    {
-                        log.info("Form Error: " + err);
-                        errorsCaseForm.add(err);
-                    }
                     modelVw.addObject("formErrors", errorsCaseForm);
                 }
             }
