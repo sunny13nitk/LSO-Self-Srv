@@ -434,6 +434,11 @@ public class LSOController
                 ModelAndView mv = splCatgMVSrv.getSplCatgModelAndView(caseForm, true);
                 viewName = mv.getViewName();
                 model.addAllAttributes(mv.getModel());
+                for (String err : userSessSrv.getFormErrors())
+                {
+                    log.info("Form Error: " + err);
+
+                }
             }
 
         }

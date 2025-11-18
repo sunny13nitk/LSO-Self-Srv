@@ -60,6 +60,11 @@ public class CL_SplCatgMVSrv implements IF_SplCatgMVSrv
                 {
                     log.info("Populating errors from SP Catg MV service");
                     modelVw.addObject("formErrors", userSessSrv.getFormErrors());
+                    for (String err : userSessSrv.getFormErrors())
+                    {
+                        log.info("Form Error: " + err);
+                        
+                    }
                 }
             }
 
