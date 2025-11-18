@@ -434,11 +434,9 @@ public class LSOController
                 ModelAndView mv = splCatgMVSrv.getSplCatgModelAndView(caseForm, true);
                 viewName = mv.getViewName();
                 model.addAllAttributes(mv.getModel());
-                Model modelfrmErr = (Model) model.getAttribute("formErrors");
-                if (modelfrmErr != null)
+                List<String> names = (List<String>) model.getAttribute("formErrors");
+                if (CollectionUtils.isNotEmpty(names))
                 {
-                    log.info("Form Errors present in model from spl. catg mv srv...");
-                    List<String> names = (List<String>) modelfrmErr.getAttribute("formErrors");
                     for (String err : names)
                     {
                         log.info("Form Error in LSO Controller redirect: " + err);
