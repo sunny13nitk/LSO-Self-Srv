@@ -7,5 +7,5 @@ import com.sap.cap.esmapi.ui.pojos.TY_Case_Form;
 
 public interface IF_SplCatgMVSrv
 {
-    public ModelAndView getSplCatgModelAndView(TY_Case_Form caseForm) throws EX_ESMAPI;
+    public ModelAndView getSplCatgModelAndView(TY_Case_Form caseForm, boolean... notiGgnoreErrors) throws EX_ESMAPI;
 }

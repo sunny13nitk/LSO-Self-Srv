@@ -35,7 +35,7 @@ public class CL_SplCatgMVSrv implements IF_SplCatgMVSrv
     private final String gc_desc = "SAP Certification Special Accomodation Request";
 
     @Override
-    public ModelAndView getSplCatgModelAndView(TY_Case_Form caseForm) throws EX_ESMAPI
+    public ModelAndView getSplCatgModelAndView(TY_Case_Form caseForm, boolean... notiGgnoreErrors) throws EX_ESMAPI
     {
         log.info("Inside CL_SplCatgMVSrv for special category SAP Certification special accomodation request");
         ModelAndView modelVw = new ModelAndView("caseFormExamExtensions");
@@ -52,6 +52,15 @@ public class CL_SplCatgMVSrv implements IF_SplCatgMVSrv
             TY_UserESS userDetails = new TY_UserESS();
             userDetails.setUserDetails(userSessSrv.getUserDetails4mSession());
             modelVw.addObject("userInfo", userDetails);
+
+            if (notiGgnoreErrors != null && notiGgnoreErrors.length > 0 && notiGgnoreErrors[0])
+            {
+                // Populate any Form Errors from Session
+                if (CollectionUtils.isNotEmpty(userSessSrv.getFormErrors()))
+                {
+                    modelVw.addObject("formErrors", userSessSrv.getFormErrors());
+                }
+            }
 
             // clear Form errors on each refresh or a New Case form request
             if (CollectionUtils.isNotEmpty(userSessSrv.getFormErrors()))

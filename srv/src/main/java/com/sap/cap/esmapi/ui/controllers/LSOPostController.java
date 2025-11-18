@@ -85,6 +85,7 @@ public class LSOPostController
 
     private final String caseListVWRedirect = "redirect:/lso/";
     private final String caseFormErrorRedirect = "redirect:/lso/errForm/";
+    private final String caseFormSplErrorRedirect = "redirect:/lso/errFormSpl/";
     private final String caseFormViewLXSS = "caseFormLSOLXSS";
     private final String caseFormReplyLXSS = "caseFormReplyLSOLXSS";
     private final String caseFormReplyErrorRedirect = "redirect:/lso/errCaseReply/";
@@ -115,8 +116,8 @@ public class LSOPostController
                 {
                     log.info("Special Category Case Form redirection post Case Form Submission..");
 
-                    //REplace
-                    viewName = caseFormErrorRedirect;
+                    // REplace
+                    viewName = caseFormSplErrorRedirect;
                 }
                 else
                 {

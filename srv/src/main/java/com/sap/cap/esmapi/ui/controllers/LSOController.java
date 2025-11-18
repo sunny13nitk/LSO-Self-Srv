@@ -37,6 +37,7 @@ import com.sap.cap.esmapi.exceptions.EX_ESMAPI;
 import com.sap.cap.esmapi.ui.pojos.TY_CaseConfirmPOJO;
 import com.sap.cap.esmapi.ui.pojos.TY_CaseEdit_Form;
 import com.sap.cap.esmapi.ui.pojos.TY_Case_Form;
+import com.sap.cap.esmapi.ui.pojos.TY_SplCatg_Seek;
 import com.sap.cap.esmapi.ui.srv.intf.IF_SplCatgMVSrv;
 import com.sap.cap.esmapi.utilities.constants.GC_Constants;
 import com.sap.cap.esmapi.utilities.enums.EnumCaseTypes;
@@ -411,6 +412,34 @@ public class LSOController
         }
 
         return caseFormViewLXSS;
+    }
+
+    @GetMapping("/errFormSpl/")
+    public String showErrorCaseSplForm(Model model)
+    {
+        String viewName = null;
+
+        if ((StringUtils.hasText(userSessSrv.getUserDetails4mSession().getAccountId())
+                || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId()))
+                && !CollectionUtils.isEmpty(catgCusSrv.getCustomizations())
+                && userSessSrv.getCurrentForm4Submission() != null)
+        {
+            log.info("Inside form Error Redirect - spl case catg... ");
+            userSessSrv.clearActiveSubmission();
+            TY_Case_Form caseForm = userSessSrv.getCurrentForm4Submission().getCaseForm();
+            log.info("Seeking Spl. Catg customizing for category: " + caseForm.getCatgDesc());
+            TY_SplCatg_Seek splCatgSeek = userSessSrv.isSplCatg(caseForm.getCatgDesc());
+            if (splCatgSeek != null)
+            {
+                ModelAndView mv = splCatgMVSrv.getSplCatgModelAndView(caseForm, true);
+                viewName = mv.getViewName();
+                model.addAllAttributes(mv.getModel());
+            }
+
+        }
+
+        return viewName;
+
     }
 
     @GetMapping("/removeAttachment/{fileName}")
