@@ -52,46 +52,43 @@ public class CL_SplCatgSubmSrv implements IF_SplCatgSubmSrv
         {
 
             log.info("Inside Case Form Submission for Specal Category with form details as : " + caseForm.toString());
+            TY_CaseFormAsync caseFormAsync = new TY_CaseFormAsync();
+            caseFormAsync.setCaseForm(caseForm);
+            caseFormAsync.setSubmGuid(UUID.randomUUID().toString());
+            // Latest time Stamp from Form Submissions
+            caseFormAsync.setTimestamp(Timestamp.from(Instant.now()));
+            caseFormAsync.setUserId(userSessionSrv.getUserDetails4mSession().getUserId());
 
-            // validate the form fields as per Special Category requirements
-            if (isCaseFormDataValid(caseForm))
+            // Get Case Type Enum from Case Transaction Type
+            Optional<TY_CatgCusItem> cusItemO = catgCusSrv.getCustomizations().stream()
+                    .filter(f -> f.getCaseType().equals(caseForm.getCaseTxnType())).findFirst();
+            if (cusItemO.isPresent())
             {
-
-                TY_CaseFormAsync caseFormAsync = new TY_CaseFormAsync();
-                caseFormAsync.setCaseForm(caseForm);
-                caseFormAsync.setSubmGuid(UUID.randomUUID().toString());
-                // Latest time Stamp from Form Submissions
-                caseFormAsync.setTimestamp(Timestamp.from(Instant.now()));
-                caseFormAsync.setUserId(userSessionSrv.getUserDetails4mSession().getUserId());
-
-                // Get Case Type Enum from Case Transaction Type
-                Optional<TY_CatgCusItem> cusItemO = catgCusSrv.getCustomizations().stream()
-                        .filter(f -> f.getCaseType().equals(caseForm.getCaseTxnType())).findFirst();
-                if (cusItemO.isPresent())
+                if (!CollectionUtils.isEmpty(catgCusSrv.getCustomizations()))
                 {
-                    if (!CollectionUtils.isEmpty(catgCusSrv.getCustomizations()))
-
+                    if (cusItemO.isPresent() && catalogSrv != null)
                     {
+                        String[] catTreeSelCatg = catalogSrv.getCatgHierarchyforCatId(caseForm.getCatgDesc(),
+                                cusItemO.get().getCaseTypeEnum());
+                        caseFormAsync.setCatTreeSelCatg(catTreeSelCatg);
 
-                        if (cusItemO.isPresent() && catalogSrv != null)
-                        {
-                            String[] catTreeSelCatg = catalogSrv.getCatgHierarchyforCatId(caseForm.getCatgDesc(),
-                                    cusItemO.get().getCaseTypeEnum());
-                            caseFormAsync.setCatTreeSelCatg(catTreeSelCatg);
-
-                            caseFormAsyncSpl = new TY_CaseFormSubmSpl();
-                            caseFormAsyncSpl.setCaseFormAsync(caseFormAsync);
-                            caseFormAsyncSpl.setValid(true);
-                        }
-
+                        caseFormAsyncSpl = new TY_CaseFormSubmSpl();
+                        caseFormAsyncSpl.setCaseFormAsync(caseFormAsync);
                     }
                 }
-
             }
-            else
+
+            // validate the form fields as per Special Category requirements
+            if (caseFormAsyncSpl != null)
             {
-                caseFormAsyncSpl = new TY_CaseFormSubmSpl();
-                caseFormAsyncSpl.setValid(true);
+                if (isCaseFormDataValid(caseForm))
+                {
+                    caseFormAsyncSpl.setValid(true);
+                }
+                else
+                {
+                    caseFormAsyncSpl.setValid(false);
+                }
             }
         }
         return caseFormAsyncSpl;

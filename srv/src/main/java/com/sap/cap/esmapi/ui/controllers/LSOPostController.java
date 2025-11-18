@@ -114,6 +114,9 @@ public class LSOPostController
                 if (splCatgSeek.isFound())
                 {
                     log.info("Special Category Case Form redirection post Case Form Submission..");
+
+                    //REplace
+                    viewName = caseFormErrorRedirect;
                 }
                 else
                 {

@@ -454,6 +454,7 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                             {
                                 log.error("Special Category Case Form Submission Validation Failed for Service : "
                                         + splCatgSeek.getSplCatgCus().getFormsubmsrv());
+                                userSessInfo.setCurrentForm4Submission(caseFormAsyncSpl.getCaseFormAsync());
                                 return false;
                             }
 
