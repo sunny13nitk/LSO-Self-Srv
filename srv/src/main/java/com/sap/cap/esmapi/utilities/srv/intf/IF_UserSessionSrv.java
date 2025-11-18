@@ -11,6 +11,7 @@ import com.sap.cap.esmapi.ui.pojos.TY_CaseEditFormAsync;
 import com.sap.cap.esmapi.ui.pojos.TY_CaseEdit_Form;
 import com.sap.cap.esmapi.ui.pojos.TY_CaseFormAsync;
 import com.sap.cap.esmapi.ui.pojos.TY_Case_Form;
+import com.sap.cap.esmapi.ui.pojos.TY_SplCatg_Seek;
 import com.sap.cap.esmapi.utilities.pojos.TY_CaseESS;
 import com.sap.cap.esmapi.utilities.pojos.TY_Message;
 import com.sap.cap.esmapi.utilities.pojos.TY_UserDetails;
@@ -28,6 +29,8 @@ public interface IF_UserSessionSrv
     public void setPreviousCategory(String catg);
 
     public String getPreviousCategory();
+
+    public TY_SplCatg_Seek isSplCatg(String caseFormCatgDesc);
 
     // For Test Purpose Only to Test the Controller - #Test
     public TY_UserSessionInfo getSessionInfo4Test();

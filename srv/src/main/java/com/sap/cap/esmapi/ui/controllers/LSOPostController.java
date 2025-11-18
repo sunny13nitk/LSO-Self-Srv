@@ -32,6 +32,7 @@ import com.sap.cap.esmapi.ui.pojos.TY_CaseEditFormAsync;
 import com.sap.cap.esmapi.ui.pojos.TY_CaseEdit_Form;
 import com.sap.cap.esmapi.ui.pojos.TY_CaseFormAsync;
 import com.sap.cap.esmapi.ui.pojos.TY_Case_Form;
+import com.sap.cap.esmapi.ui.pojos.TY_SplCatg_Seek;
 import com.sap.cap.esmapi.utilities.enums.EnumCaseTypes;
 import com.sap.cap.esmapi.utilities.pojos.TY_RLConfig;
 import com.sap.cap.esmapi.utilities.pojos.TY_UserESS;
@@ -107,8 +108,20 @@ public class LSOPostController
             if (!userSessSrv.SubmitCaseForm(caseForm))
             {
                 log.info("Error in Case Form!");
-                // Redirect to Error Processing of Form
-                viewName = caseFormErrorRedirect;
+
+                TY_SplCatg_Seek splCatgSeek = userSessSrv.isSplCatg(caseForm.getCatgDesc());
+
+                if (splCatgSeek.isFound())
+                {
+                    log.info("Special Category Case Form redirection post Case Form Submission..");
+                }
+                else
+                {
+                    log.info("Not a Special Category Case Form!");
+                    // Redirect to Error Processing of Form
+                    viewName = caseFormErrorRedirect;
+                }
+
             }
             else
             {

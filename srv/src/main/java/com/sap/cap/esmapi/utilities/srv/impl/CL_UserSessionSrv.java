@@ -48,6 +48,7 @@ import com.sap.cap.esmapi.ui.pojos.TY_CaseConfirmPOJO;
 import com.sap.cap.esmapi.ui.pojos.TY_CaseEditFormAsync;
 import com.sap.cap.esmapi.ui.pojos.TY_CaseEdit_Form;
 import com.sap.cap.esmapi.ui.pojos.TY_CaseFormAsync;
+import com.sap.cap.esmapi.ui.pojos.TY_CaseFormSubmSpl;
 import com.sap.cap.esmapi.ui.pojos.TY_Case_Form;
 import com.sap.cap.esmapi.ui.pojos.TY_SplCatg_Seek;
 import com.sap.cap.esmapi.ui.srv.intf.IF_ESS_UISrv;
@@ -443,7 +444,19 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                                 .getBean(splCatgSeek.getSplCatgCus().getFormsubmsrv());
                         try
                         {
-                            return splCatgSubmSrv.submitCaseForm(caseForm);
+                            TY_CaseFormSubmSpl caseFormAsyncSpl = splCatgSubmSrv.validateAndSubmitCaseForm(caseForm);
+                            if (caseFormAsyncSpl.isValid())
+                            {
+                                userSessInfo.setCurrentForm4Submission(caseFormAsyncSpl.getCaseFormAsync());
+                                return true;
+                            }
+                            else
+                            {
+                                log.error("Special Category Case Form Submission Validation Failed for Service : "
+                                        + splCatgSeek.getSplCatgCus().getFormsubmsrv());
+                                return false;
+                            }
+
                         }
                         catch (EX_ESMAPI e)
                         {
@@ -466,7 +479,7 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                     return false;
                 }
 
-                return false; // Temporary : To be replaced with actual call to Special Category Service
+                return false;
             }
 
             // Push Form data to Session
@@ -635,7 +648,7 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
         return isSubmitted;
     }
 
-    private TY_SplCatg_Seek isSplCatg(String caseFormCatgDesc)
+    public TY_SplCatg_Seek isSplCatg(String caseFormCatgDesc)
     {
         TY_SplCatg_Seek splCatgSeek = new TY_SplCatg_Seek();
         log.info("Checking Special Category Customizations for Category ID at Case submission : " + caseFormCatgDesc);
