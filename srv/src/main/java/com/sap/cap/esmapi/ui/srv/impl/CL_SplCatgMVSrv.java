@@ -1,5 +1,8 @@
 package com.sap.cap.esmapi.ui.srv.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -58,13 +61,15 @@ public class CL_SplCatgMVSrv implements IF_SplCatgMVSrv
                 // Populate any Form Errors from Session
                 if (CollectionUtils.isNotEmpty(userSessSrv.getFormErrors()))
                 {
+                    List<String> errorsCaseForm = new ArrayList<String>();
                     log.info("Populating errors from SP Catg MV service");
-                    modelVw.addObject("formErrors", userSessSrv.getFormErrors());
+
                     for (String err : userSessSrv.getFormErrors())
                     {
                         log.info("Form Error: " + err);
-                        
+                        errorsCaseForm.add(err);
                     }
+                    modelVw.addObject("formErrors", errorsCaseForm);
                 }
             }
 
