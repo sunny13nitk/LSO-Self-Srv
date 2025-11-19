@@ -25,6 +25,7 @@ import com.sap.cap.esmapi.catg.pojos.TY_CatgDetails;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgTemplates;
 import com.sap.cap.esmapi.catg.srv.intf.IF_CatalogSrv;
 import com.sap.cap.esmapi.catg.srv.intf.IF_CatgSrv;
+import com.sap.cap.esmapi.events.event.EV_CaseFormSplSubmit;
 import com.sap.cap.esmapi.events.event.EV_CaseFormSubmit;
 import com.sap.cap.esmapi.events.event.EV_CaseReplySubmit;
 import com.sap.cap.esmapi.exceptions.EX_ESMAPI;
@@ -104,13 +105,12 @@ public class LSOPostController
             }
 
             log.info("Processing of Case Form - UI layer :Begins....");
+            TY_SplCatg_Seek splCatgSeek = userSessSrv.isSplCatg(caseForm.getCatgDesc());
 
             // Any Validation Error(s) on the Form or Submission not possible
             if (!userSessSrv.SubmitCaseForm(caseForm))
             {
                 log.info("Error in Case Form!");
-
-                TY_SplCatg_Seek splCatgSeek = userSessSrv.isSplCatg(caseForm.getCatgDesc());
 
                 if (splCatgSeek.isFound())
                 {
@@ -133,17 +133,34 @@ public class LSOPostController
 
                 if (userSessSrv != null)
                 {
-                    log.info("User Bound in Session..");
+                    log.info("User Bound in Session.. Ready to fire event for Case Submission..");
                 }
 
-                TY_CaseFormAsync caseFormAsync = userSessSrv.getCurrentForm4Submission();
-                // External/Internal User Pass to Asynch Thread as Session Scoped Service would
-                // not be accessible in Asynch thread
-                caseFormAsync.getCaseForm().setExternal(userSessSrv.getUserDetails4mSession().isExternal());
-                caseFormAsync.setDesProps(userSessSrv.getDestinationDetails4mUserSession());
-                EV_CaseFormSubmit eventCaseSubmit = new EV_CaseFormSubmit(this, caseFormAsync);
-                applicationEventPublisher.publishEvent(eventCaseSubmit);
-                userSessSrv.setSubmissionActive();
+                if (splCatgSeek.isFound())
+                {
+                    log.info("Special Category Case Form Submission - Firing Special Case Submission Category Event..");
+                    TY_CaseFormAsync caseFormAsync = userSessSrv.getCurrentForm4Submission();
+                    // External/Internal User Pass to Asynch Thread as Session Scoped Service would
+                    // not be accessible in Asynch thread
+                    caseFormAsync.getCaseForm().setExternal(userSessSrv.getUserDetails4mSession().isExternal());
+                    caseFormAsync.setDesProps(userSessSrv.getDestinationDetails4mUserSession());
+                    EV_CaseFormSplSubmit eventCaseSplSubmit = new EV_CaseFormSplSubmit(this, caseFormAsync);
+                    applicationEventPublisher.publishEvent(eventCaseSplSubmit);
+                    userSessSrv.setSubmissionActive();
+                }
+                else
+                {
+                    log.info("Normal Case Form Submission - Firing Generic Case Submission Event..");
+                    TY_CaseFormAsync caseFormAsync = userSessSrv.getCurrentForm4Submission();
+                    // External/Internal User Pass to Asynch Thread as Session Scoped Service would
+                    // not be accessible in Asynch thread
+                    caseFormAsync.getCaseForm().setExternal(userSessSrv.getUserDetails4mSession().isExternal());
+                    caseFormAsync.setDesProps(userSessSrv.getDestinationDetails4mUserSession());
+                    EV_CaseFormSubmit eventCaseSubmit = new EV_CaseFormSubmit(this, caseFormAsync);
+                    applicationEventPublisher.publishEvent(eventCaseSubmit);
+                    userSessSrv.setSubmissionActive();
+                }
+
             }
 
             log.info("Processing of Case Form - UI layer :Ends....");
