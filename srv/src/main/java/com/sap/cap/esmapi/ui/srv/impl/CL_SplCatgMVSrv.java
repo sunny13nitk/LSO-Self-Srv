@@ -61,7 +61,9 @@ public class CL_SplCatgMVSrv implements IF_SplCatgMVSrv
                 // Populate any Form Errors from Session
                 if (CollectionUtils.isNotEmpty(userSessSrv.getFormErrors()))
                 {
+                    log.info("Form Errors present in session...");
                     List<String> errorsCaseForm = new ArrayList<String>();
+                    errorsCaseForm.addAll(userSessSrv.getFormErrors());
                     modelVw.addObject("formErrors", errorsCaseForm);
                 }
             }

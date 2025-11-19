@@ -434,6 +434,8 @@ public class LSOController
                 ModelAndView mv = splCatgMVSrv.getSplCatgModelAndView(caseForm, true);
                 viewName = mv.getViewName();
                 model.addAllAttributes(mv.getModel());
+
+                model.asMap().forEach((k, v) -> log.info(k + " -> " + v));
             }
         }
 
