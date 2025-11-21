@@ -448,6 +448,7 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                             if (caseFormAsyncSpl.isValid())
                             {
                                 userSessInfo.setCurrentForm4Submission(caseFormAsyncSpl.getCaseFormAsync());
+                                userSessInfo.getCurrentForm4Submission().setValid(true);
 
                                 // SUCC_CASE_SUBM=Case with submission id - {0} of Type - {1} submitted
                                 // Successfully for User - {2}!
