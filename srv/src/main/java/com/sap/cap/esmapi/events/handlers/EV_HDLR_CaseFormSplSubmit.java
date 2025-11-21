@@ -23,8 +23,6 @@ import com.sap.cap.esmapi.ui.srv.intf.IF_SplCatgCaseCreateSrv;
 import com.sap.cap.esmapi.utilities.enums.EnumMessageType;
 import com.sap.cap.esmapi.utilities.enums.EnumStatus;
 import com.sap.cap.esmapi.utilities.pojos.TY_Message;
-import com.sap.cap.esmapi.utilities.srvCloudApi.destination.pojos.TY_DestinationProps;
-import com.sap.cap.esmapi.utilities.srvCloudApi.srv.intf.IF_SrvCloudAPI;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -42,9 +40,6 @@ public class EV_HDLR_CaseFormSplSubmit
         private ApplicationEventPublisher applicationEventPublisher;
 
         @Autowired
-        private IF_SrvCloudAPI srvCloudApiSrv;
-
-        @Autowired
         private ApplicationContext appCtxt;
 
         @Async
@@ -55,7 +50,6 @@ public class EV_HDLR_CaseFormSplSubmit
                 if (evCaseFormSubmit != null && catgCusSrv != null
                                 && evCaseFormSubmit.getPayload().getDesProps() != null)
                 {
-                        TY_DestinationProps desProps = evCaseFormSubmit.getPayload().getDesProps();
                         log.info("Inside Case Form Asyncronous Submit Event Processing for Spl. Category ---- for Case Submission ID: "
                                         + evCaseFormSubmit.getPayload().getSubmGuid() + " for Special Category : "
                                         + evCaseFormSubmit.getSplCatgSeek().getSplCatgCus().getCatg());

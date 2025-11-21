@@ -448,7 +448,35 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                             if (caseFormAsyncSpl.isValid())
                             {
                                 userSessInfo.setCurrentForm4Submission(caseFormAsyncSpl.getCaseFormAsync());
-                                return true;
+
+                                // SUCC_CASE_SUBM=Case with submission id - {0} of Type - {1} submitted
+                                // Successfully for User - {2}!
+                                String msg = msgSrc.getMessage("SUCC_CASE_SUBM", new Object[]
+                                { caseFormAsyncSpl.getCaseFormAsync().getSubmGuid(),
+                                        caseFormAsyncSpl.getCaseFormAsync().getCaseForm().getCaseTxnType(),
+                                        caseFormAsyncSpl.getCaseFormAsync().getUserId() }, Locale.ENGLISH);
+                                log.info(msg); // System Log
+
+                                // Logging Framework
+                                TY_Message logMsg = new TY_Message(caseFormAsyncSpl.getCaseFormAsync().getUserId(),
+                                        caseFormAsyncSpl.getCaseFormAsync().getTimestamp(), EnumStatus.Success,
+                                        EnumMessageType.SUCC_CASE_SUBM,
+                                        caseFormAsyncSpl.getCaseFormAsync().getSubmGuid(), msg);
+                                userSessInfo.getMessagesStack().add(logMsg);
+                                // Instantiate and Fire the Event : Syncronous processing
+                                EV_LogMessage logMsgEvent = new EV_LogMessage(this, logMsg);
+                                applicationEventPublisher.publishEvent(logMsgEvent);
+
+                                // Add to Display Messages : to be shown to User or Successful Submission
+                                this.addSessionMessage(msg);
+
+                                // Add Submission Guids to Session Context for REconcillation after Case
+                                // Creation Process
+                                this.userSessInfo.getSubmissionIDs()
+                                        .add(caseFormAsyncSpl.getCaseFormAsync().getSubmGuid());
+
+                                isSubmitted = true;
+                                return isSubmitted;
                             }
                             else
                             {
