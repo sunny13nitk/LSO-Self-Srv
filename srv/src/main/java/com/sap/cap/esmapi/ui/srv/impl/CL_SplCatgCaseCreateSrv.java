@@ -78,6 +78,8 @@ public class CL_SplCatgCaseCreateSrv implements IF_SplCatgCaseCreateSrv
                         .findFirst();
                 // Prepare the description
                 String desc = prepareDescription(ev_CaseFormSplSubmit.getPayload().getCaseForm());
+                // #TEST
+                log.info("Prepared Description for Case Creation : " + desc);
                 ev_CaseFormSplSubmit.getPayload().getCaseForm().setDescription(desc);
 
                 if (!ev_CaseFormSplSubmit.getPayload().getCaseForm().isEmployee())
@@ -155,9 +157,11 @@ public class CL_SplCatgCaseCreateSrv implements IF_SplCatgCaseCreateSrv
         return isValid;
     }
 
-    private void createCase4Employee(EV_CaseFormSplSubmit evCaseFormSubmit, TY_DestinationProps desProps,
+    private String createCase4Employee(EV_CaseFormSplSubmit evCaseFormSubmit, TY_DestinationProps desProps,
             Optional<TY_CatgCusItem> cusItemO)
     {
+        log.info("Case creation for Employee....");
+        String caseID = null;
         TY_Case_Employee_SrvCloud newCaseEntity4Employee;
         newCaseEntity4Employee = new TY_Case_Employee_SrvCloud();
         // Account must be present
@@ -234,11 +238,10 @@ public class CL_SplCatgCaseCreateSrv implements IF_SplCatgCaseCreateSrv
 
                 try
                 {
-                    String caseID = srvCloudApiSrv.createCase4Employee(newCaseEntity4Employee, desProps);
+                    caseID = srvCloudApiSrv.createCase4Employee(newCaseEntity4Employee, desProps);
                     if (StringUtils.hasText(caseID))
                     {
-                        handleCaseSuccCreated(evCaseFormSubmit, cusItemO, caseID);
-
+                        log.info("Case created with ID : " + caseID);
                     }
                 }
                 catch (Exception e)
@@ -250,11 +253,14 @@ public class CL_SplCatgCaseCreateSrv implements IF_SplCatgCaseCreateSrv
             }
 
         }
+        return caseID;
     }
 
-    private void createCase4IndCustomer(EV_CaseFormSplSubmit evCaseFormSubmit, TY_DestinationProps desProps,
+    private String createCase4IndCustomer(EV_CaseFormSplSubmit evCaseFormSubmit, TY_DestinationProps desProps,
             Optional<TY_CatgCusItem> cusItemO)
     {
+        String caseID = null;
+        log.info("Case creation for Individual Customer....");
         TY_Case_Customer_SrvCloud newCaseEntity4Customer;
         newCaseEntity4Customer = new TY_Case_Customer_SrvCloud();
         // Account must be present
@@ -378,10 +384,10 @@ public class CL_SplCatgCaseCreateSrv implements IF_SplCatgCaseCreateSrv
 
                 try
                 {
-                    String caseID = srvCloudApiSrv.createCase4Customer(newCaseEntity4Customer, desProps);
+                    caseID = srvCloudApiSrv.createCase4Customer(newCaseEntity4Customer, desProps);
                     if (StringUtils.hasText(caseID))
                     {
-                        handleCaseSuccCreated(evCaseFormSubmit, cusItemO, caseID);
+                        log.info("Case created with ID : " + caseID);
 
                     }
                 }
@@ -394,6 +400,7 @@ public class CL_SplCatgCaseCreateSrv implements IF_SplCatgCaseCreateSrv
             }
 
         }
+        return caseID;
     }
 
     private void handleCaseCreationError(EV_CaseFormSplSubmit evCaseFormSubmit, Exception e)
@@ -403,34 +410,9 @@ public class CL_SplCatgCaseCreateSrv implements IF_SplCatgCaseCreateSrv
         { e.getLocalizedMessage(), evCaseFormSubmit.getPayload().getSubmGuid() }, Locale.ENGLISH);
 
         log.error(msg);
-        TY_Message logMsg = new TY_Message(evCaseFormSubmit.getPayload().getUserId(), Timestamp.from(Instant.now()),
-                EnumStatus.Error, EnumMessageType.ERR_CASE_CREATE, evCaseFormSubmit.getPayload().getSubmGuid(), msg);
-
-        // Instantiate and Fire the Event
-        EV_LogMessage logMsgEvent = new EV_LogMessage((Object) evCaseFormSubmit.getPayload().getSubmGuid(), logMsg);
-        applicationEventPublisher.publishEvent(logMsgEvent);
 
         // Should be handled Centrally via Aspect
         throw new EX_ESMAPI(msg);
-    }
-
-    private void handleCaseSuccCreated(EV_CaseFormSplSubmit evCaseFormSubmit, Optional<TY_CatgCusItem> cusItemO,
-            String caseID)
-    {
-        String msg = "Case ID : " + caseID + " created..";
-        log.info(msg);
-        msg = msgSrc.getMessage("SUCC_CASE", new Object[]
-        { caseID, cusItemO.get().getCaseTypeEnum().toString(), evCaseFormSubmit.getPayload().getSubmGuid() },
-                Locale.ENGLISH);
-        log.info(msg);
-        // Populate Success message in session
-
-        TY_Message logMsg = new TY_Message(evCaseFormSubmit.getPayload().getUserId(), Timestamp.from(Instant.now()),
-                EnumStatus.Success, EnumMessageType.SUCC_CASE_CREATE, evCaseFormSubmit.getPayload().getSubmGuid(), msg);
-
-        // Instantiate and Fire the Event
-        EV_LogMessage logMsgEvent = new EV_LogMessage((Object) evCaseFormSubmit.getPayload().getSubmGuid(), logMsg);
-        applicationEventPublisher.publishEvent(logMsgEvent);
     }
 
     private void handleCatgError(EV_CaseFormSplSubmit evCaseFormSubmit, Optional<TY_CatgCusItem> cusItemO)
