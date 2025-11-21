@@ -144,7 +144,7 @@ public class LSOPostController
                     // not be accessible in Asynch thread
                     caseFormAsync.getCaseForm().setExternal(userSessSrv.getUserDetails4mSession().isExternal());
                     caseFormAsync.setDesProps(userSessSrv.getDestinationDetails4mUserSession());
-                    EV_CaseFormSplSubmit eventCaseSplSubmit = new EV_CaseFormSplSubmit(this, caseFormAsync);
+                    EV_CaseFormSplSubmit eventCaseSplSubmit = new EV_CaseFormSplSubmit(this, caseFormAsync,splCatgSeek);
                     applicationEventPublisher.publishEvent(eventCaseSplSubmit);
                     userSessSrv.setSubmissionActive();
                 }
