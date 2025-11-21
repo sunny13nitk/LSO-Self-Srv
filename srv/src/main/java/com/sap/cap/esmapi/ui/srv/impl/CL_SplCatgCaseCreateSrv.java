@@ -78,19 +78,18 @@ public class CL_SplCatgCaseCreateSrv implements IF_SplCatgCaseCreateSrv
                         .findFirst();
                 // Prepare the description
                 String desc = prepareDescription(ev_CaseFormSplSubmit.getPayload().getCaseForm());
-                // #TEST
-                log.info("Prepared Description for Case Creation : " + desc);
+               
                 ev_CaseFormSplSubmit.getPayload().getCaseForm().setDescription(desc);
 
                 if (!ev_CaseFormSplSubmit.getPayload().getCaseForm().isEmployee())
                 {
                     log.info("External User -- Ind. Customer Scenario");
-                    createCase4IndCustomer(ev_CaseFormSplSubmit, desProps, cusItemO);
+                    caseId = createCase4IndCustomer(ev_CaseFormSplSubmit, desProps, cusItemO);
                 }
                 else // Case Create for an Employee
                 {
                     log.info("Internal User -- Employee Scenario");
-                    createCase4Employee(ev_CaseFormSplSubmit, desProps, cusItemO);
+                    caseId = createCase4Employee(ev_CaseFormSplSubmit, desProps, cusItemO);
                 }
             }
             else

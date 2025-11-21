@@ -2,7 +2,6 @@ package com.sap.cap.esmapi.ui.srv.intf;
 
 import com.sap.cap.esmapi.events.event.EV_CaseFormSplSubmit;
 import com.sap.cap.esmapi.exceptions.EX_ESMAPI;
-import com.sap.cap.esmapi.ui.pojos.TY_CaseFormAsync;
 
 public interface IF_SplCatgCaseCreateSrv
 {
