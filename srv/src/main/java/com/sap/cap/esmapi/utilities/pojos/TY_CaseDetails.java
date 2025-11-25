@@ -28,4 +28,6 @@ public class TY_CaseDetails
 
     private TY_PortalStatusTransICode statusTransitionCFG;
 
+    private boolean editableSplCatg;
+
 }

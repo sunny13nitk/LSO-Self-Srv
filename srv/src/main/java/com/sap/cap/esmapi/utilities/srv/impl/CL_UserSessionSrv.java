@@ -1604,16 +1604,23 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                                         // Override Edit Allowed from Special Category Config
                                         log.info("Overriding Edit Allowed flag from Special Category Config : "
                                                 + splCatg_Seek.getSplCatgCus().getEditAllowed());
-                                        caseEditForm.getCaseDetails().getStatusTransitionCFG().getTransCfg()
-                                                .setEditAllowed(splCatg_Seek.getSplCatgCus().getEditAllowed());
+                                        caseEditForm.getCaseDetails()
+                                                .setEditableSplCatg(splCatg_Seek.getSplCatgCus().getEditAllowed());
                                     }
+                                    else
+                                    {
+                                        caseEditForm.getCaseDetails().setEditableSplCatg(true);
+                                    }
+
                                 }
 
+                                log.info(
+                                        "Edit Mode :"
+                                                + caseEditForm.getCaseDetails().getStatusTransitionCFG().getTransCfg()
+                                                        .getEditAllowed()
+                                                + " for Case ID : " + caseDetails.getCaseId());
+
                             }
-
-                            log.info("Edit Mode :" + caseEditForm.getCaseDetails().getStatusTransitionCFG()
-                                    .getTransCfg().getEditAllowed() + " for Case ID : " + caseDetails.getCaseId());
-
                         }
                     }
                     catch (Exception e)
