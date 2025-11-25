@@ -1613,6 +1613,10 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                                     }
 
                                 }
+                                else
+                                {
+                                    caseEditForm.getCaseDetails().setEditableSplCatg(true);
+                                }
 
                                 log.info("Edit Mode :" + " From Status Transition : "
                                         + caseEditForm.getCaseDetails().getStatusTransitionCFG().getTransCfg()
