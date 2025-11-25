@@ -1614,11 +1614,13 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
 
                                 }
 
-                                log.info(
-                                        "Edit Mode :"
-                                                + caseEditForm.getCaseDetails().getStatusTransitionCFG().getTransCfg()
-                                                        .getEditAllowed()
-                                                + " for Case ID : " + caseDetails.getCaseId());
+                                log.info("Edit Mode :" + " From Status Transition : "
+                                        + caseEditForm.getCaseDetails().getStatusTransitionCFG().getTransCfg()
+                                                .getEditAllowed()
+
+                                        + " , From Special Category Config : "
+                                        + caseEditForm.getCaseDetails().isEditableSplCatg() + " for Case ID : "
+                                        + caseDetails.getCaseId());
 
                             }
                         }
