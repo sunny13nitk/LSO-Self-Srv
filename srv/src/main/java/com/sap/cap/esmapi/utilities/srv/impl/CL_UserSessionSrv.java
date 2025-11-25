@@ -1605,6 +1605,9 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
 
                             }
 
+                            log.info("Edit Mode :" + caseEditForm.getCaseDetails().getStatusTransitionCFG()
+                                    .getTransCfg().getEditAllowed() + " for Case ID : " + caseDetails.getCaseId());
+
                         }
                     }
                     catch (Exception e)
