@@ -1578,6 +1578,33 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                                     statusSrv.getPortalStatusTransition4CaseTypeandCaseStatus(caseDetails.getCaseType(),
                                             caseDetails.getStatus()));
 
+                            /*
+                             * Handle Edits for Special Categories Cases
+                             */
+                            if (StringUtils.hasText(caseDetails.getCatgLvl1())
+                                    && caseEditForm.getCaseDetails().getStatusTransitionCFG() != null)
+                            {
+                                // Determine Spl. Category Config for Current case Catgory Level 1
+                                TY_SplCatg_Seek splCatg_Seek = this.isSplCatg(caseDetails.getCatgLvl1());
+                                if (splCatg_Seek.isFound())
+                                {
+                                    log.info("Special category case found for Category Level 1 : "
+                                            + caseDetails.getCatgLvl1());
+                                    // Only Override Edit Allowed if true in Special Category Config and Edit is
+                                    // allowed via Status Transition Config
+                                    if (caseEditForm.getCaseDetails().getStatusTransitionCFG().getTransCfg()
+                                            .getEditAllowed())
+                                    {
+                                        // Override Edit Allowed from Special Category Config
+                                        log.info("Overriding Edit Allowed flag from Special Category Config : "
+                                                + splCatg_Seek.getSplCatgCus().getEditAllowed());
+                                        caseEditForm.getCaseDetails().getStatusTransitionCFG().getTransCfg()
+                                                .setEditAllowed(splCatg_Seek.getSplCatgCus().getEditAllowed());
+                                    }
+                                }
+
+                            }
+
                         }
                     }
                     catch (Exception e)

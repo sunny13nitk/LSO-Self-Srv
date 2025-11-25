@@ -19,5 +19,7 @@ public class TY_SplCatg
     private String formsubmsrv;
     @CsvBindByPosition(position = 3)
     private String casecreatesrv;
+    @CsvBindByPosition(position = 4)
+    private Boolean editAllowed;
 
 }

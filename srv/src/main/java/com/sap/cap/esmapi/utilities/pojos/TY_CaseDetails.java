@@ -20,6 +20,7 @@ public class TY_CaseDetails
     private String status;
     private String description;
     private String eTag;
+    private String catgLvl1;
 
     private List<TY_NotesDetails> notes;
 

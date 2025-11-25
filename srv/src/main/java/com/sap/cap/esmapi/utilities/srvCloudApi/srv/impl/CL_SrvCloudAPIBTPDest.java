@@ -3439,6 +3439,29 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                                         caseDetails.setETag(eTag);
                                         caseDetails.setNotes(new ArrayList<TY_NotesDetails>());
 
+                                        JsonNode catEnt = rootNode.path("categoryLevel1");
+                                        if (catEnt != null)
+                                        {
+                                            // log.info("AdminData Node Bound");
+
+                                            Iterator<String> fieldNamesCat = catEnt.fieldNames();
+                                            while (fieldNamesCat.hasNext())
+                                            {
+                                                String catFieldName = fieldNamesCat.next();
+                                                if (catFieldName.equals("id"))
+                                                {
+                                                    // log.info( "Created On : " +
+                                                    // admEnt.get(admFieldName).asText());
+                                                    String catglvl1 = catEnt.get(catFieldName).asText();
+                                                    if (StringUtils.hasText(catglvl1))
+                                                    {
+                                                        caseDetails.setCatgLvl1(catglvl1);
+                                                    }
+                                                }
+                                            }
+
+                                        }
+
                                     }
                                 }
 
@@ -4158,7 +4181,7 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                                                                 }
                                                                 else if (StringUtils.hasText(type))
                                                                 {
-                                                                    //BITFRCEC-1448 - filter out email attachments too
+                                                                    // BITFRCEC-1448 - filter out email attachments too
                                                                     if (!type.equals(
                                                                             GC_Constants.gc_AttachmentTypeInternal)
                                                                             && !type.equals(
