@@ -42,6 +42,7 @@ import com.sap.cap.esmapi.exceptions.EX_CaseAlreadyConfirmed;
 import com.sap.cap.esmapi.exceptions.EX_ESMAPI;
 import com.sap.cap.esmapi.exceptions.EX_SessionExpired;
 import com.sap.cap.esmapi.hana.logging.srv.intf.IF_HANALoggingSrv;
+import com.sap.cap.esmapi.status.pojos.TY_PortalStatusTransICode;
 import com.sap.cap.esmapi.status.srv.intf.IF_StatusSrv;
 import com.sap.cap.esmapi.ui.pojos.TY_Attachment;
 import com.sap.cap.esmapi.ui.pojos.TY_CaseConfirmPOJO;
@@ -1574,9 +1575,14 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                             }
                             caseEditForm.setCaseDetails(caseDetails);
 
-                            caseEditForm.getCaseDetails().setStatusTransitionCFG(
-                                    statusSrv.getPortalStatusTransition4CaseTypeandCaseStatus(caseDetails.getCaseType(),
-                                            caseDetails.getStatus()));
+                            TY_PortalStatusTransICode statTrans = statusSrv
+                                    .getPortalStatusTransition4CaseTypeandCaseStatus(caseDetails.getCaseType(),
+                                            caseDetails.getStatus());
+                            log.info("Status Transition Config fetched for Case Type : " + caseDetails.getCaseType()
+                                    + " and Status : " + caseDetails.getStatus() + " is : " + statTrans.toString());
+                            caseEditForm.getCaseDetails().setStatusTransitionCFG(statTrans);
+
+                            log.info(caseID);
 
                             /*
                              * Handle Edits for Special Categories Cases
