@@ -40,7 +40,7 @@ public class CL_SplCatgSubmSrv implements IF_SplCatgSubmSrv
     private final IF_CatalogSrv catalogSrv;
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    private final String regex = "^\\d{10}$";
+    // private final String regex = "^\\d{10}$";
 
     @Override
     public TY_CaseFormSubmSpl validateAndSubmitCaseForm(TY_Case_Form caseForm) throws EX_ESMAPI
@@ -106,9 +106,9 @@ public class CL_SplCatgSubmSrv implements IF_SplCatgSubmSrv
          */
         if (StringUtils.hasText(caseForm.getAppId()))
         {
-            if (caseForm.getAppId().matches(regex))
+            if (StringUtils.hasText(caseForm.getAppId()))
             {
-                log.info("Appointment Id is valid with 10 digits : " + caseForm.getAppId());
+                log.info("Certification Title is maintained : " + caseForm.getAppId());
 
                 // Check for atleast one extension option selected
                 if (caseForm.isExtraTime())
