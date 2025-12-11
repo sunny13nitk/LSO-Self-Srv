@@ -53,7 +53,7 @@ public class CL_SplCatgCaseCreateSrv implements IF_SplCatgCaseCreateSrv
     private final IF_SrvCloudAPI srvCloudApiSrv;
     private final TY_CatgCus catgCusSrv;
 
-    private final String gc_tag_appid = " AppId: ";
+    private final String gc_tag_appid = " Certification Title: ";
     private final String gc_tag_addtime = " Additonal time requested : ";
     private final String gc_comma = " ,";
 
