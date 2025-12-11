@@ -90,6 +90,7 @@ public class CL_SplCatgMVSrv implements IF_SplCatgMVSrv
 
             caseForm.setTemplate(null);
             caseForm.setSubject(gc_desc);
+            caseForm.setExtraTime(true); // default Extra time to true
 
             modelVw.addObject("caseForm", caseForm);
 

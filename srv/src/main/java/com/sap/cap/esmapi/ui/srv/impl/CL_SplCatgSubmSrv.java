@@ -111,8 +111,7 @@ public class CL_SplCatgSubmSrv implements IF_SplCatgSubmSrv
                 log.info("Appointment Id is valid with 10 digits : " + caseForm.getAppId());
 
                 // Check for atleast one extension option selected
-                if (caseForm.isExtraTime() || caseForm.isExambreak() || caseForm.isExtramonitor()
-                        || caseForm.isExtraperson())
+                if (caseForm.isExtraTime())
                 {
                     log.info("Atleast one extension option is selected for the Exam Extensions request");
                     isValid = true;
