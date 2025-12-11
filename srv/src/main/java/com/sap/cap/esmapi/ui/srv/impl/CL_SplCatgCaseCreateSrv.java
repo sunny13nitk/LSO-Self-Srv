@@ -55,9 +55,6 @@ public class CL_SplCatgCaseCreateSrv implements IF_SplCatgCaseCreateSrv
 
     private final String gc_tag_appid = " AppId: ";
     private final String gc_tag_addtime = " Additonal time requested : ";
-    private final String gc_tag_extrabreak = " Exam Breaks requested : ";
-    private final String gc_tag_extraperson = " Extra Personnel requested : ";
-    private final String gc_tag_extramonitor = " Extra Monitor requested : ";
     private final String gc_comma = " ,";
 
     @Override
@@ -78,7 +75,7 @@ public class CL_SplCatgCaseCreateSrv implements IF_SplCatgCaseCreateSrv
                         .findFirst();
                 // Prepare the description
                 String desc = prepareDescription(ev_CaseFormSplSubmit.getPayload().getCaseForm());
-               
+
                 ev_CaseFormSplSubmit.getPayload().getCaseForm().setDescription(desc);
 
                 if (!ev_CaseFormSplSubmit.getPayload().getCaseForm().isEmployee())
@@ -108,9 +105,6 @@ public class CL_SplCatgCaseCreateSrv implements IF_SplCatgCaseCreateSrv
         {
             desc = desc + gc_tag_appid + caseFormAsync.getAppId();
             desc = desc + gc_comma + gc_tag_addtime + (caseFormAsync.isExtraTime() ? "Yes" : "No");
-            desc = desc + gc_comma + gc_tag_extrabreak + (caseFormAsync.isExambreak() ? "Yes" : "No");
-            desc = desc + gc_comma + gc_tag_extraperson + (caseFormAsync.isExtraperson() ? "Yes" : "No");
-            desc = desc + gc_comma + gc_tag_extramonitor + (caseFormAsync.isExtramonitor() ? "Yes" : "No");
         }
         return desc;
     }
@@ -145,8 +139,7 @@ public class CL_SplCatgCaseCreateSrv implements IF_SplCatgCaseCreateSrv
                     && StringUtils.hasText(caseFormAsync.getCaseForm().getAppId())
                     && StringUtils.hasText(caseFormAsync.getCaseForm().getSubject()))
             {
-                if (caseFormAsync.getCaseForm().isExtraTime() || caseFormAsync.getCaseForm().isExtramonitor()
-                        || caseFormAsync.getCaseForm().isExambreak() || caseFormAsync.getCaseForm().isExtraperson())
+                if (caseFormAsync.getCaseForm().isExtraTime())
                 {
                     isValid = true;
                 }
