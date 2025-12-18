@@ -116,10 +116,13 @@ public class CL_ESS_UISrv implements IF_ESS_UISrv
     @Override
     public List<TY_CaseESS> getCases4User(Ty_UserAccountEmployee userDetails, EnumCaseTypes caseType) throws IOException
     {
-        return srvCloudApiSrv.getCases4User(userDetails, caseType, userSessionSrv.getDestinationDetails4mUserSession())
-                .stream().sorted(Comparator
-                        .comparing(TY_CaseESS::getTsUpdate, Comparator.nullsLast(Comparator.naturalOrder())).reversed())
-                .toList(); // Java 16+
+        List<TY_CaseESS> cases = srvCloudApiSrv.getCases4User(userDetails, caseType,
+                userSessionSrv.getDestinationDetails4mUserSession());
+
+        cases.sort(Comparator.comparing(TY_CaseESS::getTsUpdate, Comparator.nullsLast(Comparator.naturalOrder()))
+                .reversed());
+
+        return cases;
 
     }
 
