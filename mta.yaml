@@ -1,6 +1,6 @@
 _schema-version: "3.1"
 ID: lso-selfsrv
-version: 1.0.77
+version: 1.0.78
 description: "LSO Self Service Application"
 parameters:
   enable-parallel-deployments: true
