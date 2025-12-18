@@ -1,9 +1,17 @@
 package com.sap.cap.esmapi.ui.srv.impl;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import org.apache.commons.math3.util.Precision;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import com.sap.cap.esmapi.exceptions.EX_ESMAPI;
 import com.sap.cap.esmapi.ui.pojos.TY_ESS_Stats;
@@ -15,13 +23,6 @@ import com.sap.cap.esmapi.utilities.pojos.TY_CaseESS;
 import com.sap.cap.esmapi.utilities.pojos.Ty_UserAccountEmployee;
 import com.sap.cap.esmapi.utilities.srv.intf.IF_UserSessionSrv;
 import com.sap.cap.esmapi.utilities.srvCloudApi.srv.intf.IF_SrvCloudAPI;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-import org.apache.commons.math3.util.Precision;
 
 @Service
 @Scope(value = ConfigurableBeanFactory.SCOPE_PROTOTYPE)
@@ -115,7 +116,11 @@ public class CL_ESS_UISrv implements IF_ESS_UISrv
     @Override
     public List<TY_CaseESS> getCases4User(Ty_UserAccountEmployee userDetails, EnumCaseTypes caseType) throws IOException
     {
-        return srvCloudApiSrv.getCases4User(userDetails, caseType, userSessionSrv.getDestinationDetails4mUserSession());
+        return srvCloudApiSrv.getCases4User(userDetails, caseType, userSessionSrv.getDestinationDetails4mUserSession())
+                .stream().sorted(Comparator
+                        .comparing(TY_CaseESS::getTsUpdate, Comparator.nullsLast(Comparator.naturalOrder())).reversed())
+                .toList(); // Java 16+
+
     }
 
 }
