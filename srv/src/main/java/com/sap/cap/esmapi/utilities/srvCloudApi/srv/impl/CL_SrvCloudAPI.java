@@ -436,52 +436,44 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
 
                                         if (StringUtils.hasText(caseid) && StringUtils.hasText(caseguid))
                                         {
+                                            OffsetDateTime odtC = null;
+                                            Date dateC = null;
+                                            String dateFormattedC = null;
+
+                                            OffsetDateTime odtU = null;
+                                            Date dateU = null;
+                                            String dateFormattedU = null;
+
                                             if (StringUtils.hasText(createdOn))
                                             {
                                                 // Parse the date-time string into OffsetDateTime
-                                                OffsetDateTime odt = OffsetDateTime.parse(createdOn);
+                                                odtC = OffsetDateTime.parse(createdOn);
                                                 // Convert OffsetDateTime into Instant
-                                                Instant instant = odt.toInstant();
+                                                Instant instant = odtC.toInstant();
                                                 // If at all, you need java.util.Date
-                                                Date date = Date.from(instant);
+                                                dateC = Date.from(instant);
 
                                                 SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy");
-                                                String dateFormatted = sdf.format(date);
-
-                                                if (StringUtils.hasText(updatedOn))
-                                                {
-                                                    // Parse the date-time string into OffsetDateTime
-                                                    OffsetDateTime odtUpd = OffsetDateTime.parse(updatedOn);
-                                                    // Convert OffsetDateTime into Instant
-                                                    Instant instantUpd = odtUpd.toInstant();
-                                                    // If at all, you need java.util.Date
-                                                    Date dateUpd = Date.from(instantUpd);
-
-                                                    SimpleDateFormat sdfUpd = new SimpleDateFormat("dd/M/yyyy");
-                                                    String dateFormattedUpd = sdfUpd.format(dateUpd);
-
-                                                    casesESSList.add(new TY_CaseESS(caseguid, caseid, caseType,
-                                                            caseTypeDescription, subject, status, accountId, contactId,
-                                                            createdOn, date, dateFormatted, odt, updatedOn, dateUpd,
-                                                            dateFormattedUpd, odtUpd, origin, canConfirm));
-                                                }
-                                                else
-                                                {
-
-                                                    casesESSList.add(new TY_CaseESS(caseguid, caseid, caseType,
-                                                            caseTypeDescription, subject, status, accountId, contactId,
-                                                            createdOn, date, dateFormatted, odt, null, null, null, null,
-                                                            origin, canConfirm));
-                                                }
-
+                                                dateFormattedC = sdf.format(dateC);
                                             }
-                                            else
+
+                                            if (StringUtils.hasText(updatedOn))
                                             {
-                                                casesESSList.add(
-                                                        new TY_CaseESS(caseguid, caseid, caseType, caseTypeDescription,
-                                                                subject, status, accountId, contactId, null, null, null,
-                                                                null, null, null, null, null, origin, canConfirm));
+                                                // Parse the date-time string into OffsetDateTime
+                                                odtU = OffsetDateTime.parse(updatedOn);
+                                                // Convert OffsetDateTime into Instant
+                                                Instant instant = odtU.toInstant();
+                                                // If at all, you need java.util.Date
+                                                dateU = Date.from(instant);
+
+                                                SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy");
+                                                dateFormattedU = sdf.format(dateU);
                                             }
+
+                                            casesESSList.add(new TY_CaseESS(caseguid, caseid, caseType,
+                                                    caseTypeDescription, subject, status, accountId, contactId,
+                                                    createdOn, dateC, dateFormattedC, odtC, updatedOn, dateU,
+                                                    dateFormattedU, odtU, origin, canConfirm));
 
                                         }
 
@@ -2548,55 +2540,47 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
 
                                             if (StringUtils.hasText(caseid) && StringUtils.hasText(caseguid))
                                             {
+                                                OffsetDateTime odtC = null;
+                                                Date dateC = null;
+                                                String dateFormattedC = null;
+
+                                                OffsetDateTime odtU = null;
+                                                Date dateU = null;
+                                                String dateFormattedU = null;
+
                                                 if (StringUtils.hasText(createdOn))
                                                 {
                                                     // Parse the date-time string into OffsetDateTime
-                                                    OffsetDateTime odt = OffsetDateTime.parse(createdOn);
+                                                    odtC = OffsetDateTime.parse(createdOn);
                                                     // Convert OffsetDateTime into Instant
-                                                    Instant instant = odt.toInstant();
+                                                    Instant instant = odtC.toInstant();
                                                     // If at all, you need java.util.Date
-                                                    Date date = Date.from(instant);
+                                                    dateC = Date.from(instant);
 
                                                     SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy");
-                                                    String dateFormatted = sdf.format(date);
-
-                                                    if (StringUtils.hasText(updatedOn))
-                                                    {
-                                                        // Parse the date-time string into OffsetDateTime
-                                                        OffsetDateTime odtUpd = OffsetDateTime.parse(updatedOn);
-                                                        // Convert OffsetDateTime into Instant
-                                                        Instant instantUpd = odtUpd.toInstant();
-                                                        // If at all, you need java.util.Date
-                                                        Date dateUpd = Date.from(instantUpd);
-
-                                                        SimpleDateFormat sdfUpd = new SimpleDateFormat("dd/M/yyyy");
-                                                        String dateFormattedUpd = sdfUpd.format(dateUpd);
-
-                                                        casesESSList.add(new TY_CaseESS(caseguid, caseid, caseType,
-                                                                caseTypeDescription, subject, status, accountId,
-                                                                contactId, createdOn, date, dateFormatted, odt,
-                                                                updatedOn, dateUpd, dateFormattedUpd, odtUpd, origin,
-                                                                canConfirm));
-                                                    }
-                                                    else
-                                                    {
-
-                                                        casesESSList.add(new TY_CaseESS(caseguid, caseid, caseType,
-                                                                caseTypeDescription, subject, status, accountId,
-                                                                contactId, createdOn, date, dateFormatted, odt, null,
-                                                                null, null, null, origin, canConfirm));
-                                                    }
-
+                                                    dateFormattedC = sdf.format(dateC);
                                                 }
-                                                else
+
+                                                if (StringUtils.hasText(updatedOn))
                                                 {
-                                                    casesESSList.add(new TY_CaseESS(caseguid, caseid, caseType,
-                                                            caseTypeDescription, subject, status, accountId, contactId,
-                                                            null, null, null, null, null, null, null, null, origin,
-                                                            canConfirm));
+                                                    // Parse the date-time string into OffsetDateTime
+                                                    odtU = OffsetDateTime.parse(updatedOn);
+                                                    // Convert OffsetDateTime into Instant
+                                                    Instant instant = odtU.toInstant();
+                                                    // If at all, you need java.util.Date
+                                                    dateU = Date.from(instant);
+
+                                                    SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy");
+                                                    dateFormattedU = sdf.format(dateU);
                                                 }
+
+                                                casesESSList.add(new TY_CaseESS(caseguid, caseid, caseType,
+                                                        caseTypeDescription, subject, status, accountId, contactId,
+                                                        createdOn, dateC, dateFormattedC, odtC, updatedOn, dateU,
+                                                        dateFormattedU, odtU, origin, canConfirm));
 
                                             }
+
                                         }
 
                                     }
@@ -3115,55 +3099,45 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
 
                                                     if (StringUtils.hasText(caseid) && StringUtils.hasText(caseguid))
                                                     {
+                                                        OffsetDateTime odtC = null;
+                                                        Date dateC = null;
+                                                        String dateFormattedC = null;
+
+                                                        OffsetDateTime odtU = null;
+                                                        Date dateU = null;
+                                                        String dateFormattedU = null;
+
                                                         if (StringUtils.hasText(createdOn))
                                                         {
                                                             // Parse the date-time string into OffsetDateTime
-                                                            OffsetDateTime odt = OffsetDateTime.parse(createdOn);
+                                                            odtC = OffsetDateTime.parse(createdOn);
                                                             // Convert OffsetDateTime into Instant
-                                                            Instant instant = odt.toInstant();
+                                                            Instant instant = odtC.toInstant();
                                                             // If at all, you need java.util.Date
-                                                            Date date = Date.from(instant);
+                                                            dateC = Date.from(instant);
 
                                                             SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy");
-                                                            String dateFormatted = sdf.format(date);
-
-                                                            if (StringUtils.hasText(updatedOn))
-                                                            {
-                                                                // Parse the date-time string into OffsetDateTime
-                                                                OffsetDateTime odtUpd = OffsetDateTime.parse(updatedOn);
-                                                                // Convert OffsetDateTime into Instant
-                                                                Instant instantUpd = odtUpd.toInstant();
-                                                                // If at all, you need java.util.Date
-                                                                Date dateUpd = Date.from(instantUpd);
-
-                                                                SimpleDateFormat sdfUpd = new SimpleDateFormat(
-                                                                        "dd/M/yyyy");
-                                                                String dateFormattedUpd = sdfUpd.format(dateUpd);
-
-                                                                casesByCaseType.add(new TY_CaseESS(caseguid, caseid,
-                                                                        caseTypeVar, caseTypeDescription, subject,
-                                                                        status, accountId, employeeId, createdOn, date,
-                                                                        dateFormatted, odt, updatedOn, dateUpd,
-                                                                        dateFormattedUpd, odtUpd, origin, canConfirm));
-                                                            }
-                                                            else
-                                                            {
-
-                                                                casesByCaseType.add(new TY_CaseESS(caseguid, caseid,
-                                                                        caseTypeVar, caseTypeDescription, subject,
-                                                                        status, accountId, employeeId, createdOn, date,
-                                                                        dateFormatted, odt, null, null, null, null,
-                                                                        origin, canConfirm));
-                                                            }
-
+                                                            dateFormattedC = sdf.format(dateC);
                                                         }
-                                                        else
+
+                                                        if (StringUtils.hasText(updatedOn))
                                                         {
-                                                            casesByCaseType.add(new TY_CaseESS(caseguid, caseid,
-                                                                    caseTypeVar, caseTypeDescription, subject, status,
-                                                                    accountId, employeeId, null, null, null, null, null,
-                                                                    null, null, null, origin, canConfirm));
+                                                            // Parse the date-time string into OffsetDateTime
+                                                            odtU = OffsetDateTime.parse(updatedOn);
+                                                            // Convert OffsetDateTime into Instant
+                                                            Instant instant = odtU.toInstant();
+                                                            // If at all, you need java.util.Date
+                                                            dateU = Date.from(instant);
+
+                                                            SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy");
+                                                            dateFormattedU = sdf.format(dateU);
                                                         }
+
+                                                        casesByCaseType.add(new TY_CaseESS(caseguid, caseid,
+                                                                caseTypeVar, caseTypeDescription, subject, status,
+                                                                accountId, employeeId, createdOn, dateC, dateFormattedC,
+                                                                odtC, updatedOn, dateU, dateFormattedU, odtU, origin,
+                                                                canConfirm));
 
                                                     }
 
