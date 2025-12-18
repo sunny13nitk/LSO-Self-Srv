@@ -519,6 +519,9 @@
                      <th data-name="createdOn" class="sortable-column pl-6">
                         Created On
                      </th>
+                     <th data-name="updatedOn" class="sortable-column pl-6">
+                        Updated On
+                     </th>
 
                      <th class="pr-6" data-cls-column="text-left">
                         Details
@@ -532,6 +535,7 @@
                      <td th:text="${case.statusDesc}"></td>
                      <td th:text="${case.subject}"></td>
                      <td th:text="${#temporals.format(case.tsCreate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                     <td th:text="${#temporals.format(case.tsUpdate, 'yyyy-MM-dd HH:mm:ss')}"></td>
                      <td>
                         <a href="#" class="" th:href="@{'/lso/caseDetails/' + ${case.guid}}" role="button"
                            data-role="hint" data-hint-position="right" data-cls-hint="fg-black"

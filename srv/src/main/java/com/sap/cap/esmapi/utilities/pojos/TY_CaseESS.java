@@ -26,6 +26,10 @@ public class TY_CaseESS
     private Date creationDate;
     private String formattedDate;
     private OffsetDateTime tsCreate;
+    private String updatedOn;
+    private Date updationDate;
+    private String formattedUpdateDate;
+    private OffsetDateTime tsUpdate;
     private String origin;
     private boolean confirmAllowed;
 }

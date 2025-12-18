@@ -227,7 +227,8 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
                                     {
                                         String caseid = null, caseguid = null, caseType = null,
                                                 caseTypeDescription = null, subject = null, status = null,
-                                                createdOn = null, accountId = null, contactId = null, origin = null;
+                                                createdOn = null, accountId = null, contactId = null, origin = null,
+                                                updatedOn = null;
 
                                         boolean canConfirm = false;
 
@@ -344,9 +345,14 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
                                                         String admFieldName = fieldNamesAdm.next();
                                                         if (admFieldName.equals("createdOn"))
                                                         {
-                                                            // log.info( "Created On : " +
-                                                            // admEnt.get(admFieldName).asText());
+
                                                             createdOn = admEnt.get(admFieldName).asText();
+                                                        }
+
+                                                        if (admFieldName.equals("updatedOn"))
+                                                        {
+
+                                                            updatedOn = admEnt.get(admFieldName).asText();
                                                         }
                                                     }
 
@@ -442,16 +448,39 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
                                                 SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy");
                                                 String dateFormatted = sdf.format(date);
 
-                                                casesESSList.add(new TY_CaseESS(caseguid, caseid, caseType,
-                                                        caseTypeDescription, subject, status, accountId, contactId,
-                                                        createdOn, date, dateFormatted, odt, origin, canConfirm));
+                                                if (StringUtils.hasText(updatedOn))
+                                                {
+                                                    // Parse the date-time string into OffsetDateTime
+                                                    OffsetDateTime odtUpd = OffsetDateTime.parse(updatedOn);
+                                                    // Convert OffsetDateTime into Instant
+                                                    Instant instantUpd = odtUpd.toInstant();
+                                                    // If at all, you need java.util.Date
+                                                    Date dateUpd = Date.from(instantUpd);
+
+                                                    SimpleDateFormat sdfUpd = new SimpleDateFormat("dd/M/yyyy");
+                                                    String dateFormattedUpd = sdfUpd.format(dateUpd);
+
+                                                    casesESSList.add(new TY_CaseESS(caseguid, caseid, caseType,
+                                                            caseTypeDescription, subject, status, accountId, contactId,
+                                                            createdOn, date, dateFormatted, odt, updatedOn, dateUpd,
+                                                            dateFormattedUpd, odtUpd, origin, canConfirm));
+                                                }
+                                                else
+                                                {
+
+                                                    casesESSList.add(new TY_CaseESS(caseguid, caseid, caseType,
+                                                            caseTypeDescription, subject, status, accountId, contactId,
+                                                            createdOn, date, dateFormatted, odt, null, null, null, null,
+                                                            origin, canConfirm));
+                                                }
 
                                             }
                                             else
                                             {
-                                                casesESSList.add(new TY_CaseESS(caseguid, caseid, caseType,
-                                                        caseTypeDescription, subject, status, accountId, contactId,
-                                                        createdOn, null, null, null, origin, canConfirm));
+                                                casesESSList.add(
+                                                        new TY_CaseESS(caseguid, caseid, caseType, caseTypeDescription,
+                                                                subject, status, accountId, contactId, null, null, null,
+                                                                null, null, null, null, null, origin, canConfirm));
                                             }
 
                                         }
@@ -2310,7 +2339,8 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
                                     {
                                         String caseid = null, caseguid = null, caseType = null,
                                                 caseTypeDescription = null, subject = null, status = null,
-                                                createdOn = null, accountId = null, contactId = null, origin = null;
+                                                createdOn = null, accountId = null, contactId = null, origin = null,
+                                                updatedOn = null;
                                         boolean canConfirm = false;
 
                                         // log.info("Cases Entity Bound - Reading Case...");
@@ -2431,112 +2461,142 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
                                                             // admEnt.get(admFieldName).asText());
                                                             createdOn = admEnt.get(admFieldName).asText();
                                                         }
-                                                    }
 
-                                                }
-                                            }
-
-                                            if (caseFieldName.equals("account"))
-                                            {
-                                                // log.info("Inside Account: " );
-
-                                                JsonNode accEnt = caseEnt.path("account");
-                                                if (accEnt != null)
-                                                {
-                                                    // log.info("Account Node Bound");
-
-                                                    Iterator<String> fieldNamesAcc = accEnt.fieldNames();
-                                                    while (fieldNamesAcc.hasNext())
-                                                    {
-                                                        String accFieldName = fieldNamesAcc.next();
-                                                        if (accFieldName.equals("id"))
+                                                        if (admFieldName.equals("updatedOn"))
                                                         {
-                                                            // log.info(
-                                                            // "Account ID : " + accEnt.get(accFieldName).asText());
-                                                            accountId = accEnt.get(accFieldName).asText();
+                                                            updatedOn = admEnt.get(admFieldName).asText();
                                                         }
+
                                                     }
-
                                                 }
-                                            }
 
-                                            if (caseFieldName.equals("individualCustomer")
-                                                    && (!StringUtils.hasText(accountId)))
-                                            {
-                                                // log.info("Inside Account: " );
-
-                                                JsonNode accEnt = caseEnt.path("individualCustomer");
-                                                if (accEnt != null)
+                                                if (caseFieldName.equals("account"))
                                                 {
-                                                    // log.info("Account Node Bound");
+                                                    // log.info("Inside Account: " );
 
-                                                    Iterator<String> fieldNamesAcc = accEnt.fieldNames();
-                                                    while (fieldNamesAcc.hasNext())
+                                                    JsonNode accEnt = caseEnt.path("account");
+                                                    if (accEnt != null)
                                                     {
-                                                        String accFieldName = fieldNamesAcc.next();
-                                                        if (accFieldName.equals("id"))
+                                                        // log.info("Account Node Bound");
+
+                                                        Iterator<String> fieldNamesAcc = accEnt.fieldNames();
+                                                        while (fieldNamesAcc.hasNext())
                                                         {
-                                                            // log.info(
-                                                            // "Account ID : " + accEnt.get(accFieldName).asText());
-                                                            accountId = accEnt.get(accFieldName).asText();
+                                                            String accFieldName = fieldNamesAcc.next();
+                                                            if (accFieldName.equals("id"))
+                                                            {
+                                                                // log.info(
+                                                                // "Account ID : " + accEnt.get(accFieldName).asText());
+                                                                accountId = accEnt.get(accFieldName).asText();
+                                                            }
                                                         }
+
                                                     }
-
                                                 }
-                                            }
 
-                                            if (caseFieldName.equals("reporter"))
-                                            {
-                                                // log.info("Inside Reporter: " );
-
-                                                JsonNode repEnt = caseEnt.path("reporter");
-                                                if (repEnt != null)
+                                                if (caseFieldName.equals("individualCustomer")
+                                                        && (!StringUtils.hasText(accountId)))
                                                 {
-                                                    // log.info("Reporter Node Bound");
+                                                    // log.info("Inside Account: " );
 
-                                                    Iterator<String> fieldNamesRep = repEnt.fieldNames();
-                                                    while (fieldNamesRep.hasNext())
+                                                    JsonNode accEnt = caseEnt.path("individualCustomer");
+                                                    if (accEnt != null)
                                                     {
-                                                        String repFieldName = fieldNamesRep.next();
-                                                        if (repFieldName.equals("id"))
+                                                        // log.info("Account Node Bound");
+
+                                                        Iterator<String> fieldNamesAcc = accEnt.fieldNames();
+                                                        while (fieldNamesAcc.hasNext())
                                                         {
-                                                            // log.info(
-                                                            // "Reporter ID : " + repEnt.get(repFieldName).asText());
-                                                            contactId = repEnt.get(repFieldName).asText();
+                                                            String accFieldName = fieldNamesAcc.next();
+                                                            if (accFieldName.equals("id"))
+                                                            {
+                                                                // log.info(
+                                                                // "Account ID : " + accEnt.get(accFieldName).asText());
+                                                                accountId = accEnt.get(accFieldName).asText();
+                                                            }
                                                         }
+
+                                                    }
+                                                }
+
+                                                if (caseFieldName.equals("reporter"))
+                                                {
+                                                    // log.info("Inside Reporter: " );
+
+                                                    JsonNode repEnt = caseEnt.path("reporter");
+                                                    if (repEnt != null)
+                                                    {
+                                                        // log.info("Reporter Node Bound");
+
+                                                        Iterator<String> fieldNamesRep = repEnt.fieldNames();
+                                                        while (fieldNamesRep.hasNext())
+                                                        {
+                                                            String repFieldName = fieldNamesRep.next();
+                                                            if (repFieldName.equals("id"))
+                                                            {
+                                                                // log.info(
+                                                                // "Reporter ID : " +
+                                                                // repEnt.get(repFieldName).asText());
+                                                                contactId = repEnt.get(repFieldName).asText();
+                                                            }
+                                                        }
+
+                                                    }
+                                                }
+
+                                            }
+
+                                            if (StringUtils.hasText(caseid) && StringUtils.hasText(caseguid))
+                                            {
+                                                if (StringUtils.hasText(createdOn))
+                                                {
+                                                    // Parse the date-time string into OffsetDateTime
+                                                    OffsetDateTime odt = OffsetDateTime.parse(createdOn);
+                                                    // Convert OffsetDateTime into Instant
+                                                    Instant instant = odt.toInstant();
+                                                    // If at all, you need java.util.Date
+                                                    Date date = Date.from(instant);
+
+                                                    SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy");
+                                                    String dateFormatted = sdf.format(date);
+
+                                                    if (StringUtils.hasText(updatedOn))
+                                                    {
+                                                        // Parse the date-time string into OffsetDateTime
+                                                        OffsetDateTime odtUpd = OffsetDateTime.parse(updatedOn);
+                                                        // Convert OffsetDateTime into Instant
+                                                        Instant instantUpd = odtUpd.toInstant();
+                                                        // If at all, you need java.util.Date
+                                                        Date dateUpd = Date.from(instantUpd);
+
+                                                        SimpleDateFormat sdfUpd = new SimpleDateFormat("dd/M/yyyy");
+                                                        String dateFormattedUpd = sdfUpd.format(dateUpd);
+
+                                                        casesESSList.add(new TY_CaseESS(caseguid, caseid, caseType,
+                                                                caseTypeDescription, subject, status, accountId,
+                                                                contactId, createdOn, date, dateFormatted, odt,
+                                                                updatedOn, dateUpd, dateFormattedUpd, odtUpd, origin,
+                                                                canConfirm));
+                                                    }
+                                                    else
+                                                    {
+
+                                                        casesESSList.add(new TY_CaseESS(caseguid, caseid, caseType,
+                                                                caseTypeDescription, subject, status, accountId,
+                                                                contactId, createdOn, date, dateFormatted, odt, null,
+                                                                null, null, null, origin, canConfirm));
                                                     }
 
                                                 }
-                                            }
-
-                                        }
-
-                                        if (StringUtils.hasText(caseid) && StringUtils.hasText(caseguid))
-                                        {
-                                            if (StringUtils.hasText(createdOn))
-                                            {
-                                                // Parse the date-time string into OffsetDateTime
-                                                OffsetDateTime odt = OffsetDateTime.parse(createdOn);
-                                                // Convert OffsetDateTime into Instant
-                                                Instant instant = odt.toInstant();
-                                                // If at all, you need java.util.Date
-                                                Date date = Date.from(instant);
-
-                                                SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy");
-                                                String dateFormatted = sdf.format(date);
-
-                                                casesESSList.add(new TY_CaseESS(caseguid, caseid, caseType,
-                                                        caseTypeDescription, subject, status, accountId, contactId,
-                                                        createdOn, date, dateFormatted, odt, origin, canConfirm));
+                                                else
+                                                {
+                                                    casesESSList.add(new TY_CaseESS(caseguid, caseid, caseType,
+                                                            caseTypeDescription, subject, status, accountId, contactId,
+                                                            null, null, null, null, null, null, null, null, origin,
+                                                            canConfirm));
+                                                }
 
                                             }
-                                            else
-                                            {
-                                                casesESSList.add(new TY_CaseESS(caseguid, caseid, caseType,
-                                                        caseTypeDescription, subject, status, accountId, contactId,
-                                                        createdOn, null, null, null, origin, canConfirm));
-                                            }
-
                                         }
 
                                     }
@@ -2858,7 +2918,7 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
                                                     String caseid = null, caseguid = null, caseTypeVar = null,
                                                             caseTypeDescription = null, subject = null, status = null,
                                                             createdOn = null, accountId = null, employeeId = null,
-                                                            origin = null;
+                                                            origin = null, updatedOn = null;
 
                                                     boolean canConfirm = false;
 
@@ -2989,6 +3049,12 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
                                                                         // admEnt.get(admFieldName).asText());
                                                                         createdOn = admEnt.get(admFieldName).asText();
                                                                     }
+
+                                                                    if (admFieldName.equals("updatedOn"))
+                                                                    {
+
+                                                                        updatedOn = admEnt.get(admFieldName).asText();
+                                                                    }
                                                                 }
 
                                                             }
@@ -3061,18 +3127,42 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
                                                             SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy");
                                                             String dateFormatted = sdf.format(date);
 
-                                                            casesByCaseType.add(new TY_CaseESS(caseguid, caseid,
-                                                                    caseTypeVar, caseTypeDescription, subject, status,
-                                                                    accountId, employeeId, createdOn, date,
-                                                                    dateFormatted, odt, origin, canConfirm));
+                                                            if (StringUtils.hasText(updatedOn))
+                                                            {
+                                                                // Parse the date-time string into OffsetDateTime
+                                                                OffsetDateTime odtUpd = OffsetDateTime.parse(updatedOn);
+                                                                // Convert OffsetDateTime into Instant
+                                                                Instant instantUpd = odtUpd.toInstant();
+                                                                // If at all, you need java.util.Date
+                                                                Date dateUpd = Date.from(instantUpd);
+
+                                                                SimpleDateFormat sdfUpd = new SimpleDateFormat(
+                                                                        "dd/M/yyyy");
+                                                                String dateFormattedUpd = sdfUpd.format(dateUpd);
+
+                                                                casesByCaseType.add(new TY_CaseESS(caseguid, caseid,
+                                                                        caseTypeVar, caseTypeDescription, subject,
+                                                                        status, accountId, employeeId, createdOn, date,
+                                                                        dateFormatted, odt, updatedOn, dateUpd,
+                                                                        dateFormattedUpd, odtUpd, origin, canConfirm));
+                                                            }
+                                                            else
+                                                            {
+
+                                                                casesByCaseType.add(new TY_CaseESS(caseguid, caseid,
+                                                                        caseTypeVar, caseTypeDescription, subject,
+                                                                        status, accountId, employeeId, createdOn, date,
+                                                                        dateFormatted, odt, null, null, null, null,
+                                                                        origin, canConfirm));
+                                                            }
 
                                                         }
                                                         else
                                                         {
                                                             casesByCaseType.add(new TY_CaseESS(caseguid, caseid,
                                                                     caseTypeVar, caseTypeDescription, subject, status,
-                                                                    accountId, employeeId, createdOn, null, null, null,
-                                                                    origin, canConfirm));
+                                                                    accountId, employeeId, null, null, null, null, null,
+                                                                    null, null, null, origin, canConfirm));
                                                         }
 
                                                     }
