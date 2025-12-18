@@ -355,137 +355,132 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
 
                                                         if (admFieldName.equals("updatedOn"))
                                                         {
-
+                                                            // log.info( "Updated On : " +
+                                                            // admEnt.get(admFieldName).asText());
                                                             updatedOn = admEnt.get(admFieldName).asText();
                                                         }
+
                                                     }
-
                                                 }
-                                            }
 
-                                            if (caseFieldName.equals("account"))
-                                            {
-                                                // log.info("Inside Account: " );
-
-                                                JsonNode accEnt = caseEnt.path("account");
-                                                if (accEnt != null)
+                                                if (caseFieldName.equals("account"))
                                                 {
-                                                    // log.info("Account Node Bound");
+                                                    // log.info("Inside Account: " );
 
-                                                    Iterator<String> fieldNamesAcc = accEnt.fieldNames();
-                                                    while (fieldNamesAcc.hasNext())
+                                                    JsonNode accEnt = caseEnt.path("account");
+                                                    if (accEnt != null)
                                                     {
-                                                        String accFieldName = fieldNamesAcc.next();
-                                                        if (accFieldName.equals("id"))
+                                                        // log.info("Account Node Bound");
+
+                                                        Iterator<String> fieldNamesAcc = accEnt.fieldNames();
+                                                        while (fieldNamesAcc.hasNext())
                                                         {
-                                                            // log.info(
-                                                            // "Account ID : " + accEnt.get(accFieldName).asText());
-                                                            accountId = accEnt.get(accFieldName).asText();
+                                                            String accFieldName = fieldNamesAcc.next();
+                                                            if (accFieldName.equals("id"))
+                                                            {
+                                                                // log.info(
+                                                                // "Account ID : " + accEnt.get(accFieldName).asText());
+                                                                accountId = accEnt.get(accFieldName).asText();
+                                                            }
                                                         }
+
                                                     }
-
                                                 }
-                                            }
 
-                                            if (caseFieldName.equals("individualCustomer")
-                                                    && (!StringUtils.hasText(accountId)))
-                                            {
-                                                // log.info("Inside Account: " );
-
-                                                JsonNode accEnt = caseEnt.path("individualCustomer");
-                                                if (accEnt != null)
+                                                if (caseFieldName.equals("individualCustomer")
+                                                        && (!StringUtils.hasText(accountId)))
                                                 {
-                                                    // log.info("Account Node Bound");
+                                                    // log.info("Inside Account: " );
 
-                                                    Iterator<String> fieldNamesAcc = accEnt.fieldNames();
-                                                    while (fieldNamesAcc.hasNext())
+                                                    JsonNode accEnt = caseEnt.path("individualCustomer");
+                                                    if (accEnt != null)
                                                     {
-                                                        String accFieldName = fieldNamesAcc.next();
-                                                        if (accFieldName.equals("id"))
+                                                        // log.info("Account Node Bound");
+
+                                                        Iterator<String> fieldNamesAcc = accEnt.fieldNames();
+                                                        while (fieldNamesAcc.hasNext())
                                                         {
-                                                            // log.info(
-                                                            // "Account ID : " + accEnt.get(accFieldName).asText());
-                                                            accountId = accEnt.get(accFieldName).asText();
+                                                            String accFieldName = fieldNamesAcc.next();
+                                                            if (accFieldName.equals("id"))
+                                                            {
+                                                                // log.info(
+                                                                // "Account ID : " + accEnt.get(accFieldName).asText());
+                                                                accountId = accEnt.get(accFieldName).asText();
+                                                            }
                                                         }
+
                                                     }
-
                                                 }
-                                            }
 
-                                            if (caseFieldName.equals("reporter"))
-                                            {
-                                                // log.info("Inside Reporter: " );
-
-                                                JsonNode repEnt = caseEnt.path("reporter");
-                                                if (repEnt != null)
+                                                if (caseFieldName.equals("reporter"))
                                                 {
-                                                    // log.info("Reporter Node Bound");
+                                                    // log.info("Inside Reporter: " );
 
-                                                    Iterator<String> fieldNamesRep = repEnt.fieldNames();
-                                                    while (fieldNamesRep.hasNext())
+                                                    JsonNode repEnt = caseEnt.path("reporter");
+                                                    if (repEnt != null)
                                                     {
-                                                        String repFieldName = fieldNamesRep.next();
-                                                        if (repFieldName.equals("id"))
-                                                        {
-                                                            // log.info(
-                                                            // "Reporter ID : " + repEnt.get(repFieldName).asText());
-                                                            contactId = repEnt.get(repFieldName).asText();
-                                                        }
-                                                    }
+                                                        // log.info("Reporter Node Bound");
 
+                                                        Iterator<String> fieldNamesRep = repEnt.fieldNames();
+                                                        while (fieldNamesRep.hasNext())
+                                                        {
+                                                            String repFieldName = fieldNamesRep.next();
+                                                            if (repFieldName.equals("id"))
+                                                            {
+                                                                // log.info(
+                                                                // "Reporter ID : " +
+                                                                // repEnt.get(repFieldName).asText());
+                                                                contactId = repEnt.get(repFieldName).asText();
+                                                            }
+                                                        }
+
+                                                    }
                                                 }
+
                                             }
 
-                                        }
-
-                                        if (StringUtils.hasText(caseid) && StringUtils.hasText(caseguid))
-                                        {
-                                            if (StringUtils.hasText(createdOn))
+                                            if (StringUtils.hasText(caseid) && StringUtils.hasText(caseguid))
                                             {
-                                                // Parse the date-time string into OffsetDateTime
-                                                OffsetDateTime odt = OffsetDateTime.parse(createdOn);
-                                                // Convert OffsetDateTime into Instant
-                                                Instant instant = odt.toInstant();
-                                                // If at all, you need java.util.Date
-                                                Date date = Date.from(instant);
+                                                OffsetDateTime odtC = null;
+                                                Date dateC = null;
+                                                String dateFormattedC = null;
 
-                                                SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy");
-                                                String dateFormatted = sdf.format(date);
+                                                OffsetDateTime odtU = null;
+                                                Date dateU = null;
+                                                String dateFormattedU = null;
+
+                                                if (StringUtils.hasText(createdOn))
+                                                {
+                                                    // Parse the date-time string into OffsetDateTime
+                                                    odtC = OffsetDateTime.parse(createdOn);
+                                                    // Convert OffsetDateTime into Instant
+                                                    Instant instant = odtC.toInstant();
+                                                    // If at all, you need java.util.Date
+                                                    dateC = Date.from(instant);
+
+                                                    SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy");
+                                                    dateFormattedC = sdf.format(dateC);
+                                                }
+
                                                 if (StringUtils.hasText(updatedOn))
                                                 {
                                                     // Parse the date-time string into OffsetDateTime
-                                                    OffsetDateTime odtUpd = OffsetDateTime.parse(updatedOn);
+                                                    odtU = OffsetDateTime.parse(updatedOn);
                                                     // Convert OffsetDateTime into Instant
-                                                    Instant instantUpd = odtUpd.toInstant();
+                                                    Instant instant = odtU.toInstant();
                                                     // If at all, you need java.util.Date
-                                                    Date dateUpd = Date.from(instantUpd);
+                                                    dateU = Date.from(instant);
 
-                                                    SimpleDateFormat sdfUpd = new SimpleDateFormat("dd/M/yyyy");
-                                                    String dateFormattedUpd = sdfUpd.format(dateUpd);
-
-                                                    casesESSList.add(new TY_CaseESS(caseguid, caseid, caseType,
-                                                            caseTypeDescription, subject, status, accountId, contactId,
-                                                            createdOn, date, dateFormatted, odt, updatedOn, dateUpd,
-                                                            dateFormattedUpd, odtUpd, origin, canConfirm));
-                                                }
-                                                else
-                                                {
-
-                                                    casesESSList.add(new TY_CaseESS(caseguid, caseid, caseType,
-                                                            caseTypeDescription, subject, status, accountId, contactId,
-                                                            createdOn, date, dateFormatted, odt, null, null, null, null,
-                                                            origin, canConfirm));
+                                                    SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy");
+                                                    dateFormattedU = sdf.format(dateU);
                                                 }
 
-                                            }
-                                            else
-                                            {
-                                                casesESSList.add(
-                                                        new TY_CaseESS(caseguid, caseid, caseType, caseTypeDescription,
-                                                                subject, status, accountId, contactId, null, null, null,
-                                                                null, null, null, null, null, origin, canConfirm));
-                                            }
+                                                casesESSList.add(new TY_CaseESS(caseguid, caseid, caseType,
+                                                        caseTypeDescription, subject, status, accountId, contactId,
+                                                        createdOn, dateC, dateFormattedC, odtC, updatedOn, dateU,
+                                                        dateFormattedU, odtU, origin, canConfirm));
 
+                                            }
                                         }
 
                                     }
@@ -503,9 +498,7 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
 
         }
 
-        catch (
-
-        Exception e)
+        catch (Exception e)
         {
             e.printStackTrace();
         }
@@ -2667,145 +2660,137 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                                                             // admEnt.get(admFieldName).asText());
                                                             createdOn = admEnt.get(admFieldName).asText();
                                                         }
+
                                                         if (admFieldName.equals("updatedOn"))
                                                         {
-                                                            // log.info( "Updated On : " +
-                                                            // admEnt.get(admFieldName).asText());
+
                                                             updatedOn = admEnt.get(admFieldName).asText();
                                                         }
-
                                                     }
+
                                                 }
-
-                                                if (caseFieldName.equals("account"))
-                                                {
-                                                    // log.info("Inside Account: " );
-
-                                                    JsonNode accEnt = caseEnt.path("account");
-                                                    if (accEnt != null)
-                                                    {
-                                                        // log.info("Account Node Bound");
-
-                                                        Iterator<String> fieldNamesAcc = accEnt.fieldNames();
-                                                        while (fieldNamesAcc.hasNext())
-                                                        {
-                                                            String accFieldName = fieldNamesAcc.next();
-                                                            if (accFieldName.equals("id"))
-                                                            {
-                                                                // log.info(
-                                                                // "Account ID : " + accEnt.get(accFieldName).asText());
-                                                                accountId = accEnt.get(accFieldName).asText();
-                                                            }
-                                                        }
-
-                                                    }
-                                                }
-
-                                                if (caseFieldName.equals("individualCustomer")
-                                                        && (!StringUtils.hasText(accountId)))
-                                                {
-                                                    // log.info("Inside Account: " );
-
-                                                    JsonNode accEnt = caseEnt.path("individualCustomer");
-                                                    if (accEnt != null)
-                                                    {
-                                                        // log.info("Account Node Bound");
-
-                                                        Iterator<String> fieldNamesAcc = accEnt.fieldNames();
-                                                        while (fieldNamesAcc.hasNext())
-                                                        {
-                                                            String accFieldName = fieldNamesAcc.next();
-                                                            if (accFieldName.equals("id"))
-                                                            {
-                                                                // log.info(
-                                                                // "Account ID : " + accEnt.get(accFieldName).asText());
-                                                                accountId = accEnt.get(accFieldName).asText();
-                                                            }
-                                                        }
-
-                                                    }
-                                                }
-
-                                                if (caseFieldName.equals("reporter"))
-                                                {
-                                                    // log.info("Inside Reporter: " );
-
-                                                    JsonNode repEnt = caseEnt.path("reporter");
-                                                    if (repEnt != null)
-                                                    {
-                                                        // log.info("Reporter Node Bound");
-
-                                                        Iterator<String> fieldNamesRep = repEnt.fieldNames();
-                                                        while (fieldNamesRep.hasNext())
-                                                        {
-                                                            String repFieldName = fieldNamesRep.next();
-                                                            if (repFieldName.equals("id"))
-                                                            {
-                                                                // log.info(
-                                                                // "Reporter ID : " +
-                                                                // repEnt.get(repFieldName).asText());
-                                                                contactId = repEnt.get(repFieldName).asText();
-                                                            }
-                                                        }
-
-                                                    }
-                                                }
-
                                             }
 
-                                            if (StringUtils.hasText(caseid) && StringUtils.hasText(caseguid))
+                                            if (caseFieldName.equals("account"))
                                             {
-                                                if (StringUtils.hasText(createdOn))
+                                                // log.info("Inside Account: " );
+
+                                                JsonNode accEnt = caseEnt.path("account");
+                                                if (accEnt != null)
                                                 {
-                                                    // Parse the date-time string into OffsetDateTime
-                                                    OffsetDateTime odt = OffsetDateTime.parse(createdOn);
-                                                    // Convert OffsetDateTime into Instant
-                                                    Instant instant = odt.toInstant();
-                                                    // If at all, you need java.util.Date
-                                                    Date date = Date.from(instant);
+                                                    // log.info("Account Node Bound");
 
-                                                    SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy");
-                                                    String dateFormatted = sdf.format(date);
-
-                                                    if (StringUtils.hasText(updatedOn))
+                                                    Iterator<String> fieldNamesAcc = accEnt.fieldNames();
+                                                    while (fieldNamesAcc.hasNext())
                                                     {
-                                                        // Parse the date-time string into OffsetDateTime
-                                                        OffsetDateTime odtUpd = OffsetDateTime.parse(updatedOn);
-                                                        // Convert OffsetDateTime into Instant
-                                                        Instant instantUpd = odtUpd.toInstant();
-                                                        // If at all, you need java.util.Date
-                                                        Date dateUpd = Date.from(instantUpd);
-
-                                                        SimpleDateFormat sdfUpd = new SimpleDateFormat("dd/M/yyyy");
-                                                        String dateFormattedUpd = sdfUpd.format(dateUpd);
-
-                                                        casesESSList.add(new TY_CaseESS(caseguid, caseid, caseType,
-                                                                caseTypeDescription, subject, status, accountId,
-                                                                contactId, createdOn, date, dateFormatted, odt,
-                                                                updatedOn, dateUpd, dateFormattedUpd, odtUpd, origin,
-                                                                canConfirm));
-                                                    }
-                                                    else
-                                                    {
-
-                                                        casesESSList.add(new TY_CaseESS(caseguid, caseid, caseType,
-                                                                caseTypeDescription, subject, status, accountId,
-                                                                contactId, createdOn, date, dateFormatted, odt, null,
-                                                                null, null, null, origin, canConfirm));
+                                                        String accFieldName = fieldNamesAcc.next();
+                                                        if (accFieldName.equals("id"))
+                                                        {
+                                                            // log.info(
+                                                            // "Account ID : " + accEnt.get(accFieldName).asText());
+                                                            accountId = accEnt.get(accFieldName).asText();
+                                                        }
                                                     }
 
-                                                }
-                                                else
-                                                {
-                                                    casesESSList.add(new TY_CaseESS(caseguid, caseid, caseType,
-                                                            caseTypeDescription, subject, status, accountId, contactId,
-                                                            null, null, null, null, null, null, null, null, origin,
-                                                            canConfirm));
                                                 }
                                             }
+
+                                            if (caseFieldName.equals("individualCustomer")
+                                                    && (!StringUtils.hasText(accountId)))
+                                            {
+                                                // log.info("Inside Account: " );
+
+                                                JsonNode accEnt = caseEnt.path("individualCustomer");
+                                                if (accEnt != null)
+                                                {
+                                                    // log.info("Account Node Bound");
+
+                                                    Iterator<String> fieldNamesAcc = accEnt.fieldNames();
+                                                    while (fieldNamesAcc.hasNext())
+                                                    {
+                                                        String accFieldName = fieldNamesAcc.next();
+                                                        if (accFieldName.equals("id"))
+                                                        {
+                                                            // log.info(
+                                                            // "Account ID : " + accEnt.get(accFieldName).asText());
+                                                            accountId = accEnt.get(accFieldName).asText();
+                                                        }
+                                                    }
+
+                                                }
+                                            }
+
+                                            if (caseFieldName.equals("reporter"))
+                                            {
+                                                // log.info("Inside Reporter: " );
+
+                                                JsonNode repEnt = caseEnt.path("reporter");
+                                                if (repEnt != null)
+                                                {
+                                                    // log.info("Reporter Node Bound");
+
+                                                    Iterator<String> fieldNamesRep = repEnt.fieldNames();
+                                                    while (fieldNamesRep.hasNext())
+                                                    {
+                                                        String repFieldName = fieldNamesRep.next();
+                                                        if (repFieldName.equals("id"))
+                                                        {
+                                                            // log.info(
+                                                            // "Reporter ID : " + repEnt.get(repFieldName).asText());
+                                                            contactId = repEnt.get(repFieldName).asText();
+                                                        }
+                                                    }
+
+                                                }
+                                            }
+
+                                        }
+
+                                        if (StringUtils.hasText(caseid) && StringUtils.hasText(caseguid))
+                                        {
+                                            OffsetDateTime odtC = null;
+                                            Date dateC = null;
+                                            String dateFormattedC = null;
+
+                                            OffsetDateTime odtU = null;
+                                            Date dateU = null;
+                                            String dateFormattedU = null;
+
+                                            if (StringUtils.hasText(createdOn))
+                                            {
+                                                // Parse the date-time string into OffsetDateTime
+                                                odtC = OffsetDateTime.parse(createdOn);
+                                                // Convert OffsetDateTime into Instant
+                                                Instant instant = odtC.toInstant();
+                                                // If at all, you need java.util.Date
+                                                dateC = Date.from(instant);
+
+                                                SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy");
+                                                dateFormattedC = sdf.format(dateC);
+                                            }
+
+                                            if (StringUtils.hasText(updatedOn))
+                                            {
+                                                // Parse the date-time string into OffsetDateTime
+                                                odtU = OffsetDateTime.parse(updatedOn);
+                                                // Convert OffsetDateTime into Instant
+                                                Instant instant = odtU.toInstant();
+                                                // If at all, you need java.util.Date
+                                                dateU = Date.from(instant);
+
+                                                SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy");
+                                                dateFormattedU = sdf.format(dateU);
+                                            }
+
+                                            casesESSList.add(new TY_CaseESS(caseguid, caseid, caseType,
+                                                    caseTypeDescription, subject, status, accountId, contactId,
+                                                    createdOn, dateC, dateFormattedC, odtC, updatedOn, dateU,
+                                                    dateFormattedU, odtU, origin, canConfirm));
+
                                         }
 
                                     }
+
                                 }
 
                             }
@@ -3270,145 +3255,125 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                                                                                     createdOn = admEnt.get(admFieldName)
                                                                                             .asText();
                                                                                 }
+
                                                                                 if (admFieldName.equals("updatedOn"))
                                                                                 {
-                                                                                    // log.info( "Updated On : " +
-                                                                                    // admEnt.get(admFieldName).asText());
+
                                                                                     updatedOn = admEnt.get(admFieldName)
                                                                                             .asText();
                                                                                 }
-
                                                                             }
+
                                                                         }
-
-                                                                        if (caseFieldName.equals("individualCustomer")
-                                                                                && (!StringUtils.hasText(accountId)))
-                                                                        {
-                                                                            // log.info("Inside Account: " );
-
-                                                                            JsonNode accEnt = caseEnt
-                                                                                    .path("individualCustomer");
-                                                                            if (accEnt != null)
-                                                                            {
-                                                                                // log.info("Account Node Bound");
-
-                                                                                Iterator<String> fieldNamesAcc = accEnt
-                                                                                        .fieldNames();
-                                                                                while (fieldNamesAcc.hasNext())
-                                                                                {
-                                                                                    String accFieldName = fieldNamesAcc
-                                                                                            .next();
-                                                                                    if (accFieldName.equals("id"))
-                                                                                    {
-                                                                                        // log.info(
-                                                                                        // "Account ID : " +
-                                                                                        // accEnt.get(accFieldName).asText());
-                                                                                        accountId = accEnt
-                                                                                                .get(accFieldName)
-                                                                                                .asText();
-                                                                                    }
-                                                                                }
-
-                                                                            }
-                                                                        }
-
-                                                                        if (caseFieldName.equals("employee"))
-                                                                        {
-                                                                            // log.info("Inside Reporter: " );
-
-                                                                            JsonNode empEnt = caseEnt.path("employee");
-                                                                            if (empEnt != null)
-                                                                            {
-                                                                                // log.info("Reporter Node Bound");
-
-                                                                                Iterator<String> fieldNamesRep = empEnt
-                                                                                        .fieldNames();
-                                                                                while (fieldNamesRep.hasNext())
-                                                                                {
-                                                                                    String repFieldName = fieldNamesRep
-                                                                                            .next();
-                                                                                    if (repFieldName.equals("id"))
-                                                                                    {
-                                                                                        // log.info(
-                                                                                        // "Reporter ID : " +
-                                                                                        // repEnt.get(repFieldName).asText());
-                                                                                        employeeId = empEnt
-                                                                                                .get(repFieldName)
-                                                                                                .asText();
-                                                                                    }
-                                                                                }
-
-                                                                            }
-                                                                        }
-
                                                                     }
 
-                                                                    if (StringUtils.hasText(caseid)
-                                                                            && StringUtils.hasText(caseguid))
+                                                                    if (caseFieldName.equals("individualCustomer")
+                                                                            && (!StringUtils.hasText(accountId)))
                                                                     {
-                                                                        if (StringUtils.hasText(createdOn))
+                                                                        // log.info("Inside Account: " );
+
+                                                                        JsonNode accEnt = caseEnt
+                                                                                .path("individualCustomer");
+                                                                        if (accEnt != null)
                                                                         {
-                                                                            // Parse the date-time string into
-                                                                            // OffsetDateTime
-                                                                            OffsetDateTime odt = OffsetDateTime
-                                                                                    .parse(createdOn);
-                                                                            // Convert OffsetDateTime into Instant
-                                                                            Instant instant = odt.toInstant();
-                                                                            // If at all, you need java.util.Date
-                                                                            Date date = Date.from(instant);
+                                                                            // log.info("Account Node Bound");
 
-                                                                            SimpleDateFormat sdf = new SimpleDateFormat(
-                                                                                    "dd/M/yyyy");
-                                                                            String dateFormatted = sdf.format(date);
-
-                                                                            if (StringUtils.hasText(updatedOn))
+                                                                            Iterator<String> fieldNamesAcc = accEnt
+                                                                                    .fieldNames();
+                                                                            while (fieldNamesAcc.hasNext())
                                                                             {
-                                                                                // Parse the date-time string into
-                                                                                // OffsetDateTime
-                                                                                OffsetDateTime odtUpd = OffsetDateTime
-                                                                                        .parse(updatedOn);
-                                                                                // Convert OffsetDateTime into Instant
-                                                                                Instant instantUpd = odtUpd.toInstant();
-                                                                                // If at all, you need java.util.Date
-                                                                                Date dateUpd = Date.from(instantUpd);
-
-                                                                                SimpleDateFormat sdfUpd = new SimpleDateFormat(
-                                                                                        "dd/M/yyyy");
-                                                                                String dateFormattedUpd = sdfUpd
-                                                                                        .format(dateUpd);
-
-                                                                                casesByCaseType.add(new TY_CaseESS(
-                                                                                        caseguid, caseid, caseTypeVar,
-                                                                                        caseTypeDescription, subject,
-                                                                                        status, accountId, employeeId,
-                                                                                        createdOn, date, dateFormatted,
-                                                                                        odt, updatedOn, dateUpd,
-                                                                                        dateFormattedUpd, odtUpd,
-                                                                                        origin, canConfirm));
-                                                                            }
-                                                                            else
-                                                                            {
-
-                                                                                casesByCaseType.add(new TY_CaseESS(
-                                                                                        caseguid, caseid, caseTypeVar,
-                                                                                        caseTypeDescription, subject,
-                                                                                        status, accountId, employeeId,
-                                                                                        createdOn, date, dateFormatted,
-                                                                                        odt, null, null, null, null,
-                                                                                        origin, canConfirm));
+                                                                                String accFieldName = fieldNamesAcc
+                                                                                        .next();
+                                                                                if (accFieldName.equals("id"))
+                                                                                {
+                                                                                    // log.info(
+                                                                                    // "Account ID : " +
+                                                                                    // accEnt.get(accFieldName).asText());
+                                                                                    accountId = accEnt.get(accFieldName)
+                                                                                            .asText();
+                                                                                }
                                                                             }
 
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            casesByCaseType.add(new TY_CaseESS(caseguid,
-                                                                                    caseid, caseTypeVar,
-                                                                                    caseTypeDescription, subject,
-                                                                                    status, accountId, employeeId, null,
-                                                                                    null, null, null, null, null, null,
-                                                                                    null, origin, canConfirm));
                                                                         }
                                                                     }
+
+                                                                    if (caseFieldName.equals("employee"))
+                                                                    {
+                                                                        // log.info("Inside Reporter: " );
+
+                                                                        JsonNode empEnt = caseEnt.path("employee");
+                                                                        if (empEnt != null)
+                                                                        {
+                                                                            // log.info("Reporter Node Bound");
+
+                                                                            Iterator<String> fieldNamesRep = empEnt
+                                                                                    .fieldNames();
+                                                                            while (fieldNamesRep.hasNext())
+                                                                            {
+                                                                                String repFieldName = fieldNamesRep
+                                                                                        .next();
+                                                                                if (repFieldName.equals("id"))
+                                                                                {
+                                                                                    // log.info(
+                                                                                    // "Reporter ID : " +
+                                                                                    // repEnt.get(repFieldName).asText());
+                                                                                    employeeId = empEnt
+                                                                                            .get(repFieldName).asText();
+                                                                                }
+                                                                            }
+
+                                                                        }
+                                                                    }
+
+                                                                }
+
+                                                                if (StringUtils.hasText(caseid)
+                                                                        && StringUtils.hasText(caseguid))
+                                                                {
+                                                                    OffsetDateTime odtC = null;
+                                                                    Date dateC = null;
+                                                                    String dateFormattedC = null;
+
+                                                                    OffsetDateTime odtU = null;
+                                                                    Date dateU = null;
+                                                                    String dateFormattedU = null;
+
+                                                                    if (StringUtils.hasText(createdOn))
+                                                                    {
+                                                                        // Parse the date-time string into
+                                                                        // OffsetDateTime
+                                                                        odtC = OffsetDateTime.parse(createdOn);
+                                                                        // Convert OffsetDateTime into Instant
+                                                                        Instant instant = odtC.toInstant();
+                                                                        // If at all, you need java.util.Date
+                                                                        dateC = Date.from(instant);
+
+                                                                        SimpleDateFormat sdf = new SimpleDateFormat(
+                                                                                "dd/M/yyyy");
+                                                                        dateFormattedC = sdf.format(dateC);
+                                                                    }
+
+                                                                    if (StringUtils.hasText(updatedOn))
+                                                                    {
+                                                                        // Parse the date-time string into
+                                                                        // OffsetDateTime
+                                                                        odtU = OffsetDateTime.parse(updatedOn);
+                                                                        // Convert OffsetDateTime into Instant
+                                                                        Instant instant = odtU.toInstant();
+                                                                        // If at all, you need java.util.Date
+                                                                        dateU = Date.from(instant);
+
+                                                                        SimpleDateFormat sdf = new SimpleDateFormat(
+                                                                                "dd/M/yyyy");
+                                                                        dateFormattedU = sdf.format(dateU);
+                                                                    }
+
+                                                                    casesByCaseType.add(new TY_CaseESS(caseguid, caseid,
+                                                                            caseTypeVar, caseTypeDescription, subject,
+                                                                            status, accountId, employeeId, createdOn,
+                                                                            dateC, dateFormattedC, odtC, updatedOn,
+                                                                            dateU, dateFormattedU, odtU, origin,
+                                                                            canConfirm));
 
                                                                 }
 
