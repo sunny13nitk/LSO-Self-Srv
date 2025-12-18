@@ -119,9 +119,6 @@ public class CL_ESS_UISrv implements IF_ESS_UISrv
         List<TY_CaseESS> cases = srvCloudApiSrv.getCases4User(userDetails, caseType,
                 userSessionSrv.getDestinationDetails4mUserSession());
 
-        cases.sort(Comparator.comparing(TY_CaseESS::getTsUpdate, Comparator.nullsLast(Comparator.naturalOrder()))
-                .reversed());
-
         return cases;
 
     }
