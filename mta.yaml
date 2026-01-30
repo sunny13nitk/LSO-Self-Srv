@@ -3,7 +3,7 @@ ID: lso-selfsrv
 version: 1.0.78
 description: "LSO Self Service Application"
 parameters:
-  enable-parallel-deployments: true
+  enable-parallel-deployments: true 
 modules:
   - name: lso-selfsrv-srv
     type: java
