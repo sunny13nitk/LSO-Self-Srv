@@ -1,10 +1,6 @@
 {
   "xsappname": "lso-selfsrv",
   "oauth2-configuration": {
-    "credential-types": [
-      "instance-secret",
-      "binding-secret"
-    ],
     "redirect-uris": [
       "https://*.cfapps.eu10-004.hana.ondemand.com/login/callback",
       "https://*.cfapps.eu10-004.hana.ondemand.com/**"
