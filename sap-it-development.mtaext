@@ -27,7 +27,6 @@ modules:
       - name: lsossrv-xsuaa
       - name: lsossrv-hdi-container
       - name: iESM-destination-services
-      - name: xotel-agent-ext-java # xotel agent for java
 
   # HANA DB HDI Container Deployer
   - name: lsossrv-hana-db
@@ -90,5 +89,3 @@ resources:
       service: destination
       path: ./destination-dev.json
     type: org.cloudfoundry.managed-service
-  - name: xotel-agent-ext-java
-    type: org.cloudfoundry.existing-service  
