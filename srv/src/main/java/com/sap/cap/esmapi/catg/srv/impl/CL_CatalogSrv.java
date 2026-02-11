@@ -1,6 +1,7 @@
 package com.sap.cap.esmapi.catg.srv.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -279,6 +280,63 @@ public class CL_CatalogSrv implements IF_CatalogSrv
         }
 
         return catgDetails;
+    }
+
+    @Override
+    public List<TY_CatalogItem> getCategoryLvl2ByRootCatgId(String... rootCatgId) throws EX_ESMAPI
+    {
+        List<TY_CatalogItem> lvl2Catgs = null;
+        Optional<TY_CatgCusItem> caseCFgO = catgCus.getCustomizations().stream()
+                .filter(g -> g.getCaseTypeEnum().toString().equals(EnumCaseTypes.Learning.toString())).findFirst();
+        if (caseCFgO.isPresent())
+        {
+
+            if (rootCatgId == null || rootCatgId.length == 0)
+            {
+                if (caseCatgContainer == null)
+                    return Collections.emptyList();
+                else
+                {
+                    log.info("Seeking Level 2 Categories for All Root Categories as Root Category Id is Blank/Null");
+                    return caseCatgContainer.stream()
+                            .filter(c -> c.getCaseTypeEnum().equals(caseCFgO.get().getCaseTypeEnum()))
+                            .flatMap(c -> c.getCategorieslvl2().stream()).collect(Collectors.toList());
+                }
+            }
+            else
+            {
+                log.info("Seeking Level 2 Categories for Root Category Id :" + rootCatgId[0]);
+                lvl2Catgs = caseCatgContainer.stream()
+                        .filter(c -> c.getCaseTypeEnum().equals(caseCFgO.get().getCaseTypeEnum()))
+                        .flatMap(c -> c.getCategorieslvl2().stream()).filter(c -> StringUtils.hasText(c.getParentId())
+                                && StringUtils.hasText(c.getId()) && (c.getParentId().equals(rootCatgId[0])))
+                        .collect(Collectors.toList());
+            }
+
+        }
+
+        return lvl2Catgs;
+
+    }
+
+    @Override
+    public List<TY_CatalogItem> getCategoryLvl2ByRootCatgDesc(String Catg1Desc) throws EX_ESMAPI
+    {
+        if (StringUtils.hasText(Catg1Desc) && caseCatgContainer != null)
+        {
+            log.info("Seeking Level 2 Categories for Root Category Description :" + Catg1Desc);
+            return caseCatgContainer.stream().filter(c -> c.getCaseTypeEnum().equals(EnumCaseTypes.Learning))
+                    .flatMap(c -> c.getCategorieslvl2().stream()).filter(c -> StringUtils.hasText(c.getParentName())
+                            && StringUtils.hasText(c.getId()) && (c.getParentName().equals(Catg1Desc)))
+                    .collect(Collectors.toList());
+        }
+        else
+        {
+            log.info(
+                    "Root Category Description is Blank/Null. Hence Seeking Level 2 Categories for All Root Categories");
+            return caseCatgContainer.stream().filter(c -> c.getCaseTypeEnum().equals(EnumCaseTypes.Learning))
+                    .flatMap(c -> c.getCategorieslvl2().stream()).collect(Collectors.toList());
+        }
     }
 
     private TY_CatalogTree loadCatgTree4CaseType(EnumCaseTypes caseType)

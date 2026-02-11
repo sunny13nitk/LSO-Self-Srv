@@ -260,6 +260,9 @@ public class LSOController
                     model.addAttribute("catgsList",
                             catalogTreeSrv.getCaseCatgTree4LoB(EnumCaseTypes.Learning).getCategories());
 
+                    // load default level 2 categories
+                    model.addAttribute("catgslvl2", catalogSrv.getCategoryLvl2ByRootCatgId());
+
                     // Attachment file Size
                     model.addAttribute("attSize", rlConfig.getAllowedSizeAttachmentMB());
 

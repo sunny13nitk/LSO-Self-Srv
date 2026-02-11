@@ -334,10 +334,8 @@
                      th:if="${catgsList != null}">
                      <label style="color: #007db8;font-family: Arial, Helvetica, sans-serif;">Service Category
                         <a style="margin-left: 4px; margin-top: -2px;" class="button info cycle mini"
-                           data-role="popover" data-popover-position="right"
-                           data-popover-hide=1000000 
-                           data-hide-on-leave=true
-                           data-popover-text="<b> Categories Information </b>
+                           data-role="popover" data-popover-position="right" data-popover-hide=1000000
+                           data-hide-on-leave=true data-popover-text="<b> Categories Information </b>
                            <p>
                               <b>Learning and Certification Advice: </b> 
                               Business support for learners regarding information about the learning portal and learning portfolio, learning path, on-demand public courses to Run, learning method, certifications, course schedule, training delivery & training center
@@ -403,6 +401,21 @@
                            <span class="mif-replay"></span>
                         </button>
                      </span> -->
+                  </div>
+
+                  <div class="colspan-9 offset-1" style="margin-top: 5px; margin-bottom: 10px"
+                     th:if="${catgsList != null}">
+                     <label style="color: #007db8;font-family: Arial, Helvetica, sans-serif;">Service Sub Category
+                     </label>
+                     <select name="catgDesc" id="dropDown" data-role="select" th:field="*{catg2Desc}"
+                        data-cls-option="fg-grayMouse" data-cls-selected-item="bg-teal fg-white" addEmptyValue="true"
+                        data-cls-select="bd-red bg-transparent" onchange="getCatg2Sel(this)">
+
+                        <option th:each="catg2 : ${catgslvl2}" th:value="${catg2.id}" th:selected="${catg2.id}"
+                           th:text="${catg2.parentName != null} ? ${catg2.parentName} + '>' +${catg2.name}: ${catg2.name}">
+                        </option>
+                     </select>
+                  
                   </div>
 
                   <div class="colspan-9 offset-1" style="margin-top: 10px; margin-bottom: 10px">

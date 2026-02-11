@@ -1,5 +1,8 @@
 package com.sap.cap.esmapi.catg.srv.intf;
 
+import java.util.List;
+
+import com.sap.cap.esmapi.catg.pojos.TY_CatalogItem;
 import com.sap.cap.esmapi.catg.pojos.TY_CatalogTree;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgDetails;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgTemplates;
@@ -13,6 +16,10 @@ public interface IF_CatalogSrv
     public String[] getCatgHierarchyforCatId(String catId, EnumCaseTypes caseType) throws EX_ESMAPI;
 
     public TY_CatgTemplates getTemplates4Catg(String catId, EnumCaseTypes caseType) throws EX_ESMAPI;
+
+    public List<TY_CatalogItem> getCategoryLvl2ByRootCatgId(String... rootCatgId) throws EX_ESMAPI;
+
+    public List<TY_CatalogItem> getCategoryLvl2ByRootCatgDesc(String Catg1Desc) throws EX_ESMAPI;
 
     /*
      * Get Cuurent Category Description using - Category Guid from Case Form - Enum,
