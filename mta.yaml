@@ -3,7 +3,7 @@ ID: lso-selfsrv
 version: 1.0.78
 description: "LSO Self Service Application"
 parameters:
-  enable-parallel-deployments: true 
+  enable-parallel-deployments: true
 modules:
   - name: lso-selfsrv-srv
     type: java
@@ -88,6 +88,4 @@ resources:
       path: ./destination-dev.json
     type: org.cloudfoundry.managed-service
   - name: dynatrace-service
-    type: org.cloudfoundry.existing-service
-  - name: xotel-agent-ext-java
     type: org.cloudfoundry.existing-service
