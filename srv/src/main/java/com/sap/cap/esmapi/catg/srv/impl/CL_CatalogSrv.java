@@ -449,6 +449,7 @@ public class CL_CatalogSrv implements IF_CatalogSrv
         if (CollectionUtils.isNotEmpty(caseCatgTree.getCategories()))
         {
             caseCatgTree.getCategories().add(0, new TY_CatalogItem());
+            caseCatgTree.getCategorieslvl2().add(0, new TY_CatalogItem());
         }
         return caseCatgTree;
     }
