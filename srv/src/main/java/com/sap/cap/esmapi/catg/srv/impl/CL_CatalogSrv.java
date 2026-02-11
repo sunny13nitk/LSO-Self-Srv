@@ -31,8 +31,11 @@ import com.sap.cap.esmapi.utilities.pojos.TY_CaseCatalogCustomizing;
 import com.sap.cap.esmapi.utilities.srv.intf.IF_UserSessionSrv;
 import com.sap.cap.esmapi.utilities.srvCloudApi.srv.intf.IF_SrvCloudAPI;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
 @Scope(value = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
+@Slf4j
 public class CL_CatalogSrv implements IF_CatalogSrv
 {
 
@@ -282,6 +285,7 @@ public class CL_CatalogSrv implements IF_CatalogSrv
     {
 
         TY_CatalogTree caseCatgTree = null;
+        TY_CatalogTree caseCatgTreeCopy = null;
 
         // Get the Config
         Optional<TY_CatgCusItem> caseCFgO = catgCus.getCustomizations().stream()
@@ -299,8 +303,24 @@ public class CL_CatalogSrv implements IF_CatalogSrv
                     if (StringUtils.hasText(caseCus.getCataglogId()))
                     {
                         // Get category Tree for Catalog ID
-                        caseCatgTree = new TY_CatalogTree(caseType, srvCloudApiSrv.getActiveCaseCategoriesByCatalogId(
-                                caseCus.getCataglogId(), userSessionSrv.getDestinationDetails4mUserSession()));
+                        caseCatgTree = new TY_CatalogTree(caseType,
+                                srvCloudApiSrv.getActiveCaseCategoriesByCatalogId(caseCus.getCataglogId(),
+                                        userSessionSrv.getDestinationDetails4mUserSession()),
+                                new ArrayList<TY_CatalogItem>());
+                        if (caseCatgTree != null) // Category Tree Deep Copy
+                        {
+                            caseCatgTreeCopy = new TY_CatalogTree();
+                            List<TY_CatalogItem> copy = new ArrayList<>(caseCatgTree.getCategories().size());
+                            for (TY_CatalogItem item : caseCatgTree.getCategories())
+                            {
+                                copy.add(new TY_CatalogItem(item.getId(), item.getName(), item.getParentId(),
+                                        item.getParentName())); // deep copy
+                            }
+
+                            caseCatgTreeCopy.setCaseTypeEnum(caseCatgTree.getCaseTypeEnum());
+                            caseCatgTreeCopy.setCategories(copy);
+                        }
+
                         if (CollectionUtils.isNotEmpty(caseCatgTree.getCategories()))
                         {
                             // add to Container - for subsequent calls
@@ -309,14 +329,12 @@ public class CL_CatalogSrv implements IF_CatalogSrv
                                 caseCatgContainer = new ArrayList<TY_CatalogTree>();
                             }
 
-                            if (caseCFgO.get().getToplvlCatgOnly())
+                            // Retain only Top Level Categories as Step 1
+                            List<TY_CatalogItem> toplvlCatgs = caseCatgTree.getCategories().stream()
+                                    .filter(c -> c.getParentId() == null).collect(Collectors.toList());
+                            if (CollectionUtils.isNotEmpty(toplvlCatgs))
                             {
-                                List<TY_CatalogItem> toplvlCatgs = caseCatgTree.getCategories().stream()
-                                        .filter(c -> c.getParentId() == null).collect(Collectors.toList());
-                                if (CollectionUtils.isNotEmpty(toplvlCatgs))
-                                {
-                                    caseCatgTree.setCategories(toplvlCatgs);
-                                }
+                                caseCatgTree.setCategories(toplvlCatgs);
                             }
 
                             // Categories Sort Enabled
@@ -326,6 +344,28 @@ public class CL_CatalogSrv implements IF_CatalogSrv
                                 caseCatgTree.setCategories(catgItems);
                             }
 
+                            // Now load the level 2 Categories for the Catalog - As part of loading the
+                            // Catalog Tree for Case Type to avoid multiple calls to Srv Cloud while
+                            // navigating in Case form and seeking for category details
+
+                            if (CollectionUtils.isNotEmpty(caseCatgTree.getCategories()))
+                            {
+                                for (TY_CatalogItem lvl1Catg : caseCatgTree.getCategories())
+                                {
+                                    List<TY_CatalogItem> catgLvl2 = caseCatgTreeCopy.getCategories().stream().filter(
+                                            c -> c.getParentId() != null && c.getParentId().equals(lvl1Catg.getId()))
+                                            .collect(Collectors.toList());
+                                    if (CollectionUtils.isNotEmpty(catgLvl2))
+                                    {
+                                        log.info("Loading Level 2 Categories for Category :" + lvl1Catg.getName()
+                                                + " and Case Type :" + caseType.toString() + " with Count :"
+                                                + catgLvl2.size());
+                                        caseCatgTree.getCategorieslvl2().addAll(catgLvl2);
+                                    }
+                                }
+                            }
+
+                            // Finally add the Catalog Tree to Container for Session Maintenance
                             this.caseCatgContainer.add(caseCatgTree);
 
                         }

@@ -13,8 +13,11 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TY_CatalogTree 
+public class TY_CatalogTree
 {
     private EnumCaseTypes caseTypeEnum;
     private List<TY_CatalogItem> categories;
+    private List<TY_CatalogItem> categorieslvl2;
+
+    
 }
