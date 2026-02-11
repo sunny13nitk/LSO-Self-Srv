@@ -412,7 +412,7 @@
                         data-cls-select="bd-red bg-transparent" onchange="getCatg2Sel(this)">
 
                         <option th:each="catg2 : ${catgslvl2}" th:value="${catg2.id}" th:selected="${catg2.id}"
-                           th:text="${catg2.parentName != null} ? ${catg2.parentName} + '>' +${catg2.name}: ${catg2.name}">
+                           th:text="${catg2.name}">
                         </option>
                      </select>
                   
