@@ -14,6 +14,8 @@ import org.springframework.util.CollectionUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.opencsv.bean.CsvToBeanBuilder;
+import com.sap.cap.esmapi.catg.pojos.TY_Catg2Templates;
+import com.sap.cap.esmapi.catg.pojos.TY_Catg2TemplatesCus;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgCus;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgCusItem;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgRanks;
@@ -41,6 +43,7 @@ public class AppInitializrConfig
 {
     private final String configPath = "/configCatg/config.csv";
     private final String configCatgTemplates = "/configCatg/templates.csv";
+    private final String configCatg2Templates = "/configCatg/templatesCatg2.csv";
     private final String configPathVHelpsJSON = "/vhelps/VHelps.json";
     private final String configCatgCountryMandatory = "/configCatg/Mandatory_Country_Catg.csv";
     private final String configCatgLanguageMandatory = "/configCatg/Mandatory_Language_Catg.csv";
@@ -183,6 +186,43 @@ public class AppInitializrConfig
                     {
                         log.info("Entries in Config. Found for Case Categories and Templates: " + configs.size());
                         catgTempCus = new TY_CatgTemplatesCus(configs);
+                    }
+                }
+            }
+
+        }
+        catch (Exception e)
+        {
+            throw new EX_ESMAPI(msgSrc.getMessage("ERR_CASETYPE_CFG", new Object[]
+            { configPath, e.getLocalizedMessage() }, Locale.ENGLISH));
+        }
+
+        return catgTempCus;
+    }
+
+    @Bean
+    public TY_Catg2TemplatesCus loadTemplatesCatg24mConfig()
+    {
+        TY_Catg2TemplatesCus catgTempCus = null;
+
+        try
+        {
+
+            ClassPathResource classPathResource = new ClassPathResource(configCatg2Templates);
+            if (classPathResource != null)
+            {
+                Reader reader = new InputStreamReader(classPathResource.getInputStream());
+                if (reader != null)
+                {
+                    log.info("Resource Bound... ");
+                    List<TY_Catg2Templates> configs = new CsvToBeanBuilder(reader).withSkipLines(1)
+                            .withType(TY_Catg2Templates.class).build().parse();
+
+                    if (!CollectionUtils.isEmpty(configs))
+                    {
+                        log.info("Entries in Config. Found for Case Categories level 2 and Templates: "
+                                + configs.size());
+                        catgTempCus = new TY_Catg2TemplatesCus(configs);
                     }
                 }
             }

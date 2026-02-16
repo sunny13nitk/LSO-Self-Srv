@@ -77,7 +77,7 @@ public class CL_SplCatgMVSrv implements IF_SplCatgMVSrv
             // Also set the Category Description in Upper Case
             // Get the Category Description for the Category ID from Case Form
             TY_CatgDetails catgDetails = catalogSrv.getCategoryDetails4Catg(caseForm.getCatgDesc(),
-                    EnumCaseTypes.Learning, true);
+                    EnumCaseTypes.Learning, true, false);
             if (catgDetails != null)
             {
                 caseForm.setCatgText(catgDetails.getCatDesc());

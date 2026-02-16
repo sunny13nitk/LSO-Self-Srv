@@ -30,6 +30,11 @@ public interface IF_UserSessionSrv
 
     public String getPreviousCategory();
 
+    public void setPreviousCategory2(String catg);
+
+    public String getPreviousCategory2();
+    
+
     public TY_SplCatg_Seek isSplCatg(String caseFormCatgDesc);
 
     // For Test Purpose Only to Test the Controller - #Test

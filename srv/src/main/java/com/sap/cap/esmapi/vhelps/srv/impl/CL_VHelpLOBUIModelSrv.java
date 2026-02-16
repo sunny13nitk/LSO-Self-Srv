@@ -58,7 +58,7 @@ public class CL_VHelpLOBUIModelSrv implements IF_VHelpLOBUIModelSrv
             if (CollectionUtils.isNotEmpty(vHelpCusSrv.getVHelpsCus()))
             {
                 // Get the Category Description for the Category ID from Case Form
-                TY_CatgDetails catgDetails = catalogSrv.getCategoryDetails4Catg(catgId, lob, true);
+                TY_CatgDetails catgDetails = catalogSrv.getCategoryDetails4Catg(catgId, lob, true, false);
                 // Get Customizing for LOB
                 Optional<TY_Cus_VHelpsLOB> lobVHelpCusO = vHelpCusSrv.getVHelpsCus().stream()
                         .filter(x -> x.getLOB().equals(lob.name())).findFirst();

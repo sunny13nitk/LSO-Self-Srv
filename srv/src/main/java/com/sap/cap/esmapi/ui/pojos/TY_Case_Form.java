@@ -29,7 +29,9 @@ public class TY_Case_Form
     private boolean employee;
     private boolean external;
     private boolean catgChange;
+    private boolean catg2Change;
     private String catgText;
+    private String catg2Text;
     private String appId; // Exam form Extensions
     private boolean extraTime;
 

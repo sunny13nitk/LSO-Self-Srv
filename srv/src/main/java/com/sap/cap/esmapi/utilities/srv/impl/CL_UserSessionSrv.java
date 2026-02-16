@@ -699,7 +699,7 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                 // Also set the Category Description in Upper Case
                 // Get the Category Description for the Category ID from Case Form
                 TY_CatgDetails catgDetails = catalogSrv.getCategoryDetails4Catg(caseFormCatgDesc,
-                        EnumCaseTypes.Learning, true);
+                        EnumCaseTypes.Learning, true,false);
                 if (catgDetails != null)
                 {
                     log.info("Catg. Text for Category ID : " + caseFormCatgDesc + " is : " + catgDetails.getCatDesc());
@@ -2197,6 +2197,18 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
 
         }
         return isValid;
+    }
+
+    @Override
+    public void setPreviousCategory2(String catg)
+    {
+        this.userSessInfo.setPrevCatg2(catg);
+    }
+
+    @Override
+    public String getPreviousCategory2()
+    {
+        return this.userSessInfo.getPrevCatg2();
     }
 
     private void handleAPIFailure(String[] params)

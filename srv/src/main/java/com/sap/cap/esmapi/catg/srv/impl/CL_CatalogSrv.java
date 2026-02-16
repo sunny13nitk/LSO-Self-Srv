@@ -18,6 +18,8 @@ import org.springframework.util.StringUtils;
 
 import com.sap.cap.esmapi.catg.pojos.TY_CatalogItem;
 import com.sap.cap.esmapi.catg.pojos.TY_CatalogTree;
+import com.sap.cap.esmapi.catg.pojos.TY_Catg2Templates;
+import com.sap.cap.esmapi.catg.pojos.TY_Catg2TemplatesCus;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgCus;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgCusItem;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgDetails;
@@ -52,6 +54,9 @@ public class CL_CatalogSrv implements IF_CatalogSrv
 
     @Autowired
     private TY_CatgTemplatesCus catgTmplCus;
+
+    @Autowired
+    private TY_Catg2TemplatesCus catg2TmplCus;
 
     @Autowired
     private IF_SrvCloudAPI srvCloudApiSrv;
@@ -221,8 +226,8 @@ public class CL_CatalogSrv implements IF_CatalogSrv
     }
 
     @Override
-    public TY_CatgDetails getCategoryDetails4Catg(String catId, EnumCaseTypes caseType, boolean inUpperCase)
-            throws EX_ESMAPI
+    public TY_CatgDetails getCategoryDetails4Catg(String catId, EnumCaseTypes caseType, boolean inUpperCase,
+            boolean isCatg2) throws EX_ESMAPI
     {
         TY_CatgDetails catgDetails = null;
 
@@ -234,27 +239,66 @@ public class CL_CatalogSrv implements IF_CatalogSrv
             boolean isLvl1 = false;
             if (CollectionUtils.isNotEmpty(catgTree.getCategories()))
             {
-                // Remove blank Categories from Catalog Tree Used for UI Presentation
-                catgTree.getCategories().removeIf(x -> x.getId() == null);
-
-                Optional<TY_CatalogItem> currCatgDetailsO = catgTree.getCategories().stream()
-                        .filter(f -> f.getId().equals(catId)).findFirst();
-                if (currCatgDetailsO.isPresent())
+                if (!isCatg2)
                 {
-                    catgDetails = new TY_CatgDetails();
-                    // 1. Get Text from Catg Guid selected in form and Convert to Upper Case
-                    String catgTxt = null;
-                    if (StringUtils.hasText(currCatgDetailsO.get().getParentName()))
+
+                    log.info("Scanning Category details for level 1 category ..  " + catId);
+                    // Remove blank Categories from Catalog Tree Used for UI Presentation
+                    catgTree.getCategories().removeIf(x -> x.getId() == null);
+
+                    Optional<TY_CatalogItem> currCatgDetailsO = catgTree.getCategories().stream()
+                            .filter(f -> f.getId().equals(catId)).findFirst();
+                    if (currCatgDetailsO.isPresent())
                     {
-                        catgTxt = currCatgDetailsO.get().getParentName() + ">" + currCatgDetailsO.get().getName();
-                        if (inUpperCase)
+                        catgDetails = new TY_CatgDetails();
+                        // 1. Get Text from Catg Guid selected in form and Convert to Upper Case
+                        String catgTxt = null;
+                        if (StringUtils.hasText(currCatgDetailsO.get().getParentName()))
                         {
-                            catgTxt = catgTxt.toUpperCase();
+                            catgTxt = currCatgDetailsO.get().getParentName() + ">" + currCatgDetailsO.get().getName();
+                            if (inUpperCase)
+                            {
+                                catgTxt = catgTxt.toUpperCase();
+                            }
+
                         }
+                        else
+                        {
+                            // No Level 1 Catg. is valid . Hence do not seek for level 1 catg.
+                            if (inUpperCase)
+                            {
+                                catgTxt = currCatgDetailsO.get().getName().toUpperCase();
+                            }
+                            else
+                            {
+                                catgTxt = currCatgDetailsO.get().getName();
+                            }
+
+                            isLvl1 = true;
+
+                        }
+                        catgDetails.setCatDesc(catgTxt);
+                        catgDetails.setCatgId(catId);
+                        catgDetails.setInUpperCase(inUpperCase);
+                        catgDetails.setRoot(isLvl1);
 
                     }
-                    else
+
+                }
+                else // Category 2 Details
+                {
+                    log.info("Scanning Category details for level 2 category ..  " + catId);
+                    // Remove blank Categories from Catalog Tree Used for UI Presentation
+                    catgTree.getCategorieslvl2().removeIf(x -> x.getId() == null);
+
+                    Optional<TY_CatalogItem> currCatgDetailsO = catgTree.getCategorieslvl2().stream()
+                            .filter(f -> f.getId().equals(catId)).findFirst();
+                    if (currCatgDetailsO.isPresent())
                     {
+                        catgDetails = new TY_CatgDetails();
+                        // 1. Get Text from Catg Guid selected in form and Convert to Upper Case
+                        String catgTxt = null;
+
                         // No Level 1 Catg. is valid . Hence do not seek for level 1 catg.
                         if (inUpperCase)
                         {
@@ -265,21 +309,23 @@ public class CL_CatalogSrv implements IF_CatalogSrv
                             catgTxt = currCatgDetailsO.get().getName();
                         }
 
-                        isLvl1 = true;
+                        isLvl1 = false;
+
+                        catgDetails.setCatDesc(catgTxt);
+                        catgDetails.setCatgId(catId);
+                        catgDetails.setInUpperCase(inUpperCase);
+                        catgDetails.setRoot(isLvl1);
 
                     }
-                    catgDetails.setCatDesc(catgTxt);
-                    catgDetails.setCatgId(catId);
-                    catgDetails.setInUpperCase(inUpperCase);
-                    catgDetails.setRoot(isLvl1);
 
+                    // Refurbish Blank Category at Top for New Form - Session maintained
+                    catgTree.getCategories().add(0, new TY_CatalogItem());
                 }
-                // Refurbish Blank Category at Top for New Form - Session maintained
-                catgTree.getCategories().add(0, new TY_CatalogItem());
             }
         }
 
         return catgDetails;
+
     }
 
     @Override
@@ -337,6 +383,41 @@ public class CL_CatalogSrv implements IF_CatalogSrv
             return caseCatgContainer.stream().filter(c -> c.getCaseTypeEnum().equals(EnumCaseTypes.Learning))
                     .flatMap(c -> c.getCategorieslvl2().stream()).collect(Collectors.toList());
         }
+    }
+
+    @Override
+    public TY_Catg2Templates getTemplates4Catg2(String cat1Id, String cat2Id) throws EX_ESMAPI
+    {
+        TY_Catg2Templates catg2Tmpl = null;
+        if (StringUtils.hasText(cat1Id) && StringUtils.hasText(cat2Id)
+                && CollectionUtils.isNotEmpty(catg2TmplCus.getCatgTemplates()))
+        {
+            String catg1TxtToSearch = cat1Id.toUpperCase();
+            String catg2TxtToSearch = cat2Id.toUpperCase();
+            try
+            {
+                log.info("Scanning Category 2 Template for category 1 : " + catg1TxtToSearch + " and category 2 : "
+                        + catg2TxtToSearch);
+                Optional<TY_Catg2Templates> catgTmplO = catg2TmplCus.getCatgTemplates().stream()
+                        .filter(t -> t.getLvl1().equals(catg1TxtToSearch) && t.getLvl2().equals(catg2TxtToSearch))
+                        .findFirst();
+
+                if (catgTmplO.isPresent())
+                {
+                    catg2Tmpl = catgTmplO.get();
+                    log.info("Category 2 Template found for category 1 : " + catg1TxtToSearch + " and category 2 : "
+                            + catg2TxtToSearch);
+                }
+
+            }
+            catch (NullPointerException e)
+            {
+                // Do Nothing - No template Relevant Category selected
+            }
+
+        }
+
+        return catg2Tmpl;
     }
 
     private TY_CatalogTree loadCatgTree4CaseType(EnumCaseTypes caseType)

@@ -322,7 +322,9 @@
                   <input type="hidden" th:field="*{accId}" />
                   <input type="hidden" th:field="*{caseTxnType}" />
                   <input type="hidden" th:field="*{catgChange}" id="catgChange" />
+                  <input type="hidden" th:field="*{catg2Change}" id="catg2Change" />
                   <input type="hidden" th:field="*{catgText}" id="catgText" />
+                  <input type="hidden" th:field="*{catg2Text}" id="catg2Text" />
                   <div class="colspan-9 offset-1" style="margin-top: 15px; margin-bottom: 10px;">
                      <label style="color: #007db8;font-family: Arial, Helvetica, sans-serif;">Subject </label>
                      <input class="alert metro-input input-large" type="text" data-role="input"
@@ -392,19 +394,11 @@
 
                         </option>
                      </select>
-                     <!-- <small class="text-muted" style="color: #007db8; font-family: Arial, Helvetica, sans-serif;">
-                        Select service category and click the refresh button to adapt the form
-                     </small> -->
-                     <!-- <span>
-                        <button id="refresh" style="margin: 3px;" class="button secondary cycle outline" type="submit"
-                           name="action" value="catgChange">
-                           <span class="mif-replay"></span>
-                        </button>
-                     </span> -->
+
                   </div>
 
                   <div class="colspan-9 offset-1" style="margin-top: 5px; margin-bottom: 10px"
-                     th:if="${catgsList != null}">
+                     th:if="${catgslvl2 != null}">
                      <label style="color: #007db8;font-family: Arial, Helvetica, sans-serif;">Service Sub Category
                      </label>
                      <select name="catgDesc" id="dropDown" data-role="select" th:field="*{catg2Desc}"
@@ -415,7 +409,7 @@
                            th:text="${catg2.name}">
                         </option>
                      </select>
-                  
+
                   </div>
 
                   <div class="colspan-9 offset-1" style="margin-top: 10px; margin-bottom: 10px">
@@ -766,6 +760,48 @@
                      console.log("Category - Text : " + catgText);
 
                      window.location.href = '/lso/refreshForm4SelCatg'; // redirect     //this would be GET
+
+
+                  }
+               }
+
+            });
+
+
+         }
+      }
+
+      function getCatg2Sel(selectObject)
+      {
+         var value = selectObject.value;
+         var formData = new FormData($("#caseForm")[0]);
+         var catg2Change = formData.get('catg2Change');
+         console.log("Category 2 - Changed " + catg2Change);
+         var catg2Text = formData.get('catg2Text');
+         console.log("Category 2 - Text : " + catg2Text);
+
+         if (Boolean(value) && catg2Change)
+         {
+            console.log("Catg. 2 Bound..")
+            console.log(value);
+            console.log("Category 2 - Changed " + catg2Change);
+            console.log("Category 2 - Text : " + catg2Text);
+
+            $.ajax({
+               type: "POST",
+               url: "/post/selCatg2",
+               data: formData,
+               processData: false,
+               contentType: false,
+               success: function (catg2Changed)
+               {
+                  if (catg2Changed === true)
+                  {
+                     console.log("Reloading Case Form for Selected Category 2");
+                     console.log(catg2Changed);
+                     console.log("Category 2 - Text : " + catg2Text);
+
+                     window.location.href = '/lso/refreshForm4SelCatg2'; // redirect     //this would be GET
 
 
                   }
