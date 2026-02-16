@@ -655,6 +655,18 @@ public class LSOPostController
         log.info("Inside Category 2 change Post Processing...");
         if (caseForm != null && userSessSrv != null)
         {
+            if (userSessSrv.getUserDetails4mSession() != null)
+            {
+                log.info("User in Session : " + userSessSrv.getUserDetails4mSession().getUserName());
+                if (userSessSrv.getCurrentForm4Submission() != null)
+                {
+                    log.info("Current Form in Session : "
+                            + userSessSrv.getCurrentForm4Submission().getCaseForm().getCatgDesc());
+                    log.info("Current Form in Session : "
+                            + userSessSrv.getCurrentForm4Submission().getCaseForm().getCatg2Desc());
+                }
+
+            }
             if (!StringUtils.hasText(userSessSrv.getPreviousCategory2()))
             {
                 if (StringUtils.hasText(caseForm.getCatg2Desc()))
