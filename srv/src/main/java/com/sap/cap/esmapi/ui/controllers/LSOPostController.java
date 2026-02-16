@@ -652,7 +652,7 @@ public class LSOPostController
             Model model)
     {
         Boolean catg2Changed = false;
-
+        log.info("Inside Category 2 change Post Processing...");
         if (caseForm != null && userSessSrv != null)
         {
             if (!StringUtils.hasText(userSessSrv.getPreviousCategory2()))

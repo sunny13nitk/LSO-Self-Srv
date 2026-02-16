@@ -403,7 +403,7 @@
                      </label>
                      <select name="catgDesc" id="dropDown" data-role="select" th:field="*{catg2Desc}"
                         data-cls-option="fg-grayMouse" data-cls-selected-item="bg-teal fg-white" addEmptyValue="true"
-                        data-cls-select="bd-red bg-transparent" onchange="getCatg2Sel(this)">
+                        data-cls-select="bg-transparent" onchange="getCatg2Sel(this)">
 
                         <option th:each="catg2 : ${catgslvl2}" th:value="${catg2.id}" th:selected="${catg2.id}"
                            th:text="${catg2.name}">
