@@ -23,6 +23,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
+import com.sap.cap.esmapi.catg.pojos.TY_CatalogItem;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgCus;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgCusItem;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgDetails;
@@ -811,6 +812,15 @@ public class LSOController
                         caseForm.setCatgText(catgDetails.getCatDesc());
                         log.info("Catg. Text for Category ID : " + caseForm.getCatgDesc() + " is : "
                                 + catgDetails.getCatDesc());
+
+                        // Also get the Category level 2 for chosen level 1 category
+                        List<TY_CatalogItem> catgLvl2 = catalogSrv.getCategoryLvl2ByRootCatgId(caseForm.getCatgDesc());
+                        if (CollectionUtils.isNotEmpty(catgLvl2))
+                        {
+                            log.info("Catg. Level 2 count for Category ID : " + caseForm.getCatgDesc() + " is : "
+                                    + catgLvl2.size());
+                            model.addAttribute("catgslvl2", catgLvl2);
+                        }
                     }
 
                     if (CollectionUtils.isNotEmpty(splCatgCus.getSplCatgCus()))
