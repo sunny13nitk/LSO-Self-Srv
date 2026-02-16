@@ -708,9 +708,6 @@ public class LSOPostController
             userSessSrv.setCaseFormB4Submission(caseForm);
 
             log.info("Catg 2: " + caseForm.getCatg2Desc());
-            log.info(
-                    "Reading case form from User session service inside Catg2 POST after setting the form in session : "
-                            + userSessSrv.getCaseFormB4Submission().toString());
             catg2Changed = caseForm.isCatgChange();
         }
 
