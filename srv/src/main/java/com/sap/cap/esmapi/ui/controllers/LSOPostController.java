@@ -653,11 +653,7 @@ public class LSOPostController
     {
         Boolean catg2Changed = false;
         log.info("Inside Category 2 change Post Processing...");
-        if (caseForm != null)
-        {
-            log.info("Category 2 selected : " + caseForm.getCatg2Desc());
-            log.info("Category 1 selected : " + caseForm.getCatgDesc());
-        }
+
         if (caseForm != null && userSessSrv != null)
         {
             if (userSessSrv.getUserDetails4mSession() != null)
@@ -665,9 +661,9 @@ public class LSOPostController
                 log.info("User in Session : " + userSessSrv.getUserDetails4mSession().getUserName());
                 if (userSessSrv.getCurrentForm4Submission() != null)
                 {
-                    log.info("Current Form in Session : "
+                    log.info("Current Catg1 in Session : "
                             + userSessSrv.getCurrentForm4Submission().getCaseForm().getCatgDesc());
-                    log.info("Current Form in Session : "
+                    log.info("Current Catg2 in Session : "
                             + userSessSrv.getCurrentForm4Submission().getCaseForm().getCatg2Desc());
                 }
 
@@ -712,6 +708,9 @@ public class LSOPostController
             userSessSrv.setCaseFormB4Submission(caseForm);
 
             log.info("Catg 2: " + caseForm.getCatg2Desc());
+            log.info(
+                    "Reading case form from User session service inside Catg2 POST after setting the form in session : "
+                            + userSessSrv.getCaseFormB4Submission().toString());
             catg2Changed = caseForm.isCatgChange();
         }
 
