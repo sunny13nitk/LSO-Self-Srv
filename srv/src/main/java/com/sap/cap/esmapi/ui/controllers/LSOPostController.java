@@ -708,7 +708,7 @@ public class LSOPostController
             userSessSrv.setCaseFormB4Submission(caseForm);
 
             log.info("Catg 2: " + caseForm.getCatg2Desc());
-            catg2Changed = caseForm.isCatgChange();
+            catg2Changed = caseForm.isCatg2Change();
         }
 
         return catg2Changed;
