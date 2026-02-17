@@ -733,9 +733,19 @@
       }
       let catg1RequestInProgress = false;
       let catg2RequestInProgress = false;
+      let isInitialLoad = true;
+
+      $(document).ready(function ()
+      {
+         setTimeout(() =>
+         {
+            isInitialLoad = false;
+         }, 500);
+      });
 
       function getCatgSel(selectObject)
       {
+         if (isInitialLoad) return;
          const selectedValue = selectObject.value || "";
          const timestamp = new Date().toISOString();
 
@@ -788,6 +798,7 @@
 
       function getCatg2Sel(selectObject)
       {
+         if (isInitialLoad) return;
          const selectedValue = selectObject.value || "";
          const timestamp = new Date().toISOString();
 

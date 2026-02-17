@@ -597,6 +597,11 @@ public class LSOPostController
     public Boolean refreshCaseForm4CatgSel(@RequestParam(value = "catgDesc", required = false) String newCatg)
     {
         log.info("Received request to check category change for category 1 : " + newCatg);
+        if (userSessSrv == null || userSessSrv.getUserDetails4mSession() == null)
+        {
+            log.error("Session invalid during category check.");
+            return false;
+        }
         TY_Case_Form sessionForm = userSessSrv.getCaseFormB4Submission();
 
         if (sessionForm == null)
@@ -621,6 +626,11 @@ public class LSOPostController
     public Boolean refreshCaseForm4Catg2Sel(@RequestParam(value = "catg2Desc", required = false) String newCatg2)
     {
         log.info("Received request to check category change for category 2 : " + newCatg2);
+        if (userSessSrv == null || userSessSrv.getUserDetails4mSession() == null)
+        {
+            log.error("Session invalid during category check.");
+            return false;
+        }
         TY_Case_Form sessionForm = userSessSrv.getCaseFormB4Submission();
 
         if (sessionForm == null)
