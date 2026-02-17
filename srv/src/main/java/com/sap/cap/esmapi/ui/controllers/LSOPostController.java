@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.sap.cap.esmapi.catg.pojos.TY_CatalogItem;
 import com.sap.cap.esmapi.catg.pojos.TY_Catg2Templates;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgCus;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgCusItem;
@@ -204,7 +203,6 @@ public class LSOPostController
             // Clear form for New Attachment as Current Attachment already in Container
             caseForm.setAttachment(null);
             caseForm.setCatgChange(false);
-            caseForm.setCatgText(null);
 
             Optional<TY_CatgCusItem> cusItemO = catgCusSrv.getCustomizations().stream()
                     .filter(g -> g.getCaseTypeEnum().toString().equals(EnumCaseTypes.Learning.toString())).findFirst();
@@ -227,15 +225,43 @@ public class LSOPostController
                     caseForm.setEmployee(true);
                 }
 
+                caseForm.setCatg2Desc(userSessSrv.getCurrentForm4Submission().getCaseForm().getCatg2Desc()); // Curr Sub
+
+                if (StringUtils.hasText(caseForm.getCatgDesc()))
+                {
+                    // load default level 2 categories based on category 1 selection
+                    model.addAttribute("catgslvl2", catalogTreeSrv.getCategoryLvl2ByRootCatgId(caseForm.getCatgDesc()));
+                }
+                else
+                {
+                    // load default level 2 categories
+                    model.addAttribute("catgslvl2", catalogTreeSrv.getCategoryLvl2ByRootCatgId());
+                } // Catg
+
                 // Scan for Template Load
-                TY_CatgTemplates catgTemplate = catalogTreeSrv.getTemplates4Catg(caseForm.getCatgDesc(),
-                        EnumCaseTypes.Learning);
+
+                TY_Catg2Templates catgTemplate = catalogTreeSrv.getTemplates4Catg2(caseForm.getCatgText(),
+                        caseForm.getCatg2Text());
                 if (catgTemplate != null)
                 {
-
-                    // Set Questionnaire for Category
+                    // Set Questionnaire for Category 2
                     caseForm.setTemplate(catgTemplate.getQuestionnaire());
 
+                }
+                else
+                {
+                    log.info("No Template Found for Catg. Level 2 : " + caseForm.getCatg2Text() + " and Category :    "
+                            + caseForm.getCatgText());
+                    // Fallingback to level 1 category template if level 2 template not found
+                    TY_CatgTemplates catgLvl1Template = catalogTreeSrv.getTemplates4Catg(caseForm.getCatgDesc(),
+                            EnumCaseTypes.Learning);
+                    if (catgLvl1Template != null)
+                    {
+
+                        // Set Questionnaire for Category
+                        caseForm.setTemplate(catgLvl1Template.getQuestionnaire());
+
+                    }
                 }
 
                 if (vhlpUISrv != null)
@@ -300,20 +326,46 @@ public class LSOPostController
             // Clear form for New Attachment as Current Attachment already in Container
             caseForm.setAttachment(null);
             caseForm.setCatgChange(false);
-            caseForm.setCatgText(null);
+
             if (userSessSrv.getUserDetails4mSession().isEmployee())
             {
                 caseForm.setEmployee(true);
             }
+            if (StringUtils.hasText(caseForm.getCatgDesc()))
+            {
+                // load default level 2 categories based on category 1 selection
+                model.addAttribute("catgslvl2", catalogTreeSrv.getCategoryLvl2ByRootCatgId(caseForm.getCatgDesc()));
+            }
+            else
+            {
+                // load default level 2 categories
+                model.addAttribute("catgslvl2", catalogTreeSrv.getCategoryLvl2ByRootCatgId());
+            } // Catg
+
             // Scan for Template Load
-            TY_CatgTemplates catgTemplate = catalogTreeSrv.getTemplates4Catg(caseForm.getCatgDesc(),
-                    EnumCaseTypes.Learning);
+
+            TY_Catg2Templates catgTemplate = catalogTreeSrv.getTemplates4Catg2(caseForm.getCatgText(),
+                    caseForm.getCatg2Text());
             if (catgTemplate != null)
             {
-
-                // Set Questionnaire for Category
+                // Set Questionnaire for Category 2
                 caseForm.setTemplate(catgTemplate.getQuestionnaire());
 
+            }
+            else
+            {
+                log.info("No Template Found for Catg. Level 2 : " + caseForm.getCatg2Text() + " and Category :    "
+                        + caseForm.getCatgText());
+                // Fallingback to level 1 category template if level 2 template not found
+                TY_CatgTemplates catgLvl1Template = catalogTreeSrv.getTemplates4Catg(caseForm.getCatgDesc(),
+                        EnumCaseTypes.Learning);
+                if (catgLvl1Template != null)
+                {
+
+                    // Set Questionnaire for Category
+                    caseForm.setTemplate(catgLvl1Template.getQuestionnaire());
+
+                }
             }
             userSessSrv.setCaseFormB4Submission(caseForm);
 
@@ -365,16 +417,42 @@ public class LSOPostController
                             catalogTreeSrv.getCaseCatgTree4LoB(EnumCaseTypes.Learning).getCategories());
 
                     // Scan Current Catg for Templ. Load and or Additional Fields
+                    if (StringUtils.hasText(caseForm.getCatgDesc()))
+                    {
+                        // load default level 2 categories based on category 1 selection
+                        model.addAttribute("catgslvl2",
+                                catalogTreeSrv.getCategoryLvl2ByRootCatgId(caseForm.getCatgDesc()));
+                    }
+                    else
+                    {
+                        // load default level 2 categories
+                        model.addAttribute("catgslvl2", catalogTreeSrv.getCategoryLvl2ByRootCatgId());
+                    } // Catg
 
                     // Scan for Template Load
-                    TY_CatgTemplates catgTemplate = catalogTreeSrv.getTemplates4Catg(caseForm.getCatgDesc(),
-                            EnumCaseTypes.Learning);
+
+                    TY_Catg2Templates catgTemplate = catalogTreeSrv.getTemplates4Catg2(caseForm.getCatgText(),
+                            caseForm.getCatg2Text());
                     if (catgTemplate != null)
                     {
-
-                        // Set Questionnaire for Category
+                        // Set Questionnaire for Category 2
                         caseForm.setTemplate(catgTemplate.getQuestionnaire());
 
+                    }
+                    else
+                    {
+                        log.info("No Template Found for Catg. Level 2 : " + caseForm.getCatg2Text()
+                                + " and Category :    " + caseForm.getCatgText());
+                        // Fallingback to level 1 category template if level 2 template not found
+                        TY_CatgTemplates catgLvl1Template = catalogTreeSrv.getTemplates4Catg(caseForm.getCatgDesc(),
+                                EnumCaseTypes.Learning);
+                        if (catgLvl1Template != null)
+                        {
+
+                            // Set Questionnaire for Category
+                            caseForm.setTemplate(catgLvl1Template.getQuestionnaire());
+
+                        }
                     }
 
                     if (vhlpUISrv != null)
@@ -545,21 +623,43 @@ public class LSOPostController
                     model.addAttribute("catgsList",
                             catalogTreeSrv.getCaseCatgTree4LoB(EnumCaseTypes.Learning).getCategories());
 
-                    // Scan Current Catg for Templ. Load and or Additional Fields
+                    if (StringUtils.hasText(caseForm.getCatgDesc()))
+                    {
+                        // load default level 2 categories based on category 1 selection
+                        model.addAttribute("catgslvl2",
+                                catalogTreeSrv.getCategoryLvl2ByRootCatgId(caseForm.getCatgDesc()));
+                    }
+                    else
+                    {
+                        // load default level 2 categories
+                        model.addAttribute("catgslvl2", catalogTreeSrv.getCategoryLvl2ByRootCatgId());
+                    } // Catg
 
                     // Scan for Template Load
-                    TY_CatgTemplates catgTemplate = catalogTreeSrv.getTemplates4Catg(caseForm.getCatgDesc(),
-                            EnumCaseTypes.Learning);
+
+                    TY_Catg2Templates catgTemplate = catalogTreeSrv.getTemplates4Catg2(caseForm.getCatgText(),
+                            caseForm.getCatg2Text());
                     if (catgTemplate != null)
                     {
-
-                        // Set Questionnaire for Category
+                        // Set Questionnaire for Category 2
                         caseForm.setTemplate(catgTemplate.getQuestionnaire());
-                        caseForm.setCatgChange(false);
-                        caseForm.setCatgText(null);
 
                     }
+                    else
+                    {
+                        log.info("No Template Found for Catg. Level 2 : " + caseForm.getCatg2Text()
+                                + " and Category :    " + caseForm.getCatgText());
+                        // Fallingback to level 1 category template if level 2 template not found
+                        TY_CatgTemplates catgLvl1Template = catalogTreeSrv.getTemplates4Catg(caseForm.getCatgDesc(),
+                                EnumCaseTypes.Learning);
+                        if (catgLvl1Template != null)
+                        {
 
+                            // Set Questionnaire for Category
+                            caseForm.setTemplate(catgLvl1Template.getQuestionnaire());
+
+                        }
+                    }
                     if (vhlpUISrv != null && coLaDDLBSrv != null)
                     {
                         model.addAllAttributes(coLaDDLBSrv.adjustCountryLanguageDDLB(caseForm.getCountry(),
@@ -818,12 +918,16 @@ public class LSOPostController
                             catalogTreeSrv.getCaseCatgTree4LoB(EnumCaseTypes.Learning).getCategories());
 
                     // Also get the Category level 2 for chosen level 1 category
-                    List<TY_CatalogItem> catgLvl2 = catalogTreeSrv.getCategoryLvl2ByRootCatgId(caseForm.getCatgDesc());
-                    if (CollectionUtils.isNotEmpty(catgLvl2))
+                    if (StringUtils.hasText(caseForm.getCatgDesc()))
                     {
-                        log.info("Catg. Level 2 count for Category ID : " + caseForm.getCatgDesc() + " is : "
-                                + catgLvl2.size());
-                        model.addAttribute("catgslvl2", catgLvl2);
+                        // load default level 2 categories based on category 1 selection
+                        model.addAttribute("catgslvl2",
+                                catalogTreeSrv.getCategoryLvl2ByRootCatgId(caseForm.getCatgDesc()));
+                    }
+                    else
+                    {
+                        // load default level 2 categories
+                        model.addAttribute("catgslvl2", catalogTreeSrv.getCategoryLvl2ByRootCatgId());
                     }
 
                     // Get the Category Description for the Category ID2 from Case Form
