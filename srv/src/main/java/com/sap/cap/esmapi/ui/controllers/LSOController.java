@@ -24,7 +24,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
 import com.sap.cap.esmapi.catg.pojos.TY_CatalogItem;
-import com.sap.cap.esmapi.catg.pojos.TY_Catg2Templates;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgCus;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgCusItem;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgDetails;
@@ -954,116 +953,125 @@ public class LSOController
     @GetMapping("/refreshForm4SelCatg2")
     public String refreshFormCxtx4SelCatg2(HttpServletRequest request, Model model)
     {
-        if (userSessSrv != null)
-        {
-            TY_Case_Form caseForm = userSessSrv.getCaseFormB4Submission();
 
-            if (caseForm != null)
-            {
-                String catg2 = caseForm.getCatg2Desc();
-                log.info("Selected Catg. Level 2 is : " + catg2);
-                // Also get the Category level 2 for chosen level 1 category
-                List<TY_CatalogItem> catgLvl2 = catalogSrv.getCategoryLvl2ByRootCatgId(caseForm.getCatgDesc());
-                if (CollectionUtils.isNotEmpty(catgLvl2))
-                {
-                    log.info("Catg. Level 2 count for Category ID : " + caseForm.getCatgDesc() + " is : "
-                            + catgLvl2.size());
-                    model.addAttribute("catgslvl2", catgLvl2);
-                }
+        log.info("Inside refreshFormCxtx4SelCatg2... ");
+        // if (userSessSrv != null)
+        // {
+        // TY_Case_Form caseForm = userSessSrv.getCaseFormB4Submission();
 
-                userSessSrv.setCaseFormB4Submission(null);
+        // if (caseForm != null)
+        // {
+        // String catg2 = caseForm.getCatg2Desc();
+        // log.info("Selected Catg. Level 2 is : " + catg2);
+        // // Also get the Category level 2 for chosen level 1 category
+        // List<TY_CatalogItem> catgLvl2 =
+        // catalogSrv.getCategoryLvl2ByRootCatgId(caseForm.getCatgDesc());
+        // if (CollectionUtils.isNotEmpty(catgLvl2))
+        // {
+        // log.info("Catg. Level 2 count for Category ID : " + caseForm.getCatgDesc() +
+        // " is : "
+        // + catgLvl2.size());
+        // model.addAttribute("catgslvl2", catgLvl2);
+        // }
 
-                // Normal Scenario - Catg. chosen Not relevant for Notes Template and/or
-                // additional fields
+        // userSessSrv.setCaseFormB4Submission(null);
 
-                if ((StringUtils.hasText(userSessSrv.getUserDetails4mSession().getAccountId())
-                        || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId()))
-                        && !CollectionUtils.isEmpty(catgCusSrv.getCustomizations()))
-                {
+        // // Normal Scenario - Catg. chosen Not relevant for Notes Template and/or
+        // // additional fields
 
-                    Optional<TY_CatgCusItem> cusItemO = catgCusSrv.getCustomizations().stream()
-                            .filter(g -> g.getCaseTypeEnum().toString().equals(EnumCaseTypes.Learning.toString()))
-                            .findFirst();
-                    if (cusItemO.isPresent() && catgTreeSrv != null)
-                    {
+        // if
+        // ((StringUtils.hasText(userSessSrv.getUserDetails4mSession().getAccountId())
+        // ||
+        // StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId()))
+        // && !CollectionUtils.isEmpty(catgCusSrv.getCustomizations()))
+        // {
 
-                        model.addAttribute("caseTypeStr", EnumCaseTypes.Learning.toString());
+        // Optional<TY_CatgCusItem> cusItemO = catgCusSrv.getCustomizations().stream()
+        // .filter(g ->
+        // g.getCaseTypeEnum().toString().equals(EnumCaseTypes.Learning.toString()))
+        // .findFirst();
+        // if (cusItemO.isPresent() && catgTreeSrv != null)
+        // {
 
-                        // Populate User Details
-                        TY_UserESS userDetails = new TY_UserESS();
-                        userDetails.setUserDetails(userSessSrv.getUserDetails4mSession());
-                        model.addAttribute("userInfo", userDetails);
+        // model.addAttribute("caseTypeStr", EnumCaseTypes.Learning.toString());
 
-                        // clear Form errors on each refresh or a New Case form request
-                        if (CollectionUtils.isNotEmpty(userSessSrv.getFormErrors()))
-                        {
-                            userSessSrv.clearFormErrors();
-                        }
+        // // Populate User Details
+        // TY_UserESS userDetails = new TY_UserESS();
+        // userDetails.setUserDetails(userSessSrv.getUserDetails4mSession());
+        // model.addAttribute("userInfo", userDetails);
 
-                        // also Upload the Catg. Tree as per Case Type
-                        model.addAttribute("catgsList",
-                                catalogTreeSrv.getCaseCatgTree4LoB(EnumCaseTypes.Learning).getCategories());
+        // // clear Form errors on each refresh or a New Case form request
+        // if (CollectionUtils.isNotEmpty(userSessSrv.getFormErrors()))
+        // {
+        // userSessSrv.clearFormErrors();
+        // }
 
-                        // Scan Current Catg for Templ. Load and or Additional Fields
+        // // also Upload the Catg. Tree as per Case Type
+        // model.addAttribute("catgsList",
+        // catalogTreeSrv.getCaseCatgTree4LoB(EnumCaseTypes.Learning).getCategories());
 
-                        // Scan for Template Load
-                        TY_Catg2Templates catgTemplate = catalogTreeSrv.getTemplates4Catg2(caseForm.getCatgDesc(),
-                                catg2);
-                        if (catgTemplate != null)
-                        {
+        // // Scan Current Catg for Templ. Load and or Additional Fields
 
-                            // Set Questionnaire for Category 2
-                            caseForm.setTemplate(catgTemplate.getQuestionnaire());
+        // // Scan for Template Load
+        // TY_Catg2Templates catgTemplate =
+        // catalogTreeSrv.getTemplates4Catg2(caseForm.getCatgDesc(),
+        // catg2);
+        // if (catgTemplate != null)
+        // {
 
-                        }
-                        else
-                        {
-                            log.info("No Template Found for Catg. Level 2 : " + catg2 + " and Category : "
-                                    + caseForm.getCatgDesc());
-                            // Fallingback to level 1 category template if level 2 template not found
-                            TY_CatgTemplates catgLvl1Template = catalogTreeSrv.getTemplates4Catg(caseForm.getCatgDesc(),
-                                    EnumCaseTypes.Learning);
-                            if (catgLvl1Template != null)
-                            {
+        // // Set Questionnaire for Category 2
+        // caseForm.setTemplate(catgTemplate.getQuestionnaire());
 
-                                // Set Questionnaire for Category
-                                caseForm.setTemplate(catgLvl1Template.getQuestionnaire());
+        // }
+        // else
+        // {
+        // log.info("No Template Found for Catg. Level 2 : " + catg2 + " and Category :
+        // "
+        // + caseForm.getCatgDesc());
+        // // Fallingback to level 1 category template if level 2 template not found
+        // TY_CatgTemplates catgLvl1Template =
+        // catalogTreeSrv.getTemplates4Catg(caseForm.getCatgDesc(),
+        // EnumCaseTypes.Learning);
+        // if (catgLvl1Template != null)
+        // {
 
-                            }
-                        }
+        // // Set Questionnaire for Category
+        // caseForm.setTemplate(catgLvl1Template.getQuestionnaire());
 
-                        if (vhlpUISrv != null)
-                        {
-                            model.addAllAttributes(coLaDDLBSrv.adjustCountryLanguageDDLB(caseForm.getCountry(),
-                                    vhlpUISrv.getVHelpUIModelMap4LobCatg(EnumCaseTypes.Learning,
-                                            caseForm.getCatgDesc())));
-                        }
+        // }
+        // }
 
-                        // Case Form Model Set at last
-                        model.addAttribute("caseForm", caseForm);
+        // if (vhlpUISrv != null)
+        // {
+        // model.addAllAttributes(coLaDDLBSrv.adjustCountryLanguageDDLB(caseForm.getCountry(),
+        // vhlpUISrv.getVHelpUIModelMap4LobCatg(EnumCaseTypes.Learning,
+        // caseForm.getCatgDesc())));
+        // }
 
-                        if (attSrv != null)
-                        {
-                            if (CollectionUtils.isNotEmpty(attSrv.getAttachmentNames()))
-                            {
-                                model.addAttribute("attachments", attSrv.getAttachmentNames());
-                            }
-                        }
+        // // Case Form Model Set at last
+        // model.addAttribute("caseForm", caseForm);
 
-                        // Attachment file Size
-                        model.addAttribute("attSize", rlConfig.getAllowedSizeAttachmentMB());
-                    }
-                    else
-                    {
+        // if (attSrv != null)
+        // {
+        // if (CollectionUtils.isNotEmpty(attSrv.getAttachmentNames()))
+        // {
+        // model.addAttribute("attachments", attSrv.getAttachmentNames());
+        // }
+        // }
 
-                        throw new EX_ESMAPI(msgSrc.getMessage("ERR_CASE_TYPE_NOCFG", new Object[]
-                        { EnumCaseTypes.Learning.toString() }, Locale.ENGLISH));
-                    }
+        // // Attachment file Size
+        // model.addAttribute("attSize", rlConfig.getAllowedSizeAttachmentMB());
+        // }
+        // else
+        // {
 
-                }
-            }
+        // throw new EX_ESMAPI(msgSrc.getMessage("ERR_CASE_TYPE_NOCFG", new Object[]
+        // { EnumCaseTypes.Learning.toString() }, Locale.ENGLISH));
+        // }
 
-        }
+        // }
+        // }
+        // }
 
         return caseFormViewLXSS;
 
