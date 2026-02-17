@@ -843,8 +843,8 @@ public class LSOPostController
 
                     // Scan for Template Load
 
-                    TY_Catg2Templates catgTemplate = catalogTreeSrv.getTemplates4Catg2(caseForm.getCatgDesc(),
-                            caseForm.getCatg2Desc());
+                    TY_Catg2Templates catgTemplate = catalogTreeSrv.getTemplates4Catg2(caseForm.getCatgText(),
+                            caseForm.getCatg2Text());
                     if (catgTemplate != null)
                     {
                         // Set Questionnaire for Category 2
