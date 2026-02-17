@@ -24,6 +24,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
 
 import com.sap.cap.esmapi.catg.pojos.TY_CatalogItem;
+import com.sap.cap.esmapi.catg.pojos.TY_Catg2Templates;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgCus;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgCusItem;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgDetails;
@@ -468,7 +469,16 @@ public class LSOController
             userSessSrv.clearActiveSubmission();
             if (attSrv.checkIFExists(fileName))
             {
-                attSrv.removeAttachmentByName(fileName);
+                log.info("Removing Attachment from Session Service : " + fileName);
+
+                if (attSrv.removeAttachmentByName(fileName))
+                {
+                    log.info("Attachment removed successfully from Session Service : " + fileName);
+                }
+                else
+                {
+                    log.info("Error in removing attachment from Session Service : " + fileName);
+                }
             }
 
             // Populate the view
@@ -491,7 +501,7 @@ public class LSOController
 
                 if (caseForm != null)
                 {
-
+                    log.info("Case Form Retrieved from Session Service for Attachment Refresh...");
                     if (userSessSrv.getUserDetails4mSession().isEmployee())
                     {
                         caseForm.setEmployee(true);
@@ -500,21 +510,51 @@ public class LSOController
                     // Clear form for New Attachment as Current Attachment already in Container
                     caseForm.setAttachment(null);
 
-                    // Scan for Template Load
-                    TY_CatgTemplates catgTemplate = catalogTreeSrv.getTemplates4Catg(caseForm.getCatgDesc(),
-                            EnumCaseTypes.Learning);
-                    if (catgTemplate != null)
+                    if (StringUtils.hasText(caseForm.getCatgDesc()))
                     {
-
-                        // Set Questionnaire for Category
-                        caseForm.setTemplate(catgTemplate.getQuestionnaire());
-
+                        // load default level 2 categories based on category 1 selection
+                        model.addAttribute("catgslvl2", catalogSrv.getCategoryLvl2ByRootCatgId(caseForm.getCatgDesc()));
+                    }
+                    else
+                    {
+                        // load default level 2 categories
+                        model.addAttribute("catgslvl2", catalogSrv.getCategoryLvl2ByRootCatgId());
                     }
 
-                    if (vhlpUISrv != null)
+                    // Scan for Template Load
+                    if (StringUtils.hasText(caseForm.getCatg2Text()) || StringUtils.hasText(caseForm.getCatgText()))
                     {
-                        model.addAllAttributes(coLaDDLBSrv.adjustCountryLanguageDDLB(caseForm.getCountry(),
-                                vhlpUISrv.getVHelpUIModelMap4LobCatg(EnumCaseTypes.Learning, caseForm.getCatgDesc())));
+
+                        TY_Catg2Templates catgTemplate = catalogTreeSrv.getTemplates4Catg2(caseForm.getCatgText(),
+                                caseForm.getCatg2Text());
+                        if (catgTemplate != null)
+                        {
+                            // Set Questionnaire for Category 2
+                            caseForm.setTemplate(catgTemplate.getQuestionnaire());
+
+                        }
+                        else
+                        {
+                            log.info("No Template Found for Catg. Level 2 : " + caseForm.getCatg2Text()
+                                    + " and Category :    " + caseForm.getCatgText());
+                            // Fallingback to level 1 category template if level 2 template not found
+                            TY_CatgTemplates catgLvl1Template = catalogTreeSrv.getTemplates4Catg(caseForm.getCatgDesc(),
+                                    EnumCaseTypes.Learning);
+                            if (catgLvl1Template != null)
+                            {
+
+                                // Set Questionnaire for Category
+                                caseForm.setTemplate(catgLvl1Template.getQuestionnaire());
+
+                            }
+                        }
+
+                        if (vhlpUISrv != null)
+                        {
+                            model.addAllAttributes(coLaDDLBSrv.adjustCountryLanguageDDLB(caseForm.getCountry(),
+                                    vhlpUISrv.getVHelpUIModelMap4LobCatg(EnumCaseTypes.Learning,
+                                            caseForm.getCatgDesc())));
+                        }
                     }
 
                     model.addAttribute("caseForm", caseForm);
