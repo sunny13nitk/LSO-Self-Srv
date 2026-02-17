@@ -321,8 +321,6 @@
                   method="post">
                   <input type="hidden" th:field="*{accId}" />
                   <input type="hidden" th:field="*{caseTxnType}" />
-                  <input type="hidden" th:field="*{catgChange}" id="catgChange" />
-                  <input type="hidden" th:field="*{catg2Change}" id="catg2Change" />
                   <input type="hidden" th:field="*{catgText}" id="catgText" />
                   <input type="hidden" th:field="*{catg2Text}" id="catg2Text" />
                   <div class="colspan-9 offset-1" style="margin-top: 15px; margin-bottom: 10px;">
@@ -735,88 +733,44 @@
       }
       function getCatgSel(selectObject)
       {
-         var value = selectObject.value;
-         var formData = new FormData($("#caseForm")[0]);
-         var catgChange = formData.get('catgChange');
-         console.log("Category - Changed " + catgChange);
-         var catgText = formData.get('catgText');
-         console.log("Category - Text : " + catgText);
+         var selectedValue = selectObject.value;
 
-         if (Boolean(value) && catgChange)
-         {
-            console.log("Catg. Bound..")
-            console.log(value);
-            console.log("Category - Changed " + catgChange);
-            console.log("Category - Text : " + catgText);
-
-            $.ajax({
-               type: "POST",
-               url: "/post/selCatg",
-               data: formData,
-               processData: false,
-               contentType: false,
-               success: function (catgChanged)
+         $.ajax({
+            type: "POST",
+            url: "/post/selCatg",
+            data: { catgDesc: selectedValue || "" },
+            success: function (changed)
+            {
+               if (changed === true)
                {
-                  if (catgChanged === true)
-                  {
-                     console.log("Reloading Case Form for Selected Category");
-                     console.log(catgChanged);
-                     console.log("Category - Text : " + catgText);
-
-                     window.location.href = '/lso/refreshForm4SelCatg'; // redirect     //this would be GET
-
-
-                  }
+                  window.location.href =
+                     '/lso/refreshForm4SelCatg?catgDesc=' + encodeURIComponent(selectedValue || "");
                }
-
-            });
-
-
-         }
+            }
+         });
       }
+
 
       function getCatg2Sel(selectObject)
       {
-         var value = selectObject.value;
-         var formData = new FormData($("#caseForm")[0]);
-         var catg2Change = formData.get('catg2Change');
-         console.log("Category 2 - Changed " + catg2Change);
-         var catg2Text = formData.get('catg2Text');
-         console.log("Category 2 - Text : " + catg2Text);
+         var selectedValue = selectObject.value;
+         if (!selectedValue) return;
 
-         if (Boolean(value) && catg2Change)
-         {
-            console.log("Catg. 2 Bound..")
-            console.log(value);
-            console.log("Category 2 - Changed " + catg2Change);
-            console.log("Category 2 - Text : " + catg2Text);
-
-            $.ajax({
-               type: "POST",
-               url: "/post/selCatg2",
-               data: formData,
-               processData: false,
-               contentType: false,
-               success: function (catg2Changed)
+         $.ajax({
+            type: "POST",
+            url: "/post/selCatg2",
+            data: { catg2Desc: selectedValue },
+            success: function (changed)
+            {
+               if (changed === true)
                {
-                  if (catg2Changed === true)
-                  {
-                     console.log("Reloading Case Form for Selected Category 2");
-                     console.log(catg2Changed);
-                     console.log("Category 2 - Text : " + catg2Text);
+                  window.location.href =
+                     '/lso/refreshForm4SelCatg2?catg2Desc=' + encodeURIComponent(selectedValue);
 
-                     window.location.href = '/lso/refreshForm4SelCatg2'; // redirect     //this would be GET
-
-
-                  }
                }
-
-            });
-
-
-         }
+            }
+         });
       }
-
 
    </script>
 

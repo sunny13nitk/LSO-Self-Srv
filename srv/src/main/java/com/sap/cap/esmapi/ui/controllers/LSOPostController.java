@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.sap.cap.esmapi.catg.pojos.TY_CatgCus;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgCusItem;
-import com.sap.cap.esmapi.catg.pojos.TY_CatgDetails;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgTemplates;
 import com.sap.cap.esmapi.catg.srv.intf.IF_CatalogSrv;
 import com.sap.cap.esmapi.catg.srv.intf.IF_CatgSrv;
@@ -593,126 +592,48 @@ public class LSOPostController
 
     }
 
-    @PostMapping(value = "/selCatg")
-    public @ResponseBody Boolean refreshCaseForm4CatgSel(@ModelAttribute("caseForm") TY_Case_Form caseForm, Model model)
+    @PostMapping("/selCatg")
+    @ResponseBody
+    public Boolean refreshCaseForm4CatgSel(@RequestParam(value = "catgDesc", required = false) String newCatg)
     {
-        Boolean catgChanged = false;
+        log.info("Received request to check category change for category 1 : " + newCatg);
+        TY_Case_Form sessionForm = userSessSrv.getCaseFormB4Submission();
 
-        if (caseForm != null && userSessSrv != null)
+        if (sessionForm == null)
         {
-            if (!StringUtils.hasText(userSessSrv.getPreviousCategory()))
-            {
-                if (StringUtils.hasText(caseForm.getCatgDesc()))
-                {
-                    userSessSrv.setPreviousCategory(caseForm.getCatgDesc());
-                    caseForm.setCatgChange(true);
-                    log.info("Category changed by User ...");
-                    // Also set the Category Description in Upper Case
-                    // Get the Category Description for the Category ID from Case Form
-                    TY_CatgDetails catgDetails = catalogTreeSrv.getCategoryDetails4Catg(caseForm.getCatgDesc(),
-                            EnumCaseTypes.Learning, true, false);
-                    if (catgDetails != null)
-                    {
-                        caseForm.setCatgText(catgDetails.getCatDesc());
-                        log.info("Catg. Text for Category ID : " + caseForm.getCatgDesc() + " is : "
-                                + catgDetails.getCatDesc());
-                    }
-                }
-            }
-            else
-            {
-                if (StringUtils.hasText(caseForm.getCatgDesc()))
-                {
-                    if (!userSessSrv.getPreviousCategory().equals(caseForm.getCatgDesc()))
-                    {
-                        userSessSrv.setPreviousCategory(caseForm.getCatgDesc());
-                        caseForm.setCatgChange(true);
-                        log.info("Category changed by User ...");
-                    }
-                    else
-                    {
-                        caseForm.setCatgChange(false);
-                        log.info("Category not changed by User ...");
-                    }
-                }
-
-            }
-            userSessSrv.setCaseFormB4Submission(caseForm);
-
-            log.info("Catg : " + caseForm.getCatgDesc());
-            catgChanged = caseForm.isCatgChange();
+            log.warn("Session form is null during category check. Treating as changed.");
+            return true;
         }
 
-        return catgChanged;
+        String currentCatg = sessionForm.getCatgDesc();
 
+        // Normalize null to empty
+        String normalizedCurrent = StringUtils.hasText(currentCatg) ? currentCatg : "";
+
+        String normalizedNew = StringUtils.hasText(newCatg) ? newCatg : "";
+
+        // Compare normalized values
+        return !normalizedCurrent.equals(normalizedNew);
     }
 
-    @PostMapping(value = "/selCatg2")
-    public @ResponseBody Boolean refreshCaseForm4Catg2Sel(@ModelAttribute("caseForm") TY_Case_Form caseForm,
-            Model model)
+    @PostMapping("/selCatg2")
+    @ResponseBody
+    public Boolean refreshCaseForm4Catg2Sel(@RequestParam(value = "catg2Desc", required = false) String newCatg2)
     {
-        Boolean catg2Changed = false;
-        log.info("Inside Category 2 change Post Processing...");
+        log.info("Received request to check category change for category 2 : " + newCatg2);
+        TY_Case_Form sessionForm = userSessSrv.getCaseFormB4Submission();
 
-        if (caseForm != null && userSessSrv != null)
+        if (sessionForm == null)
         {
-            if (userSessSrv.getUserDetails4mSession() != null)
-            {
-                log.info("User in Session : " + userSessSrv.getUserDetails4mSession().getUserName());
-                if (userSessSrv.getCurrentForm4Submission() != null)
-                {
-                    log.info("Current Catg1 in Session : "
-                            + userSessSrv.getCurrentForm4Submission().getCaseForm().getCatgDesc());
-                    log.info("Current Catg2 in Session : "
-                            + userSessSrv.getCurrentForm4Submission().getCaseForm().getCatg2Desc());
-                }
-
-            }
-            if (!StringUtils.hasText(userSessSrv.getPreviousCategory2()))
-            {
-                if (StringUtils.hasText(caseForm.getCatg2Desc()))
-                {
-                    userSessSrv.setPreviousCategory2(caseForm.getCatg2Desc());
-                    caseForm.setCatg2Change(true);
-                    log.info("Category 2 changed by User ...");
-                    // Also set the Category Description in Upper Case
-                    // Get the Category Description for the Category ID from Case Form
-                    TY_CatgDetails catgDetails = catalogTreeSrv.getCategoryDetails4Catg(caseForm.getCatg2Desc(),
-                            EnumCaseTypes.Learning, true, true);
-                    if (catgDetails != null)
-                    {
-                        caseForm.setCatg2Text(catgDetails.getCatDesc());
-                        log.info("Catg. Text for Category ID : " + caseForm.getCatg2Desc() + " at level 2 is : "
-                                + catgDetails.getCatDesc());
-                    }
-                }
-            }
-            else
-            {
-                if (StringUtils.hasText(caseForm.getCatg2Desc()))
-                {
-                    if (!userSessSrv.getPreviousCategory2().equals(caseForm.getCatg2Desc()))
-                    {
-                        userSessSrv.setPreviousCategory2(caseForm.getCatg2Desc());
-                        caseForm.setCatg2Change(true);
-                        log.info("Category 2 changed by User ...");
-                    }
-                    else
-                    {
-                        caseForm.setCatg2Change(false);
-                        log.info("Category 2 not changed by User ...");
-                    }
-                }
-
-            }
-            userSessSrv.setCaseFormB4Submission(caseForm);
-
-            log.info("Catg 2: " + caseForm.getCatg2Desc());
-            catg2Changed = caseForm.isCatg2Change();
+            log.warn("Session form is null during category check. Treating as changed.");
+            return true;
         }
 
-        return catg2Changed;
+        String normalizedCurrent = StringUtils.hasText(sessionForm.getCatg2Desc()) ? sessionForm.getCatg2Desc() : "";
 
+        String normalizedNew = StringUtils.hasText(newCatg2) ? newCatg2 : "";
+
+        return !normalizedCurrent.equals(normalizedNew);
     }
 
     @PostMapping(value = "/uploadAJAXReply")
