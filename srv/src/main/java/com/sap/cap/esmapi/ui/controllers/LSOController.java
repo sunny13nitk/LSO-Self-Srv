@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeansException;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.web.servlet.view.RedirectView;
@@ -57,6 +55,7 @@ import com.sap.cap.esmapi.vhelps.srv.intf.IF_VHelpLOBUIModelSrv;
 import com.sap.cds.services.request.UserInfo;
 import com.sap.cloud.security.token.Token;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -792,41 +791,14 @@ public class LSOController
     }
 
     @GetMapping("/refreshForm4SelCatg")
-    public String refreshFormCxtx4SelCatg(@RequestParam("catgDesc") String catgDesc, Model model)
+    public String refreshFormCxtx4SelCatg(HttpServletRequest request, Model model)
     {
-        String traceId = UUID.randomUUID().toString().substring(0, 8);
-        log.info("[{}] GET refreshForm4SelCatg START - catgDesc={}", traceId, catgDesc);
-
         if (userSessSrv != null)
         {
             TY_Case_Form caseForm = userSessSrv.getCaseFormB4Submission();
 
             if (caseForm != null)
             {
-                log.info("[{}] Session before update - catg1={}, catg2={}", traceId, caseForm.getCatgDesc(),
-                        caseForm.getCatg2Desc());
-                // FIRST update session form with new value
-                caseForm.setCatgDesc(catgDesc);
-                caseForm.setCatg2Desc(null);
-                caseForm.setCatg2Text(null);
-                log.info("[{}] Session updated - catg1={}, catg2 reset", traceId, catgDesc);
-                TY_CatgDetails catgDetails = catalogSrv.getCategoryDetails4Catg(caseForm.getCatgDesc(),
-                        EnumCaseTypes.Learning, true, false);
-                if (catgDetails != null)
-                {
-                    caseForm.setCatgText(catgDetails.getCatDesc());
-                    log.info("Catg. Text for Category ID : " + caseForm.getCatgDesc() + " is : "
-                            + catgDetails.getCatDesc());
-
-                    // Also get the Category level 2 for chosen level 1 category
-                    List<TY_CatalogItem> catgLvl2 = catalogSrv.getCategoryLvl2ByRootCatgId(caseForm.getCatgDesc());
-                    if (CollectionUtils.isNotEmpty(catgLvl2))
-                    {
-                        log.info("Catg. Level 2 count for Category ID : " + caseForm.getCatgDesc() + " is : "
-                                + catgLvl2.size());
-                        model.addAttribute("catgslvl2", catgLvl2);
-                    }
-                }
                 // Check for Special Category Customizations
                 if (splCatgCus != null)
                 {
@@ -834,6 +806,23 @@ public class LSOController
                     log.info("Getting Text for the Category IDfrom customizing...");
                     // Also set the Category Description in Upper Case
                     // Get the Category Description for the Category ID from Case Form
+                    TY_CatgDetails catgDetails = catalogSrv.getCategoryDetails4Catg(caseForm.getCatgDesc(),
+                            EnumCaseTypes.Learning, true, false);
+                    if (catgDetails != null)
+                    {
+                        caseForm.setCatgText(catgDetails.getCatDesc());
+                        log.info("Catg. Text for Category ID : " + caseForm.getCatgDesc() + " is : "
+                                + catgDetails.getCatDesc());
+
+                        // Also get the Category level 2 for chosen level 1 category
+                        List<TY_CatalogItem> catgLvl2 = catalogSrv.getCategoryLvl2ByRootCatgId(caseForm.getCatgDesc());
+                        if (CollectionUtils.isNotEmpty(catgLvl2))
+                        {
+                            log.info("Catg. Level 2 count for Category ID : " + caseForm.getCatgDesc() + " is : "
+                                    + catgLvl2.size());
+                            model.addAttribute("catgslvl2", catgLvl2);
+                        }
+                    }
 
                     if (CollectionUtils.isNotEmpty(splCatgCus.getSplCatgCus()))
                     {
@@ -879,6 +868,8 @@ public class LSOController
                         }
                     }
                 }
+
+                userSessSrv.setCaseFormB4Submission(null);
 
                 // Normal Scenario - Catg. chosen Not relevant for Notes Template and/or
                 // additional fields
@@ -953,39 +944,24 @@ public class LSOController
                     }
 
                 }
-                userSessSrv.setCaseFormB4Submission(caseForm); // Finally update session form
-
             }
 
-            else
-            {
-                log.error("Case Form is null in Session Service for traceId : " + traceId);
-            }
         }
-        log.info("[{}] GET refreshForm4SelCatg END", traceId);
 
         return caseFormViewLXSS;
     }
 
     @GetMapping("/refreshForm4SelCatg2")
-    public String refreshFormCxtx4SelCatg2(@RequestParam("catg2Desc") String catg2Desc, Model model)
+    public String refreshFormCxtx4SelCatg2(HttpServletRequest request, Model model)
     {
-        String traceId = UUID.randomUUID().toString().substring(0, 8);
-        log.info("[{}] GET refreshForm4SelCatg2 START - catg2Desc={}", traceId, catg2Desc);
-
         if (userSessSrv != null)
         {
             TY_Case_Form caseForm = userSessSrv.getCaseFormB4Submission();
 
             if (caseForm != null)
             {
-                log.info("[{}] Session before update - catg1={}, catg2={}", traceId, caseForm.getCatgDesc(),
-                        caseForm.getCatg2Desc());
-
-                log.info("Selected Catg. Level 2 is : " + catg2Desc);
-
-                caseForm.setCatg2Desc(catg2Desc);
-                log.info("[{}] Session updated - catg2 set to {}", traceId, catg2Desc);
+                String catg2 = caseForm.getCatg2Desc();
+                log.info("Selected Catg. Level 2 is : " + catg2);
                 // Also get the Category level 2 for chosen level 1 category
                 List<TY_CatalogItem> catgLvl2 = catalogSrv.getCategoryLvl2ByRootCatgId(caseForm.getCatgDesc());
                 if (CollectionUtils.isNotEmpty(catgLvl2))
@@ -994,6 +970,8 @@ public class LSOController
                             + catgLvl2.size());
                     model.addAttribute("catgslvl2", catgLvl2);
                 }
+
+                userSessSrv.setCaseFormB4Submission(null);
 
                 // Normal Scenario - Catg. chosen Not relevant for Notes Template and/or
                 // additional fields
@@ -1030,7 +1008,7 @@ public class LSOController
 
                         // Scan for Template Load
                         TY_Catg2Templates catgTemplate = catalogTreeSrv.getTemplates4Catg2(caseForm.getCatgDesc(),
-                                catg2Desc);
+                                catg2);
                         if (catgTemplate != null)
                         {
 
@@ -1040,7 +1018,7 @@ public class LSOController
                         }
                         else
                         {
-                            log.info("No Template Found for Catg. Level 2 : " + catg2Desc + " and Category : "
+                            log.info("No Template Found for Catg. Level 2 : " + catg2 + " and Category : "
                                     + caseForm.getCatgDesc());
                             // Fallingback to level 1 category template if level 2 template not found
                             TY_CatgTemplates catgLvl1Template = catalogTreeSrv.getTemplates4Catg(caseForm.getCatgDesc(),
@@ -1083,8 +1061,6 @@ public class LSOController
                     }
 
                 }
-                userSessSrv.setCaseFormB4Submission(caseForm);
-
             }
 
         }
