@@ -654,62 +654,62 @@ public class LSOPostController
         Boolean catg2Changed = false;
         log.info("Inside Category 2 change Post Processing...");
 
-        if (caseForm != null && userSessSrv != null)
-        {
-            if (userSessSrv.getUserDetails4mSession() != null)
-            {
-                log.info("User in Session : " + userSessSrv.getUserDetails4mSession().getUserName());
-                if (userSessSrv.getCurrentForm4Submission() != null)
-                {
-                    log.info("Current Catg1 in Session : "
-                            + userSessSrv.getCurrentForm4Submission().getCaseForm().getCatgDesc());
-                    log.info("Current Catg2 in Session : "
-                            + userSessSrv.getCurrentForm4Submission().getCaseForm().getCatg2Desc());
-                }
+        // if (caseForm != null && userSessSrv != null)
+        // {
+        //     if (userSessSrv.getUserDetails4mSession() != null)
+        //     {
+        //         log.info("User in Session : " + userSessSrv.getUserDetails4mSession().getUserName());
+        //         if (userSessSrv.getCurrentForm4Submission() != null)
+        //         {
+        //             log.info("Current Catg1 in Session : "
+        //                     + userSessSrv.getCurrentForm4Submission().getCaseForm().getCatgDesc());
+        //             log.info("Current Catg2 in Session : "
+        //                     + userSessSrv.getCurrentForm4Submission().getCaseForm().getCatg2Desc());
+        //         }
 
-            }
-            if (!StringUtils.hasText(userSessSrv.getPreviousCategory2()))
-            {
-                if (StringUtils.hasText(caseForm.getCatg2Desc()))
-                {
-                    userSessSrv.setPreviousCategory2(caseForm.getCatg2Desc());
-                    caseForm.setCatg2Change(true);
-                    log.info("Category 2 changed by User ...");
-                    // Also set the Category Description in Upper Case
-                    // Get the Category Description for the Category ID from Case Form
-                    TY_CatgDetails catgDetails = catalogTreeSrv.getCategoryDetails4Catg(caseForm.getCatg2Desc(),
-                            EnumCaseTypes.Learning, true, true);
-                    if (catgDetails != null)
-                    {
-                        caseForm.setCatg2Text(catgDetails.getCatDesc());
-                        log.info("Catg. Text for Category ID : " + caseForm.getCatg2Desc() + " at level 2 is : "
-                                + catgDetails.getCatDesc());
-                    }
-                }
-            }
-            else
-            {
-                if (StringUtils.hasText(caseForm.getCatg2Desc()))
-                {
-                    if (!userSessSrv.getPreviousCategory2().equals(caseForm.getCatg2Desc()))
-                    {
-                        userSessSrv.setPreviousCategory2(caseForm.getCatg2Desc());
-                        caseForm.setCatg2Change(true);
-                        log.info("Category 2 changed by User ...");
-                    }
-                    else
-                    {
-                        caseForm.setCatg2Change(false);
-                        log.info("Category 2 not changed by User ...");
-                    }
-                }
+        //     }
+        //     if (!StringUtils.hasText(userSessSrv.getPreviousCategory2()))
+        //     {
+        //         if (StringUtils.hasText(caseForm.getCatg2Desc()))
+        //         {
+        //             userSessSrv.setPreviousCategory2(caseForm.getCatg2Desc());
+        //             caseForm.setCatg2Change(true);
+        //             log.info("Category 2 changed by User ...");
+        //             // Also set the Category Description in Upper Case
+        //             // Get the Category Description for the Category ID from Case Form
+        //             TY_CatgDetails catgDetails = catalogTreeSrv.getCategoryDetails4Catg(caseForm.getCatg2Desc(),
+        //                     EnumCaseTypes.Learning, true, true);
+        //             if (catgDetails != null)
+        //             {
+        //                 caseForm.setCatg2Text(catgDetails.getCatDesc());
+        //                 log.info("Catg. Text for Category ID : " + caseForm.getCatg2Desc() + " at level 2 is : "
+        //                         + catgDetails.getCatDesc());
+        //             }
+        //         }
+        //     }
+        //     else
+        //     {
+        //         if (StringUtils.hasText(caseForm.getCatg2Desc()))
+        //         {
+        //             if (!userSessSrv.getPreviousCategory2().equals(caseForm.getCatg2Desc()))
+        //             {
+        //                 userSessSrv.setPreviousCategory2(caseForm.getCatg2Desc());
+        //                 caseForm.setCatg2Change(true);
+        //                 log.info("Category 2 changed by User ...");
+        //             }
+        //             else
+        //             {
+        //                 caseForm.setCatg2Change(false);
+        //                 log.info("Category 2 not changed by User ...");
+        //             }
+        //         }
 
-            }
-            userSessSrv.setCaseFormB4Submission(caseForm);
+        //     }
+        //     userSessSrv.setCaseFormB4Submission(caseForm);
 
-            log.info("Catg 2: " + caseForm.getCatg2Desc());
-            catg2Changed = caseForm.isCatg2Change();
-        }
+        //     log.info("Catg 2: " + caseForm.getCatg2Desc());
+        //     catg2Changed = caseForm.isCatg2Change();
+        // }
 
         return catg2Changed;
 
