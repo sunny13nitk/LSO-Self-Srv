@@ -377,7 +377,7 @@ public class LSOPostController
             }
             userSessSrv.setCaseFormB4Submission(caseForm);
 
-            log.info("Processing of Case Attachment Upload Form - UI layer :Ends....");
+            log.info("Processing of Case Attachment Upload Form - UI layer :Ends...." + (uploadSuccess ? "Upload Success" : "Upload Failure"));
         }
 
         return uploadSuccess;
