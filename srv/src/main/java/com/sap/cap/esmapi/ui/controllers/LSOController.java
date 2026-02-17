@@ -510,6 +510,10 @@ public class LSOController
                     // Clear form for New Attachment as Current Attachment already in Container
                     caseForm.setAttachment(null);
 
+                    // also Upload the Catg. Tree as per Case Type
+                    model.addAttribute("catgsList",
+                            catalogTreeSrv.getCaseCatgTree4LoB(EnumCaseTypes.Learning).getCategories());
+
                     if (StringUtils.hasText(caseForm.getCatgDesc()))
                     {
                         // load default level 2 categories based on category 1 selection
@@ -524,7 +528,8 @@ public class LSOController
                     // Scan for Template Load
                     if (StringUtils.hasText(caseForm.getCatg2Text()) || StringUtils.hasText(caseForm.getCatgText()))
                     {
-
+                        log.info("Seeking Template for Category : " + caseForm.getCatgText() + " and Sub Category : "
+                                + caseForm.getCatg2Text());
                         TY_Catg2Templates catgTemplate = catalogTreeSrv.getTemplates4Catg2(caseForm.getCatgText(),
                                 caseForm.getCatg2Text());
                         if (catgTemplate != null)
@@ -558,24 +563,6 @@ public class LSOController
                     }
 
                     model.addAttribute("caseForm", caseForm);
-
-                    // also Upload the Catg. Tree as per Case Type
-                    model.addAttribute("catgsList",
-                            catalogTreeSrv.getCaseCatgTree4LoB(EnumCaseTypes.Learning).getCategories());
-
-                    caseForm.setCatg2Desc(userSessSrv.getCurrentForm4Submission().getCaseForm().getCatg2Desc()); // Curr
-                                                                                                                 // Sub
-
-                    if (StringUtils.hasText(caseForm.getCatgDesc()))
-                    {
-                        // load default level 2 categories based on category 1 selection
-                        model.addAttribute("catgslvl2", catalogSrv.getCategoryLvl2ByRootCatgId(caseForm.getCatgDesc()));
-                    }
-                    else
-                    {
-                        // load default level 2 categories
-                        model.addAttribute("catgslvl2", catalogSrv.getCategoryLvl2ByRootCatgId());
-                    }
 
                     model.addAttribute("attachments", attSrv.getAttachmentNames());
 
