@@ -360,7 +360,9 @@ public class CL_CatalogSrv implements IF_CatalogSrv
             }
 
         }
-
+        log.info("Number of Level 2 Categories found for Root Category Id :"
+                + (rootCatgId != null && rootCatgId.length > 0 ? rootCatgId[0] : "All Root Categories") + " are : "
+                + (lvl2Catgs != null ? lvl2Catgs.size() : 0));
         return lvl2Catgs;
 
     }
