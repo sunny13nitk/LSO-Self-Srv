@@ -303,6 +303,7 @@ public class LSOPostController
             log.info("Processing of Case Attachment Upload Form - UI layer :Begins....");
             if (caseForm.getAttachment() != null)
             {
+                log.info("Attachment Found in the Form for Upload...");
                 if (StringUtils.hasText(caseForm.getAttachment().getOriginalFilename()))
                 {
                     // Clear Attachment Service Session Messages for subsequent roundtip
@@ -310,17 +311,24 @@ public class LSOPostController
                     if (!attSrv.addAttachment(caseForm.getAttachment()))
                     {
                         // Attachment to Local Storage Persistence Error
+                        log.info("Error in Attachment Upload : " + attSrv.getSessionMessages());
                         uploadSuccess = false;
                         userSessSrv.addFormErrors(caseFormErrorRedirect);
 
                     }
                     else
                     {
+                        log.info(
+                                "Attachment Uploaded Successfully : " + caseForm.getAttachment().getOriginalFilename());
                         uploadSuccess = true;
                     }
 
                 }
 
+            }
+            else
+            {
+                log.info("No Attachment Found in the Form for Upload...");
             }
 
             // Clear form for New Attachment as Current Attachment already in Container
