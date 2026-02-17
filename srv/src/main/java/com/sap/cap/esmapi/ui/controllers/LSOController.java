@@ -990,12 +990,20 @@ public class LSOController
             {
 
                 TY_Case_Form caseForm = userSessSrv.getCaseFormB4Submission();
+                if (caseForm != null)
+                {
+                    log.info("Case Form Retrieved from Session Service for Attachment Refresh...");
+                    if (userSessSrv.getUserDetails4mSession().isEmployee())
+                    {
+                        caseForm.setEmployee(true);
+                    }
+                }
 
                 model.addAttribute("caseTypeStr", EnumCaseTypes.Learning.toString());
 
                 // Populate User Details
                 TY_UserESS userDetails = new TY_UserESS();
-                if (userSessSrv != null)
+                if (userSessSrv != null && userSessSrv.getUserDetails4mSession() != null)
                 {
                     log.info("User Bound in Session..");
                 }
@@ -1016,8 +1024,6 @@ public class LSOController
                 // also Upload the Catg. Tree as per Case Type
                 model.addAttribute("catgsList",
                         catalogTreeSrv.getCaseCatgTree4LoB(EnumCaseTypes.Learning).getCategories());
-
-                caseForm.setCatg2Desc(userSessSrv.getCurrentForm4Submission().getCaseForm().getCatg2Desc()); // Curr Sub
 
                 if (StringUtils.hasText(caseForm.getCatgDesc()))
                 {
