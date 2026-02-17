@@ -324,6 +324,8 @@ public class LSOController
 
                 caseForm.setCaseTxnType(cusItemO.get().getCaseType()); // hidden
                 caseForm.setCatgDesc(userSessSrv.getCurrentForm4Submission().getCaseForm().getCatgDesc()); // Curr Catg
+                caseForm.setCatg2Desc(userSessSrv.getCurrentForm4Submission().getCaseForm().getCatg2Desc()); // Curr Sub
+                                                                                                             // Catg
                 caseForm.setDescription(userSessSrv.getCurrentForm4Submission().getCaseForm().getDescription()); // Curr
                                                                                                                  // Notes
                 caseForm.setSubject(userSessSrv.getCurrentForm4Submission().getCaseForm().getSubject()); // Curr Subject
@@ -393,6 +395,17 @@ public class LSOController
                 // also Upload the Catg. Tree as per Case Type
                 model.addAttribute("catgsList",
                         catalogTreeSrv.getCaseCatgTree4LoB(EnumCaseTypes.Learning).getCategories());
+
+                if (StringUtils.hasText(caseForm.getCatgDesc()))
+                {
+                    // load default level 2 categories based on category 1 selection
+                    model.addAttribute("catgslvl2", catalogSrv.getCategoryLvl2ByRootCatgId(caseForm.getCatgDesc()));
+                }
+                else
+                {
+                    // load default level 2 categories
+                    model.addAttribute("catgslvl2", catalogSrv.getCategoryLvl2ByRootCatgId());
+                }
 
                 if (attSrv != null)
                 {
@@ -509,6 +522,20 @@ public class LSOController
                     // also Upload the Catg. Tree as per Case Type
                     model.addAttribute("catgsList",
                             catalogTreeSrv.getCaseCatgTree4LoB(EnumCaseTypes.Learning).getCategories());
+
+                    caseForm.setCatg2Desc(userSessSrv.getCurrentForm4Submission().getCaseForm().getCatg2Desc()); // Curr
+                                                                                                                 // Sub
+
+                    if (StringUtils.hasText(caseForm.getCatgDesc()))
+                    {
+                        // load default level 2 categories based on category 1 selection
+                        model.addAttribute("catgslvl2", catalogSrv.getCategoryLvl2ByRootCatgId(caseForm.getCatgDesc()));
+                    }
+                    else
+                    {
+                        // load default level 2 categories
+                        model.addAttribute("catgslvl2", catalogSrv.getCategoryLvl2ByRootCatgId());
+                    }
 
                     model.addAttribute("attachments", attSrv.getAttachmentNames());
 
@@ -950,133 +977,6 @@ public class LSOController
         return caseFormViewLXSS;
     }
 
-    @GetMapping("/refreshForm4SelCatg2")
-    public String refreshFormCxtx4SelCatg2(HttpServletRequest request, Model model)
-    {
-
-        log.info("Inside refreshFormCxtx4SelCatg2... ");
-        // if (userSessSrv != null)
-        // {
-        // TY_Case_Form caseForm = userSessSrv.getCaseFormB4Submission();
-
-        // if (caseForm != null)
-        // {
-        // String catg2 = caseForm.getCatg2Desc();
-        // log.info("Selected Catg. Level 2 is : " + catg2);
-        // // Also get the Category level 2 for chosen level 1 category
-        // List<TY_CatalogItem> catgLvl2 =
-        // catalogSrv.getCategoryLvl2ByRootCatgId(caseForm.getCatgDesc());
-        // if (CollectionUtils.isNotEmpty(catgLvl2))
-        // {
-        // log.info("Catg. Level 2 count for Category ID : " + caseForm.getCatgDesc() +
-        // " is : "
-        // + catgLvl2.size());
-        // model.addAttribute("catgslvl2", catgLvl2);
-        // }
-
-        // userSessSrv.setCaseFormB4Submission(null);
-
-        // // Normal Scenario - Catg. chosen Not relevant for Notes Template and/or
-        // // additional fields
-
-        // if
-        // ((StringUtils.hasText(userSessSrv.getUserDetails4mSession().getAccountId())
-        // ||
-        // StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId()))
-        // && !CollectionUtils.isEmpty(catgCusSrv.getCustomizations()))
-        // {
-
-        // Optional<TY_CatgCusItem> cusItemO = catgCusSrv.getCustomizations().stream()
-        // .filter(g ->
-        // g.getCaseTypeEnum().toString().equals(EnumCaseTypes.Learning.toString()))
-        // .findFirst();
-        // if (cusItemO.isPresent() && catgTreeSrv != null)
-        // {
-
-        // model.addAttribute("caseTypeStr", EnumCaseTypes.Learning.toString());
-
-        // // Populate User Details
-        // TY_UserESS userDetails = new TY_UserESS();
-        // userDetails.setUserDetails(userSessSrv.getUserDetails4mSession());
-        // model.addAttribute("userInfo", userDetails);
-
-        // // clear Form errors on each refresh or a New Case form request
-        // if (CollectionUtils.isNotEmpty(userSessSrv.getFormErrors()))
-        // {
-        // userSessSrv.clearFormErrors();
-        // }
-
-        // // also Upload the Catg. Tree as per Case Type
-        // model.addAttribute("catgsList",
-        // catalogTreeSrv.getCaseCatgTree4LoB(EnumCaseTypes.Learning).getCategories());
-
-        // // Scan Current Catg for Templ. Load and or Additional Fields
-
-        // // Scan for Template Load
-        // TY_Catg2Templates catgTemplate =
-        // catalogTreeSrv.getTemplates4Catg2(caseForm.getCatgDesc(),
-        // catg2);
-        // if (catgTemplate != null)
-        // {
-
-        // // Set Questionnaire for Category 2
-        // caseForm.setTemplate(catgTemplate.getQuestionnaire());
-
-        // }
-        // else
-        // {
-        // log.info("No Template Found for Catg. Level 2 : " + catg2 + " and Category :
-        // "
-        // + caseForm.getCatgDesc());
-        // // Fallingback to level 1 category template if level 2 template not found
-        // TY_CatgTemplates catgLvl1Template =
-        // catalogTreeSrv.getTemplates4Catg(caseForm.getCatgDesc(),
-        // EnumCaseTypes.Learning);
-        // if (catgLvl1Template != null)
-        // {
-
-        // // Set Questionnaire for Category
-        // caseForm.setTemplate(catgLvl1Template.getQuestionnaire());
-
-        // }
-        // }
-
-        // if (vhlpUISrv != null)
-        // {
-        // model.addAllAttributes(coLaDDLBSrv.adjustCountryLanguageDDLB(caseForm.getCountry(),
-        // vhlpUISrv.getVHelpUIModelMap4LobCatg(EnumCaseTypes.Learning,
-        // caseForm.getCatgDesc())));
-        // }
-
-        // // Case Form Model Set at last
-        // model.addAttribute("caseForm", caseForm);
-
-        // if (attSrv != null)
-        // {
-        // if (CollectionUtils.isNotEmpty(attSrv.getAttachmentNames()))
-        // {
-        // model.addAttribute("attachments", attSrv.getAttachmentNames());
-        // }
-        // }
-
-        // // Attachment file Size
-        // model.addAttribute("attSize", rlConfig.getAllowedSizeAttachmentMB());
-        // }
-        // else
-        // {
-
-        // throw new EX_ESMAPI(msgSrc.getMessage("ERR_CASE_TYPE_NOCFG", new Object[]
-        // { EnumCaseTypes.Learning.toString() }, Locale.ENGLISH));
-        // }
-
-        // }
-        // }
-        // }
-
-        return caseFormViewLXSS;
-
-    }
-
     @GetMapping("/refreshForm4AttUpload")
     public String refreshCaseFormPostAttachmentUpload(Model model)
     {
@@ -1117,6 +1017,19 @@ public class LSOController
                 model.addAttribute("catgsList",
                         catalogTreeSrv.getCaseCatgTree4LoB(EnumCaseTypes.Learning).getCategories());
 
+                caseForm.setCatg2Desc(userSessSrv.getCurrentForm4Submission().getCaseForm().getCatg2Desc()); // Curr Sub
+
+                if (StringUtils.hasText(caseForm.getCatgDesc()))
+                {
+                    // load default level 2 categories based on category 1 selection
+                    model.addAttribute("catgslvl2", catalogSrv.getCategoryLvl2ByRootCatgId(caseForm.getCatgDesc()));
+                }
+                else
+                {
+                    // load default level 2 categories
+                    model.addAttribute("catgslvl2", catalogSrv.getCategoryLvl2ByRootCatgId());
+                }
+
                 model.addAttribute("attachments", attSrv.getAttachmentNames());
 
                 // Attachment file Size
@@ -1155,6 +1068,18 @@ public class LSOController
                 model.addAttribute("attachments", attSrv.getAttachmentNames());
                 // Attachment file Size
                 model.addAttribute("attSize", rlConfig.getAllowedSizeAttachmentMB());
+
+                if (StringUtils.hasText(caseEditForm.getCaseDetails().getCatgLvl1()))
+                {
+                    // load default level 2 categories based on category 1 selection
+                    model.addAttribute("catgslvl2",
+                            catalogSrv.getCategoryLvl2ByRootCatgId(caseEditForm.getCaseDetails().getCatgLvl1()));
+                }
+                else
+                {
+                    // load default level 2 categories
+                    model.addAttribute("catgslvl2", catalogSrv.getCategoryLvl2ByRootCatgId());
+                }
             }
         }
 
