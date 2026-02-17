@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.BeansException;
@@ -793,16 +794,22 @@ public class LSOController
     @GetMapping("/refreshForm4SelCatg")
     public String refreshFormCxtx4SelCatg(@RequestParam("catgDesc") String catgDesc, Model model)
     {
+        String traceId = UUID.randomUUID().toString().substring(0, 8);
+        log.info("[{}] GET refreshForm4SelCatg START - catgDesc={}", traceId, catgDesc);
+
         if (userSessSrv != null)
         {
             TY_Case_Form caseForm = userSessSrv.getCaseFormB4Submission();
 
             if (caseForm != null)
             {
+                log.info("[{}] Session before update - catg1={}, catg2={}", traceId, caseForm.getCatgDesc(),
+                        caseForm.getCatg2Desc());
                 // FIRST update session form with new value
                 caseForm.setCatgDesc(catgDesc);
                 caseForm.setCatg2Desc(null);
                 caseForm.setCatg2Text(null);
+                log.info("[{}] Session updated - catg1={}, catg2 reset", traceId, catgDesc);
                 TY_CatgDetails catgDetails = catalogSrv.getCategoryDetails4Catg(caseForm.getCatgDesc(),
                         EnumCaseTypes.Learning, true, false);
                 if (catgDetails != null)
@@ -950,25 +957,35 @@ public class LSOController
 
             }
 
+            else
+            {
+                log.error("Case Form is null in Session Service for traceId : " + traceId);
+            }
         }
+        log.info("[{}] GET refreshForm4SelCatg END", traceId);
 
         return caseFormViewLXSS;
     }
 
     @GetMapping("/refreshForm4SelCatg2")
     public String refreshFormCxtx4SelCatg2(@RequestParam("catg2Desc") String catg2Desc, Model model)
-
     {
+        String traceId = UUID.randomUUID().toString().substring(0, 8);
+        log.info("[{}] GET refreshForm4SelCatg2 START - catg2Desc={}", traceId, catg2Desc);
+
         if (userSessSrv != null)
         {
             TY_Case_Form caseForm = userSessSrv.getCaseFormB4Submission();
 
             if (caseForm != null)
             {
+                log.info("[{}] Session before update - catg1={}, catg2={}", traceId, caseForm.getCatgDesc(),
+                        caseForm.getCatg2Desc());
 
                 log.info("Selected Catg. Level 2 is : " + catg2Desc);
 
                 caseForm.setCatg2Desc(catg2Desc);
+                log.info("[{}] Session updated - catg2 set to {}", traceId, catg2Desc);
                 // Also get the Category level 2 for chosen level 1 category
                 List<TY_CatalogItem> catgLvl2 = catalogSrv.getCategoryLvl2ByRootCatgId(caseForm.getCatgDesc());
                 if (CollectionUtils.isNotEmpty(catgLvl2))

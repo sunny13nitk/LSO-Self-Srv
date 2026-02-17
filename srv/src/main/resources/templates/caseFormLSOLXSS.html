@@ -731,30 +731,77 @@
 
          });
       }
+      let catg1RequestInProgress = false;
+      let catg2RequestInProgress = false;
+
       function getCatgSel(selectObject)
       {
-         var selectedValue = selectObject.value;
+         const selectedValue = selectObject.value || "";
+         const timestamp = new Date().toISOString();
+
+         if (catg1RequestInProgress)
+         {
+            console.warn("[Catg1] Duplicate request blocked at", timestamp);
+            return;
+         }
+
+         catg1RequestInProgress = true;
+
+         console.group("Category 1 Selection");
+         console.log("Time:", timestamp);
+         console.log("Selected Value:", selectedValue);
 
          $.ajax({
             type: "POST",
             url: "/post/selCatg",
-            data: { catgDesc: selectedValue || "" },
+            data: { catgDesc: selectedValue },
             success: function (changed)
             {
+               console.log("Server responded - changed:", changed);
+
                if (changed === true)
                {
+                  console.log("Redirecting to GET refresh with catgDesc =", selectedValue);
+
                   window.location.href =
-                     '/lso/refreshForm4SelCatg?catgDesc=' + encodeURIComponent(selectedValue || "");
+                     "/lso/refreshForm4SelCatg?catgDesc=" +
+                     encodeURIComponent(selectedValue);
+
+                  // No reset needed — page reloads
                }
+               else
+               {
+                  console.log("No change detected. Unlocking request.");
+                  catg1RequestInProgress = false;
+               }
+
+               console.groupEnd();
+            },
+            error: function (xhr, status, error)
+            {
+               console.error("[Catg1] AJAX error:", status, error);
+               catg1RequestInProgress = false;
+               console.groupEnd();
             }
          });
       }
 
-
       function getCatg2Sel(selectObject)
       {
-         var selectedValue = selectObject.value;
-         if (!selectedValue) return;
+         const selectedValue = selectObject.value || "";
+         const timestamp = new Date().toISOString();
+
+         if (catg2RequestInProgress)
+         {
+            console.warn("[Catg2] Duplicate request blocked at", timestamp);
+            return;
+         }
+
+         catg2RequestInProgress = true;
+
+         console.group("Category 2 Selection");
+         console.log("Time:", timestamp);
+         console.log("Selected Value:", selectedValue);
 
          $.ajax({
             type: "POST",
@@ -762,15 +809,35 @@
             data: { catg2Desc: selectedValue },
             success: function (changed)
             {
+               console.log("Server responded - changed:", changed);
+
                if (changed === true)
                {
-                  window.location.href =
-                     '/lso/refreshForm4SelCatg2?catg2Desc=' + encodeURIComponent(selectedValue);
+                  console.log("Redirecting to GET refresh with catg2Desc =", selectedValue);
 
+                  window.location.href =
+                     "/lso/refreshForm4SelCatg2?catg2Desc=" +
+                     encodeURIComponent(selectedValue);
+
+                  // No reset needed — page reloads
                }
+               else
+               {
+                  console.log("No change detected. Unlocking request.");
+                  catg2RequestInProgress = false;
+               }
+
+               console.groupEnd();
+            },
+            error: function (xhr, status, error)
+            {
+               console.error("[Catg2] AJAX error:", status, error);
+               catg2RequestInProgress = false;
+               console.groupEnd();
             }
          });
       }
+
 
    </script>
 

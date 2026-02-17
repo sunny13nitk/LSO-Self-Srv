@@ -633,7 +633,10 @@ public class LSOPostController
 
         String normalizedNew = StringUtils.hasText(newCatg2) ? newCatg2 : "";
 
-        return !normalizedCurrent.equals(normalizedNew);
+        boolean changed = !normalizedCurrent.equals(normalizedNew);
+        log.info("POST selCatg - current={}, new={}, changed={}", normalizedCurrent, normalizedNew, changed);
+
+        return changed;
     }
 
     @PostMapping(value = "/uploadAJAXReply")
