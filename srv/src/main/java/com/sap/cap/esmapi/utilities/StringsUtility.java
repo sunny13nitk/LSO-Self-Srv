@@ -1,5 +1,9 @@
 package com.sap.cap.esmapi.utilities;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.springframework.util.StringUtils;
 
 import com.sap.cap.esmapi.exceptions.EX_ESMAPI;
@@ -72,6 +76,42 @@ public class StringsUtility
             left++;
             right--;
         }
+    }
+
+    public static String[] cleanReverseAndPad(String[] input)
+    {
+        if (input == null)
+        {
+            return null;
+        }
+
+        int size = input.length;
+
+        // 1️⃣ Collect non-null values
+        List<String> nonNullValues = new ArrayList<>();
+        for (String val : input)
+        {
+            if (val != null && !val.trim().isEmpty())
+            {
+                nonNullValues.add(val);
+            }
+        }
+
+        // 2️⃣ Reverse valid values
+        Collections.reverse(nonNullValues);
+
+        // 3️⃣ Create result array of original size
+        String[] result = new String[size];
+
+        // 4️⃣ Copy reversed values to top
+        for (int i = 0; i < nonNullValues.size(); i++)
+        {
+            result[i] = nonNullValues.get(i);
+        }
+
+        // Remaining positions automatically stay null
+
+        return result;
     }
 
 }

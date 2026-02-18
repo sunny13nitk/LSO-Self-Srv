@@ -153,7 +153,7 @@ public class CL_CatalogSrv implements IF_CatalogSrv
                     }
 
                 }
-                StringsUtility.reverseArray(catTree);
+                catTree = StringsUtility.cleanReverseAndPad(catTree);
                 for (int i = 0; i < catTree.length; i++)
                 {
                     log.info("Category Hierarchy Array at index : " + i + " has category id : " + catTree[i]);
