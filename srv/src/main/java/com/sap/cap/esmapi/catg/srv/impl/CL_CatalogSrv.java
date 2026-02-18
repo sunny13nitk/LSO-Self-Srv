@@ -29,7 +29,6 @@ import com.sap.cap.esmapi.catg.pojos.TY_CatgTemplates;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgTemplatesCus;
 import com.sap.cap.esmapi.catg.srv.intf.IF_CatalogSrv;
 import com.sap.cap.esmapi.exceptions.EX_ESMAPI;
-import com.sap.cap.esmapi.utilities.StringsUtility;
 import com.sap.cap.esmapi.utilities.enums.EnumCaseTypes;
 import com.sap.cap.esmapi.utilities.pojos.TY_CaseCatalogCustomizing;
 import com.sap.cap.esmapi.utilities.srv.intf.IF_UserSessionSrv;
@@ -153,8 +152,8 @@ public class CL_CatalogSrv implements IF_CatalogSrv
                     }
 
                 }
-                catTree = StringsUtility.cleanReverseAndPad(catTree);
-                for (int i = 0; i < catTree.length; i++)
+                // catTree = StringsUtility.cleanReverseAndPad(catTree);
+                for (int i = catTree.length - 1; i >= 0; i--)
                 {
                     log.info("Category Hierarchy Array at index : " + i + " has category id : " + catTree[i]);
                 }

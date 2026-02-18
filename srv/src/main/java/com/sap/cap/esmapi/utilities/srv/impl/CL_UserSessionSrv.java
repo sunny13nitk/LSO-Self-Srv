@@ -578,6 +578,12 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                     {
                         String[] catTreeSelCatg = catalogSrv.getCatgHierarchyforCatId(caseForm.getCatg2Desc(),
                                 cusItemO.get().getCaseTypeEnum(), false);
+
+                        for (int i = 0; i < catTreeSelCatg.length; i++)
+                        {
+                            log.info(
+                                    "Category Tree Selection for Categories at Form Submission : " + catTreeSelCatg[i]);
+                        }
                         caseFormAsync.setCatTreeSelCatg(catTreeSelCatg);
                     }
                     else if (StringUtils.hasText(caseForm.getCatgDesc()))
