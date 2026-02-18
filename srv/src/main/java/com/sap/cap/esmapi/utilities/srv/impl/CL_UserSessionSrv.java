@@ -11,7 +11,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -29,8 +28,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.annotation.SessionScope;
 
-import com.sap.cap.esmapi.catg.pojos.TY_CatalogItem;
-import com.sap.cap.esmapi.catg.pojos.TY_CatalogTree;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgCus;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgCusItem;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgDetails;
@@ -1065,72 +1062,76 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                         }
                     }
 
-                    Optional<TY_CatgCusItem> cusItemO = catgCusSrv.getCustomizations().stream()
-                            .filter(g -> g.getCaseType()
-                                    .equals(userSessInfo.getCurrentForm4Submission().getCaseForm().getCaseTxnType()))
-                            .findFirst();
+                    // Optional<TY_CatgCusItem> cusItemO = catgCusSrv.getCustomizations().stream()
+                    // .filter(g -> g.getCaseType()
+                    // .equals(userSessInfo.getCurrentForm4Submission().getCaseForm().getCaseTxnType()))
+                    // .findFirst();
 
-                    if (cusItemO.isPresent())
-                    {
-                        // Only Validate for Category Lower than level 1 if Set in Customization for
-                        // Multi level Categories in Case Type
-                        if (!cusItemO.get().getToplvlCatgOnly())
-                        {
+                    // if (cusItemO.isPresent())
+                    // {
+                    // // Only Validate for Category Lower than level 1 if Set in Customization for
+                    // // Multi level Categories in Case Type
+                    // if (!cusItemO.get().getToplvlCatgOnly())
+                    // {
 
-                            long catLen = Arrays.stream(catalogSrv.getCatgHierarchyforCatId(
-                                    userSessInfo.getCurrentForm4Submission().getCaseForm().getCatgDesc(),
-                                    cusItemO.get().getCaseTypeEnum(), false)).filter(Objects::nonNull).count();
-                            // Check that Category is not a level 1 - Base Category
-                            if (catLen <= 1)
-                            {
-                                // Extract Category Description
-                                TY_CatalogTree catgTree = catalogSrv
-                                        .getCaseCatgTree4LoB(cusItemO.get().getCaseTypeEnum());
-                                if (catgTree != null)
-                                {
-                                    if (CollectionUtils.isNotEmpty(catgTree.getCategories()))
-                                    {
+                    // long catLen = Arrays.stream(catalogSrv.getCatgHierarchyforCatId(
+                    // userSessInfo.getCurrentForm4Submission().getCaseForm().getCatgDesc(),
+                    // cusItemO.get().getCaseTypeEnum(), false)).filter(Objects::nonNull).count();
+                    // log.info("Category Level for the chosen Category "
+                    // + userSessInfo.getCurrentForm4Submission().getCaseForm().getCatgDesc() + " is
+                    // : "
+                    // + catLen);
+                    // // Check that Category is not a level 1 - Base Category
+                    // if (catLen <= 1)
+                    // {
+                    // // Extract Category Description
+                    // TY_CatalogTree catgTree = catalogSrv
+                    // .getCaseCatgTree4LoB(cusItemO.get().getCaseTypeEnum());
+                    // if (catgTree != null)
+                    // {
+                    // if (CollectionUtils.isNotEmpty(catgTree.getCategories()))
+                    // {
 
-                                        // Remove blank Categories from Catalog Tree Used for UI Presentation
-                                        catgTree.getCategories().removeIf(x -> x.getId() == null);
-                                        Optional<TY_CatalogItem> currCatgDetailsO = catgTree
-                                                .getCategories().stream().filter(f -> f.getId().equals(userSessInfo
-                                                        .getCurrentForm4Submission().getCaseForm().getCatgDesc()))
-                                                .findFirst();
-                                        if (currCatgDetailsO.isPresent())
-                                        {
-                                            // Payload Error as Category level shuld be atleast 2
-                                            String msg = msgSrc.getMessage("ERR_CATG_LVL", new Object[]
-                                            { currCatgDetailsO.get().getName() }, Locale.ENGLISH);
-                                            log.error(msg); // System Log
+                    // // Remove blank Categories from Catalog Tree Used for UI Presentation
+                    // catgTree.getCategories().removeIf(x -> x.getId() == null);
+                    // Optional<TY_CatalogItem> currCatgDetailsO = catgTree
+                    // .getCategories().stream().filter(f -> f.getId().equals(userSessInfo
+                    // .getCurrentForm4Submission().getCaseForm().getCatgDesc()))
+                    // .findFirst();
+                    // if (currCatgDetailsO.isPresent())
+                    // {
+                    // // Payload Error as Category level shuld be atleast 2
+                    // String msg = msgSrc.getMessage("ERR_CATG_LVL", new Object[]
+                    // { currCatgDetailsO.get().getName() }, Locale.ENGLISH);
+                    // log.error(msg); // System Log
 
-                                            // Logging Framework
-                                            TY_Message logMsg = new TY_Message(
-                                                    userSessInfo.getUserDetails().getUsAccEmpl().getUserId(),
-                                                    Timestamp.from(Instant.now()), EnumStatus.Error,
-                                                    EnumMessageType.ERR_PAYLOAD,
-                                                    userSessInfo.getUserDetails().getUsAccEmpl().getUserId(), msg);
-                                            userSessInfo.getMessagesStack().add(logMsg);
+                    // // Logging Framework
+                    // TY_Message logMsg = new TY_Message(
+                    // userSessInfo.getUserDetails().getUsAccEmpl().getUserId(),
+                    // Timestamp.from(Instant.now()), EnumStatus.Error,
+                    // EnumMessageType.ERR_PAYLOAD,
+                    // userSessInfo.getUserDetails().getUsAccEmpl().getUserId(), msg);
+                    // userSessInfo.getMessagesStack().add(logMsg);
 
-                                            // Instantiate and Fire the Event : Syncronous processing
-                                            EV_LogMessage logMsgEvent = new EV_LogMessage(this, logMsg);
-                                            applicationEventPublisher.publishEvent(logMsgEvent);
+                    // // Instantiate and Fire the Event : Syncronous processing
+                    // EV_LogMessage logMsgEvent = new EV_LogMessage(this, logMsg);
+                    // applicationEventPublisher.publishEvent(logMsgEvent);
 
-                                            this.addFormErrors(msg);// For Form Display
+                    // this.addFormErrors(msg);// For Form Display
 
-                                        }
-                                        // Refurbish Blank Category at Top for New Form - Session maintained
-                                        catgTree.getCategories().add(0, new TY_CatalogItem());
-                                    }
-                                }
+                    // }
+                    // // Refurbish Blank Category at Top for New Form - Session maintained
+                    // catgTree.getCategories().add(0, new TY_CatalogItem());
+                    // }
+                    // }
 
-                                // Add to Display Messages : to be shown to User or Successful Submission
-                                isValid = false;
+                    // // Add to Display Messages : to be shown to User or Successful Submission
+                    // isValid = false;
 
-                            }
+                    // }
 
-                        }
-                    }
+                    // }
+                    // }
 
                 }
                 else
