@@ -273,7 +273,7 @@ public class ESSController
                 if (cusItemO.isPresent() && catalogTreeSrv != null)
                 {
                     String[] catTreeSelCatg = catalogTreeSrv.getCatgHierarchyforCatId(caseForm.getCatgDesc(),
-                            cusItemO.get().getCaseTypeEnum());
+                            cusItemO.get().getCaseTypeEnum(), false);
                     if (Arrays.stream(catTreeSelCatg).filter(e -> e != null).count() > 0)
                     {
                         switch ((int) Arrays.stream(catTreeSelCatg).filter(e -> e != null).count())
