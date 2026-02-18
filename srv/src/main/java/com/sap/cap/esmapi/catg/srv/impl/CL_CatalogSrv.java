@@ -99,16 +99,19 @@ public class CL_CatalogSrv implements IF_CatalogSrv
 
     }
 
+    // Get Complete Category Hierarchy passing most granular Category Id and Case
+    // Type
     @Override
     public String[] getCatgHierarchyforCatId(String catId, EnumCaseTypes caseType) throws EX_ESMAPI
     {
         String[] catTree = null;
         int idx = 0;
+        List<TY_CatalogItem> catgTreeAll = null;
 
         if (StringUtils.hasText(catId) && caseType != null)
         {
             String catCurr = catId;
-
+            catgTreeAll = new ArrayList<TY_CatalogItem>();
             // Get Complete Catalog Details
             TY_CatalogTree catalogTree = this.getCaseCatgTree4LoB(caseType);
             if (CollectionUtils.isNotEmpty(catalogTree.getCategories()))
@@ -118,17 +121,26 @@ public class CL_CatalogSrv implements IF_CatalogSrv
                 {
                     String catScan = catCurr;
                     // Remove blank Categories from Catalog Tree Used for UI Presentation
+                    // Add level 1 and level 2 categories to single list for scanning the category
+                    // hierarchy for selected category id
                     catalogTree.getCategories().removeIf(x -> x.getId() == null);
+                    catgTreeAll.addAll(catalogTree.getCategories());
+                    catgTreeAll.addAll(catalogTree.getCategorieslvl2());
                     // Scan for Category in Catalog Tree
-                    Optional<TY_CatalogItem> itemSel = catalogTree.getCategories().stream()
-                            .filter(t -> t.getId().equals(catScan)).findFirst();
+                    Optional<TY_CatalogItem> itemSel = catgTreeAll.stream().filter(t -> t.getId().equals(catScan))
+                            .findFirst();
                     if (itemSel.isPresent())
                     {
+                        log.info("Category found in Catalog Tree for category id : " + catScan
+                                + " with category name : " + itemSel.get().getName());
                         catTree[idx] = catCurr;
-
+                        log.info("Category added to category hierarchy array at index : " + idx + " with category id : "
+                                + catCurr);
                         // Seek Parent
                         if (StringUtils.hasText(itemSel.get().getParentId()))
                         {
+                            log.info("Seeking parent category for category id : " + catCurr
+                                    + " with parent category id : " + itemSel.get().getParentId());
                             catCurr = itemSel.get().getParentId();
                         }
                         else

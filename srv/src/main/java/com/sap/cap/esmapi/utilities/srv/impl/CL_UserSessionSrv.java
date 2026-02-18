@@ -569,15 +569,30 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
             caseFormAsync.setTimestamp(Timestamp.from(Instant.now()));
             caseFormAsync.setUserId(userSessInfo.getUserDetails().getUsAccEmpl().getUserId());
 
+            // Preparing Category Tree as per Categories on Form
             if (!CollectionUtils.isEmpty(catgCusSrv.getCustomizations()))
 
             {
 
                 if (cusItemO.isPresent() && catalogSrv != null)
                 {
-                    String[] catTreeSelCatg = catalogSrv.getCatgHierarchyforCatId(caseForm.getCatgDesc(),
-                            cusItemO.get().getCaseTypeEnum());
-                    caseFormAsync.setCatTreeSelCatg(catTreeSelCatg);
+                    // Get Category hierarchy based on lowest maintable category
+                    if (StringUtils.hasText(caseForm.getCatg2Desc()))
+                    {
+                        String[] catTreeSelCatg = catalogSrv.getCatgHierarchyforCatId(caseForm.getCatg2Desc(),
+                                cusItemO.get().getCaseTypeEnum());
+                        caseFormAsync.setCatTreeSelCatg(catTreeSelCatg);
+                    }
+                    else if (StringUtils.hasText(caseForm.getCatgDesc()))
+                    {
+
+                        // level 1 category selection at form submission
+                        String[] catTreeSelCatg = catalogSrv.getCatgHierarchyforCatId(caseForm.getCatgDesc(),
+                                cusItemO.get().getCaseTypeEnum());
+                        caseFormAsync.setCatTreeSelCatg(catTreeSelCatg);
+
+                        caseFormAsync.setCatTreeSelCatg(catTreeSelCatg);
+                    }
                 }
 
                 userSessInfo.setCurrentForm4Submission(caseFormAsync);
@@ -699,7 +714,7 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                 // Also set the Category Description in Upper Case
                 // Get the Category Description for the Category ID from Case Form
                 TY_CatgDetails catgDetails = catalogSrv.getCategoryDetails4Catg(caseFormCatgDesc,
-                        EnumCaseTypes.Learning, true,false);
+                        EnumCaseTypes.Learning, true, false);
                 if (catgDetails != null)
                 {
                     log.info("Catg. Text for Category ID : " + caseFormCatgDesc + " is : " + catgDetails.getCatDesc());
