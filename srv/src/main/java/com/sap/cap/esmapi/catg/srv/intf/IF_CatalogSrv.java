@@ -16,7 +16,7 @@ public interface IF_CatalogSrv
 
     // Get Complete Category Hierarchy passing most granular Category Id and Case
     // Type
-    public String[] getCatgHierarchyforCatId(String catId, EnumCaseTypes caseType) throws EX_ESMAPI;
+    public String[] getCatgHierarchyforCatId(String catId, EnumCaseTypes caseType, boolean addBlank) throws EX_ESMAPI;
 
     public TY_CatgTemplates getTemplates4Catg(String catId, EnumCaseTypes caseType) throws EX_ESMAPI;
 
