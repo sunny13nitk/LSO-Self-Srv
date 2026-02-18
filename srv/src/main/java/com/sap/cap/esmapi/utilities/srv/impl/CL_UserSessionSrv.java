@@ -580,7 +580,7 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                     if (StringUtils.hasText(caseForm.getCatg2Desc()))
                     {
                         String[] catTreeSelCatg = catalogSrv.getCatgHierarchyforCatId(caseForm.getCatg2Desc(),
-                                cusItemO.get().getCaseTypeEnum());
+                                cusItemO.get().getCaseTypeEnum(), false);
                         caseFormAsync.setCatTreeSelCatg(catTreeSelCatg);
                     }
                     else if (StringUtils.hasText(caseForm.getCatgDesc()))
@@ -588,7 +588,7 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
 
                         // level 1 category selection at form submission
                         String[] catTreeSelCatg = catalogSrv.getCatgHierarchyforCatId(caseForm.getCatgDesc(),
-                                cusItemO.get().getCaseTypeEnum());
+                                cusItemO.get().getCaseTypeEnum(), false);
                         caseFormAsync.setCatTreeSelCatg(catTreeSelCatg);
 
                         caseFormAsync.setCatTreeSelCatg(catTreeSelCatg);
@@ -1079,7 +1079,7 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
 
                             long catLen = Arrays.stream(catalogSrv.getCatgHierarchyforCatId(
                                     userSessInfo.getCurrentForm4Submission().getCaseForm().getCatgDesc(),
-                                    cusItemO.get().getCaseTypeEnum())).filter(Objects::nonNull).count();
+                                    cusItemO.get().getCaseTypeEnum(), false)).filter(Objects::nonNull).count();
                             // Check that Category is not a level 1 - Base Category
                             if (catLen <= 1)
                             {

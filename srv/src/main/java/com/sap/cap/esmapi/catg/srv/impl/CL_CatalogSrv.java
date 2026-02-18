@@ -29,6 +29,7 @@ import com.sap.cap.esmapi.catg.pojos.TY_CatgTemplates;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgTemplatesCus;
 import com.sap.cap.esmapi.catg.srv.intf.IF_CatalogSrv;
 import com.sap.cap.esmapi.exceptions.EX_ESMAPI;
+import com.sap.cap.esmapi.utilities.StringsUtility;
 import com.sap.cap.esmapi.utilities.enums.EnumCaseTypes;
 import com.sap.cap.esmapi.utilities.pojos.TY_CaseCatalogCustomizing;
 import com.sap.cap.esmapi.utilities.srv.intf.IF_UserSessionSrv;
@@ -102,7 +103,7 @@ public class CL_CatalogSrv implements IF_CatalogSrv
     // Get Complete Category Hierarchy passing most granular Category Id and Case
     // Type
     @Override
-    public String[] getCatgHierarchyforCatId(String catId, EnumCaseTypes caseType) throws EX_ESMAPI
+    public String[] getCatgHierarchyforCatId(String catId, EnumCaseTypes caseType, boolean addBlank) throws EX_ESMAPI
     {
         String[] catTree = null;
         int idx = 0;
@@ -152,8 +153,16 @@ public class CL_CatalogSrv implements IF_CatalogSrv
                     }
 
                 }
-                // Refurbish Blank Category at Top for New Form - Session maintained
-                catalogTree.getCategories().add(0, new TY_CatalogItem());
+                StringsUtility.reverseArray(catTree);
+                for (int i = 0; i < catTree.length; i++)
+                {
+                    log.info("Category Hierarchy Array at index : " + i + " has category id : " + catTree[i]);
+                }
+                if (addBlank)
+                {
+                    // Refurbish Blank Category at Top for New Form - Session maintained
+                    catalogTree.getCategories().add(0, new TY_CatalogItem());
+                }
 
             }
         }
