@@ -69,7 +69,7 @@ public class CL_SplCatgSubmSrv implements IF_SplCatgSubmSrv
                     if (cusItemO.isPresent() && catalogSrv != null)
                     {
                         String[] catTreeSelCatg = catalogSrv.getCatgHierarchyforCatId(caseForm.getCatgDesc(),
-                                cusItemO.get().getCaseTypeEnum());
+                                cusItemO.get().getCaseTypeEnum(), false);
                         caseFormAsync.setCatTreeSelCatg(catTreeSelCatg);
 
                         caseFormAsyncSpl = new TY_CaseFormSubmSpl();
