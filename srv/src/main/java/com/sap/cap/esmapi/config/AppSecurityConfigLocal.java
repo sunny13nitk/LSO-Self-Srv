@@ -32,15 +32,21 @@ public class AppSecurityConfigLocal
          * ----------- Local Testing --------------------
         */
 
-        // @formatter:off
-        http.logout((logout) -> logout.logoutSuccessUrl("/logout/").permitAll())
-        .authorizeRequests()
-        .requestMatchers(HttpMethod.GET, "/static/**").permitAll()
-        .requestMatchers("/api/**").permitAll()
-        .requestMatchers("/poclocal/**").permitAll().and().csrf()
-        .disable() // don't insist on csrf tokens in put, post etc.
-        .authorizeRequests().anyRequest().denyAll();
-        
+    // @formatter:off
+            http
+                .logout(logout -> logout
+                    .logoutSuccessUrl("/logout/")
+                    .permitAll()
+                )
+                .csrf(csrf -> csrf.disable())   // don't insist on csrf tokens in put, post etc.
+                .authorizeHttpRequests(auth -> auth
+                    .requestMatchers(HttpMethod.GET, "/static/**").permitAll()
+                    .requestMatchers("/api/**").permitAll()
+                    .requestMatchers("/poclocal/**").permitAll()
+                    .anyRequest().denyAll()
+                );
+// @formatter:on
+
         // @formatter:on
 
         // @formatter:on
