@@ -3428,102 +3428,96 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
         return caseId;
     }
 
-   @Override
-public String createCase4EmployeeAddUserIC(
-        TY_Case_EmployeeAddUserIC_SrvCloud caseEntity,
-        TY_DestinationProps desProps) throws EX_ESMAPI {
+    @Override
+    public String createCase4EmployeeAddUserIC(TY_Case_EmployeeAddUserIC_SrvCloud caseEntity,
+            TY_DestinationProps desProps) throws EX_ESMAPI
+    {
 
-    String caseId = null;
+        String caseId = null;
 
-    if (caseEntity == null
-            || caseEntity.getEmployee() == null
-            || !StringUtils.hasText(caseEntity.getEmployee().getId())) {
+        if (caseEntity == null || caseEntity.getEmployee() == null
+                || !StringUtils.hasText(caseEntity.getEmployee().getId()))
+        {
 
-        return null;
-    }
-
-    String casePOSTURL =
-            getPOSTURL4BaseUrl(srvCloudUrls.getCasesUrl());
-
-    if (!StringUtils.hasText(casePOSTURL)) {
-        return null;
-    }
-
-    try {
-
-        ObjectMapper mapper = new ObjectMapper();
-        String requestBody = mapper.writeValueAsString(caseEntity);
-        log.info(requestBody);
-
-        ResponseEntity<String> response = webClient.post()
-                .uri(casePOSTURL)
-                .header(HttpHeaders.AUTHORIZATION,
-                        srvCloudUrls.getToken())
-                .header(HttpHeaders.CONTENT_TYPE,
-                        MediaType.APPLICATION_JSON_VALUE)
-                .bodyValue(requestBody)
-                .exchangeToMono(r -> r.toEntity(String.class))
-                .block();
-
-        if (response == null) {
-            throw new EX_ESMAPI(
-                    msgSrc.getMessage("ERR_NOTES_POST",
-                            new Object[]{"No response received"},
-                            Locale.ENGLISH));
+            return null;
         }
 
-        int statusCode = response.getStatusCode().value();
+        String casePOSTURL = getPOSTURL4BaseUrl(srvCloudUrls.getCasesUrl());
 
-        // SC_CREATED = 201
-        if (statusCode != 201) {
-
-            String apiOutput = response.getBody();
-            log.info(apiOutput);
-
-            throw new RuntimeException(
-                    "Failed with HTTP error code : "
-                            + statusCode
-                            + " Details: "
-                            + apiOutput);
+        if (!StringUtils.hasText(casePOSTURL))
+        {
+            return null;
         }
 
-        // Parse response
-        JsonNode jsonNode =
-                mapper.readTree(response.getBody());
+        try
+        {
 
-        JsonNode rootNode = jsonNode.path("value");
+            ObjectMapper mapper = new ObjectMapper();
+            String requestBody = mapper.writeValueAsString(caseEntity);
+            log.info(requestBody);
 
-        if (!rootNode.isMissingNode()) {
+            ResponseEntity<String> response = webClient.post().uri(casePOSTURL)
+                    .header(HttpHeaders.AUTHORIZATION, srvCloudUrls.getToken())
+                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE).bodyValue(requestBody)
+                    .exchangeToMono(r -> r.toEntity(String.class)).block();
 
-            log.info("New Case Entity Bound");
-
-            caseId = rootNode.path("displayId")
-                    .asText(null);
-
-            if (StringUtils.hasText(caseId)) {
-                log.info("Case ID Added : " + caseId);
+            if (response == null)
+            {
+                throw new EX_ESMAPI(msgSrc.getMessage("ERR_NOTES_POST", new Object[]
+                { "No response received" }, Locale.ENGLISH));
             }
+
+            int statusCode = response.getStatusCode().value();
+
+            // SC_CREATED = 201
+            if (statusCode != 201)
+            {
+
+                String apiOutput = response.getBody();
+                log.info(apiOutput);
+
+                throw new RuntimeException("Failed with HTTP error code : " + statusCode + " Details: " + apiOutput);
+            }
+
+            // Parse response
+            JsonNode jsonNode = mapper.readTree(response.getBody());
+
+            JsonNode rootNode = jsonNode.path("value");
+
+            if (!rootNode.isMissingNode())
+            {
+
+                log.info("New Case Entity Bound");
+
+                caseId = rootNode.path("displayId").asText(null);
+
+                if (StringUtils.hasText(caseId))
+                {
+                    log.info("Case ID Added : " + caseId);
+                }
+            }
+
+        }
+        catch (JsonProcessingException e)
+        {
+
+            throw new EX_ESMAPI(msgSrc.getMessage("ERR_NEW_NOTES_JSON", new Object[]
+            { e.getLocalizedMessage() }, Locale.ENGLISH));
+
+        }
+        catch (EX_ESMAPI e)
+        {
+            throw e;
+        }
+        catch (Exception e)
+        {
+
+            throw new EX_ESMAPI(msgSrc.getMessage("ERR_NOTES_POST", new Object[]
+            { e.getLocalizedMessage() }, Locale.ENGLISH));
         }
 
-    } catch (JsonProcessingException e) {
-
-        throw new EX_ESMAPI(
-                msgSrc.getMessage("ERR_NEW_NOTES_JSON",
-                        new Object[]{e.getLocalizedMessage()},
-                        Locale.ENGLISH));
-
-    } catch (EX_ESMAPI e) {
-        throw e;
-    } catch (Exception e) {
-
-        throw new EX_ESMAPI(
-                msgSrc.getMessage("ERR_NOTES_POST",
-                        new Object[]{e.getLocalizedMessage()},
-                        Locale.ENGLISH));
+        return caseId;
     }
-
-    return caseId;
-}
 
     private String getPOSTURL4BaseUrl(String urlBase)
     {
