@@ -40,10 +40,12 @@ import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -111,74 +113,72 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
     private MessageSource msgSrc;
 
     @Autowired
+    private WebClient webClient;
+
+    @Autowired
     private TY_PortalStatusTransitions statusTransitions;
 
     @Override
     public JsonNode getAllCases(TY_DestinationProps desProps) throws IOException
     {
+
         JsonNode jsonNode = null;
-        HttpResponse response = null;
-        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
         String url = null;
 
         try
         {
+
             if (StringUtils.hasLength(srvCloudUrls.getUserName()) && StringUtils.hasLength(srvCloudUrls.getPassword())
                     && StringUtils.hasLength(srvCloudUrls.getCasesUrl())
                     && StringUtils.hasText(srvCloudUrls.getToken()))
             {
+
                 log.info("Url and Credentials Found!!");
 
                 long numCases = apiSrv.getNumberofEntitiesByUrl(srvCloudUrls.getCasesUrl());
+
                 if (numCases > 0)
                 {
+
                     url = srvCloudUrls.getCasesUrl() + srvCloudUrls.getTopSuffix() + GC_Constants.equalsString
                             + numCases;
 
-                    HttpGet httpGet = new HttpGet(url);
-                    httpGet.setHeader(HttpHeaders.AUTHORIZATION, srvCloudUrls.getToken());
-                    httpGet.addHeader("accept", "application/json");
+                    ResponseEntity<String> response = webClient.get().uri(url)
+                            .header(HttpHeaders.AUTHORIZATION, srvCloudUrls.getToken())
+                            .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                            .exchangeToMono(clientResponse -> clientResponse.toEntity(String.class)).block();
 
-                    try
+                    if (response == null)
                     {
-                        // Fire the Url
-                        response = httpClient.execute(httpGet);
-
-                        // verify the valid error code first
-                        int statusCode = response.getStatusLine().getStatusCode();
-                        if (statusCode != HttpStatus.SC_OK)
-                        {
-                            throw new RuntimeException("Failed with HTTP error code : " + statusCode);
-                        }
-
-                        // Try and Get Entity from Response
-                        HttpEntity entity = response.getEntity();
-                        String apiOutput = EntityUtils.toString(entity);
-                        // Lets see what we got from API
-                        // Log.info(apiOutput);
-
-                        // Conerting to JSON
-                        ObjectMapper mapper = new ObjectMapper();
-                        jsonNode = mapper.readTree(apiOutput);
-
-                    }
-                    catch (IOException e)
-                    {
-
-                        e.printStackTrace();
+                        throw new RuntimeException("No response received from API");
                     }
 
+                    // Spring 6 compliant status handling
+                    if (!response.getStatusCode().is2xxSuccessful())
+                    {
+                        throw new RuntimeException("Failed with HTTP error code : " + response.getStatusCode().value());
+                    }
+
+                    String apiOutput = response.getBody();
+
+                    if (apiOutput == null || apiOutput.isEmpty())
+                    {
+                        throw new RuntimeException("Empty response body received");
+                    }
+
+                    ObjectMapper mapper = new ObjectMapper();
+                    jsonNode = mapper.readTree(apiOutput);
                 }
-
             }
 
         }
-        finally
+        catch (Exception e)
         {
-            httpClient.close();
+            log.error("Error while fetching cases", e);
+            throw new IOException(e);
         }
-        return jsonNode;
 
+        return jsonNode;
     }
 
     @Override
