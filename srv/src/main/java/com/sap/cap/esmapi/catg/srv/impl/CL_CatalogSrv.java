@@ -383,6 +383,16 @@ public class CL_CatalogSrv implements IF_CatalogSrv
         log.info("Number of Level 2 Categories found for Root Category Id :"
                 + (rootCatgId != null && rootCatgId.length > 0 ? rootCatgId[0] : "All Root Categories") + " are : "
                 + (lvl2Catgs != null ? lvl2Catgs.size() : 0));
+
+        // ---- Add Blank Row at Top ----
+        if (lvl2Catgs == null)
+            lvl2Catgs = new ArrayList<>();
+
+        TY_CatalogItem blankItem = new TY_CatalogItem();
+        blankItem.setId("");
+        blankItem.setName("-- Select --");
+        lvl2Catgs.add(0, blankItem);
+
         return lvl2Catgs;
 
     }
