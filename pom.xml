@@ -140,13 +140,13 @@
         			<release>${jdk.version}</release>
 					<parameters>true</parameters>
 					<!-- ✅ Enable Lombok globally -->
-					<annotationProcessorPaths>
+					<!-- <annotationProcessorPaths>
 						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
 							<version>1.18.30</version>
 						</path>
-					</annotationProcessorPaths>
+					</annotationProcessorPaths> -->
 				</configuration>
 			</plugin>
 
