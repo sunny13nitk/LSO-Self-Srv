@@ -136,7 +136,17 @@
 				<configuration>
 					<source>${jdk.version}</source>
 					<target>${jdk.version}</target>
+					<!-- ✅ Fix Java 17 properly -->
+        			<release>${jdk.version}</release>
 					<parameters>true</parameters>
+					<!-- ✅ Enable Lombok globally -->
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>1.18.30</version>
+						</path>
+					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
 
