@@ -1,12 +1,15 @@
 caseTypeEnum,catg,rank
-Learning,Learning and Certification Advice,1
-Learning,Booking & Order,2
-Learning,Technical Queries,3
-Learning,Demo or Interactive Learning,4
-Learning,Practice Systems,5
-Learning,Training Reseller Partner Support,6
-Learning,Learning Virtual Class Support,7
-Learning,Virtual Event Services,8
-Learning,Practice System Delivery (SAP Internal),9
-Learning,System Based Assessment,10
-Learning,Scenario Based Assessment,11
+Learning,Learning Advisory,1
+Learning,Learning Virtual Class Support,2
+Learning,Booking & Order,3
+Learning,Certification & Stay Certified,4
+Learning,Exam - Scenario Based Assessment,5
+Learning,Exam - System Based Assessment,6
+Learning,Access & Universal ID,7
+Learning,Learning Experience - Technical Issues,8
+Learning,Practice Systems,9
+Learning,SAP Learning Hub Admin Service,10
+Learning,Practice System Delivery (SAP Internal),11
+Learning,Training Reseller Partner Support,12
+Learning,Virtual Event Services,13
+Learning,Demo or Interactive Learning,14
