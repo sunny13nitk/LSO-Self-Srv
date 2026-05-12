@@ -992,8 +992,8 @@ public class LSOPostController
                         // Prepare alistt of category descriptions to be sent as criteria to get the
                         // mandatory fields for the category combination
                         List<String> catgDescList = new ArrayList<String>();
-                        catgDescList.add(caseForm.getCatgDesc());
-                        catgDescList.add(caseForm.getCatg2Desc());
+                        catgDescList.add(caseForm.getCatgText());
+                        catgDescList.add(caseForm.getCatg2Text());
 
                         Map<String, List<TY_KeyValue>> Vhlps = vhlpUISrv
                                 .getVHelpUIModelMap4LobCatgs(EnumCaseTypes.Learning, catgDescList);
