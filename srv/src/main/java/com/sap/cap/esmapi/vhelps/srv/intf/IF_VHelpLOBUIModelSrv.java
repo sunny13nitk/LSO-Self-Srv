@@ -10,4 +10,8 @@ import com.sap.cap.esmapi.vhelps.pojos.TY_KeyValue;
 public interface IF_VHelpLOBUIModelSrv
 {
     public Map<String, List<TY_KeyValue>> getVHelpUIModelMap4LobCatg(EnumCaseTypes lob, String catgId) throws EX_ESMAPI;
+
+    public Map<String, List<TY_KeyValue>> getVHelpUIModelMap4LobCatgs(EnumCaseTypes lob, List<String> catgDescList)
+            throws EX_ESMAPI;
+
 }

@@ -28,8 +28,11 @@ import com.sap.cap.esmapi.vhelps.srv.intf.IF_FilterDDLB4VHelp;
 import com.sap.cap.esmapi.vhelps.srv.intf.IF_VHelpLOBUIModelSrv;
 import com.sap.cap.esmapi.vhelps.srv.intf.IF_VHelpSrv;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+@Slf4j
 public class CL_VHelpLOBUIModelSrv implements IF_VHelpLOBUIModelSrv
 {
 
@@ -168,6 +171,152 @@ public class CL_VHelpLOBUIModelSrv implements IF_VHelpLOBUIModelSrv
 
         return modelAttrs;
 
+    }
+
+    @Override
+    public Map<String, List<TY_KeyValue>> getVHelpUIModelMap4LobCatgs(EnumCaseTypes lob, List<String> catgDescList)
+            throws EX_ESMAPI
+    {
+        Map<String, List<TY_KeyValue>> modelAttrs = new HashMap<String, List<TY_KeyValue>>();
+        if (StringUtils.hasText(lob.name()) && CollectionUtils.isNotEmpty(catgDescList) && catalogSrv != null
+                && vHelpSrv != null && vHelpCusSrv != null && appCtxt != null)
+        {
+            // Categories descriptions shpuld contain both level 1 and level 2 categories
+            if (catgDescList.size() != 2)
+            {
+                log.info(
+                        "Level and 2 Categories should be bound...... to determine mandatory field(s).. # Categories Bound : "
+                                + catgDescList.size());
+                return null;
+            }
+
+            // Create a Concatenated String converting list of categories to UpperCase and
+            // seperated by '|'
+            String catgDescListStr = StringUtils.collectionToDelimitedString(catgDescList, "|", "", "").toUpperCase();
+            if (StringUtils.hasText(catgDescListStr))
+            {
+                log.info("Category Description List String created for filtering : " + catgDescListStr);
+                // Get all RElevant Value help Fields for LoB
+                if (CollectionUtils.isNotEmpty(vHelpCusSrv.getVHelpsCus()))
+                {
+
+                    // Get Customizing for LOB
+                    Optional<TY_Cus_VHelpsLOB> lobVHelpCusO = vHelpCusSrv.getVHelpsCus().stream()
+                            .filter(x -> x.getLOB().equals(lob.name())).findFirst();
+
+                    if (lobVHelpCusO.isPresent())
+                    {
+                        log.info("LOB specific Value Help Customization found for LoB : " + lob.name());
+                        TY_Cus_VHelpsLOB lobVHelpCus = lobVHelpCusO.get();
+                        // Iterate over fieldNames for Value Helps
+                        for (TY_FieldProperties fldLob : lobVHelpCus.getFields())
+                        {
+                            log.info("Processing Field : " + fldLob.getFieldName() + " for LoB : " + lob.name());
+                            if (StringUtils.hasText(fldLob.getFieldName())
+                                    && StringUtils.hasText(fldLob.getCatgListBean()))
+                            {
+                                // If Category specific - SCan for Category to match and Then Populate in
+                                // Attributes Map
+                                if (fldLob.isCatgSpecific())
+                                {
+
+                                    // Scan for the Current Category Text in Field Category Text bean
+
+                                    // Get Bean Instance for Field Category Texts
+                                    TY_MandatoryFlds_CatgsList catgsList = (TY_MandatoryFlds_CatgsList) appCtxt
+                                            .getBean(fldLob.getCatgListBean());
+                                    if (catgsList != null)
+                                    {
+                                        if (CollectionUtils.isNotEmpty(catgsList.getCatgsList()))
+                                        {
+                                            // check if Current Category is in List of Enabling Categories for
+                                            // current
+                                            // iteration field
+                                            Optional<TY_Catg_MandatoryFlds> catgMandFldsO = catgsList.getCatgsList()
+                                                    .stream().filter(e -> e.getCatgString().equals(catgDescListStr))
+                                                    .findFirst();
+                                            if (catgMandFldsO.isPresent())
+                                            {
+                                                log.info("Category specific mandatory fields found for Category : "
+                                                        + catgDescListStr);
+                                                // Get DDLB for field --should be enabled
+                                                List<TY_KeyValue> vHlpDDLB = vHelpSrv.getVHelpDDLB4Field(lob,
+                                                        fldLob.getFieldName());
+
+                                                // Check if Filter is specified on the Srv Cloud Obtained Value
+                                                // Helps
+                                                if (StringUtils.hasText(fldLob.getFltListBean()))
+                                                {
+                                                    switch (fldLob.fieldName)
+                                                    {
+                                                    case GC_Constants.gc_LSO_COUNTRY: // For LSO_Country filter
+                                                                                      // criteria
+                                                                                      // is 'Category'
+                                                        Object[] criteria = new Object[]
+                                                        { catgDescListStr };
+                                                        log.info("Filter Criteria for Value Help DDLB : "
+                                                                + catgDescListStr);
+                                                        // Get Bean Instance for Filtering DDLB Vals
+                                                        IF_FilterDDLB4VHelp ddlbFltBean = (IF_FilterDDLB4VHelp) appCtxt
+                                                                .getBean(fldLob.getFltListBean());
+                                                        if (ddlbFltBean != null)
+                                                        {
+                                                            // Filter the Srv Cloud DDLB as per criteria
+                                                            vHlpDDLB = ddlbFltBean.filterValueHelpbyCriteria(criteria,
+                                                                    vHlpDDLB);
+                                                        }
+
+                                                        break;
+
+                                                    default:
+                                                        break;
+                                                    }
+                                                }
+
+                                                /*
+                                                 * Only Add Blank Row if not present at top
+                                                 */
+
+                                                if (StringUtils.hasText(vHlpDDLB.get(0).getKey()))
+                                                {
+                                                    vHlpDDLB.add(0, new TY_KeyValue());
+                                                }
+
+                                                // Append to Model Map
+                                                if (CollectionUtils.isNotEmpty(vHlpDDLB))
+                                                {
+                                                    modelAttrs.put(fldLob.getFieldName(), vHlpDDLB);
+                                                }
+                                            }
+                                        }
+
+                                    }
+                                }
+
+                                // Not Category specific - Get Vhelp and Populate in Attributes Map
+                                else
+                                {
+                                    // Get DDLB for field --should be enabled
+                                    List<TY_KeyValue> vHlpDDLB = vHelpSrv.getVHelpDDLB4Field(lob,
+                                            fldLob.getFieldName());
+
+                                    // Append to Model Map
+                                    if (CollectionUtils.isNotEmpty(vHlpDDLB))
+                                    {
+                                        modelAttrs.put(fldLob.getFieldName(), vHlpDDLB);
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+
+                }
+            }
+
+        }
+
+        return modelAttrs;
     }
 
 }
