@@ -529,6 +529,9 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                 if (StringUtils.hasText(caseForm.getCatg2Desc()) && StringUtils.hasText(caseForm.getCatgDesc())
                         && vHlpModelSrv != null)
                 {
+                    log.info(
+                            "Scanning for Mandatory Fields based on Category 1 and Category 2 combination inside Case Form Submission User Session Service: "
+                                    + caseForm.getCatgDesc() + " & " + caseForm.getCatg2Desc());
                     // Prepare alistt of category descriptions to be sent as criteria to get the
                     // mandatory fields for the category combination
                     List<String> catgDescList = new ArrayList<String>();

@@ -330,6 +330,8 @@ public class LSOController
                 caseForm.setCatgDesc(userSessSrv.getCurrentForm4Submission().getCaseForm().getCatgDesc()); // Curr Catg
                 caseForm.setCatg2Desc(userSessSrv.getCurrentForm4Submission().getCaseForm().getCatg2Desc()); // Curr Sub
                                                                                                              // Catg
+                log.info("Error Form Redirection - Category Selected in Form - " + caseForm.getCatgDesc()
+                        + " and Sub Catg - " + caseForm.getCatg2Desc());
                 caseForm.setDescription(userSessSrv.getCurrentForm4Submission().getCaseForm().getDescription()); // Curr
                                                                                                                  // Notes
                 caseForm.setSubject(userSessSrv.getCurrentForm4Submission().getCaseForm().getSubject()); // Curr Subject
