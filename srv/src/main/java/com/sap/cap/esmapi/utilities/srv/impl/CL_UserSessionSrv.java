@@ -413,7 +413,7 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
     public boolean SubmitCaseForm(TY_Case_Form caseForm)
     {
         boolean isSubmitted = true;
-
+        Map<String, List<TY_KeyValue>> vHlpsMap = null;
         // Clear Buffer for Previous Form Submission
         clearPreviousSubmission4mSessionBuffer();
 
@@ -523,10 +523,47 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
             if (cusItemO.isPresent())
             {
 
-                Map<String, List<TY_KeyValue>> vHlpsMap = vHlpModelSrv
-                        .getVHelpUIModelMap4LobCatg(cusItemO.get().getCaseTypeEnum(), caseForm.getCatgDesc());
+                // Load Mandatory Fields on the Case Form as Per Category 1 and Category 2
+                // Descriptions in case a Valid combination is found in the Configuration
+
+                if (StringUtils.hasText(caseForm.getCatg2Desc()) && StringUtils.hasText(caseForm.getCatgDesc())
+                        && vHlpModelSrv != null)
+                {
+                    // Prepare alistt of category descriptions to be sent as criteria to get the
+                    // mandatory fields for the category combination
+                    List<String> catgDescList = new ArrayList<String>();
+                    catgDescList.add(caseForm.getCatgText());
+                    catgDescList.add(caseForm.getCatg2Text());
+
+                    vHlpsMap = vHlpModelSrv.getVHelpUIModelMap4LobCatgs(EnumCaseTypes.Learning, catgDescList);
+                    if (vHlpsMap != null && vHlpsMap.size() > 0)
+                    {
+                        // Do Nothing
+                    }
+                    else // Procced considering only level 1 Category as default
+                    {
+                        if (vHlpModelSrv != null)
+                        {
+
+                            vHlpsMap = vHlpModelSrv.getVHelpUIModelMap4LobCatg(EnumCaseTypes.Learning,
+                                    caseForm.getCatgDesc());
+                        }
+                    }
+
+                }
+                else // Procced considering only level 1 Category as default
+                {
+
+                    if (vHlpModelSrv != null)
+                    {
+
+                        vHlpsMap = vHlpModelSrv.getVHelpUIModelMap4LobCatg(EnumCaseTypes.Learning,
+                                caseForm.getCatgDesc());
+                    }
+                }
+
                 // Some Attributes Relevant for Current Category
-                if (vHlpsMap.size() > 0)
+                if (vHlpsMap != null && vHlpsMap.size() > 0)
                 { // Country Field Relevant
                     if (CollectionUtils.isNotEmpty(vHlpsMap.get(GC_Constants.gc_LSO_COUNTRY)))
                     {
