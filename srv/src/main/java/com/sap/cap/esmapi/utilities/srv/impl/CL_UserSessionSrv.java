@@ -531,7 +531,7 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                 {
                     log.info(
                             "Scanning for Mandatory Fields based on Category 1 and Category 2 combination inside Case Form Submission User Session Service: "
-                                    + caseForm.getCatgDesc() + " & " + caseForm.getCatg2Desc());
+                                    + caseForm.getCatgText() + "|" + caseForm.getCatg2Text());
                     // Prepare alistt of category descriptions to be sent as criteria to get the
                     // mandatory fields for the category combination
                     List<String> catgDescList = new ArrayList<String>();
@@ -541,7 +541,12 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                     vHlpsMap = vHlpModelSrv.getVHelpUIModelMap4LobCatgs(EnumCaseTypes.Learning, catgDescList);
                     if (vHlpsMap != null && vHlpsMap.size() > 0)
                     {
-                        // Do Nothing
+                        // Do Nothing - Dealt Later in the Code
+                        String catgDescListStr = StringUtils.collectionToDelimitedString(catgDescList, "|", "", "")
+                                .toUpperCase();
+                        log.info(
+                                "Mandatory Fields based on Category Combination for Case Form Submission User Session Service found for Category Combination : "
+                                        + catgDescListStr);
                     }
                     else // Procced considering only level 1 Category as default
                     {
@@ -567,9 +572,16 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
 
                 // Some Attributes Relevant for Current Category
                 if (vHlpsMap != null && vHlpsMap.size() > 0)
-                { // Country Field Relevant
+                {
+
+                    log.info(
+                            "Mandatory Fields based on Category for Case Form Submission User Session Service found !!");
+
+                    // Country Field Relevant
                     if (CollectionUtils.isNotEmpty(vHlpsMap.get(GC_Constants.gc_LSO_COUNTRY)))
                     {
+                        log.info(
+                                "Country Field marked as Mandatory for Current Category combination at Case Form Submission");
                         caseForm.setCountryMandatory(true);
                     }
                     else // Remove if Country field is not relevant for Current Category and passed on //
@@ -581,6 +593,8 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                     // Language Field Relevant
                     if (CollectionUtils.isNotEmpty(vHlpsMap.get(GC_Constants.gc_LSO_LANGUAGE)))
                     {
+                        log.info(
+                                "Language Field marked as Mandatory for Current Category combination at Case Form Submission");
                         caseForm.setLangMandatory(true);
                     }
                     else // Remove if Country field is not relevant for Current Category and passed on

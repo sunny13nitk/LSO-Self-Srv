@@ -330,8 +330,8 @@ public class LSOController
                 caseForm.setCatgDesc(userSessSrv.getCurrentForm4Submission().getCaseForm().getCatgDesc()); // Curr Catg
                 caseForm.setCatg2Desc(userSessSrv.getCurrentForm4Submission().getCaseForm().getCatg2Desc()); // Curr Sub
                                                                                                              // Catg
-                log.info("Error Form Redirection - Category Selected in Form - " + caseForm.getCatgDesc()
-                        + " and Sub Catg - " + caseForm.getCatg2Desc());
+                log.info("Error Form Redirection - Category Selected in Form - " + caseForm.getCatgText()
+                        + " and Sub Catg - " + caseForm.getCatg2Text());
                 caseForm.setDescription(userSessSrv.getCurrentForm4Submission().getCaseForm().getDescription()); // Curr
                                                                                                                  // Notes
                 caseForm.setSubject(userSessSrv.getCurrentForm4Submission().getCaseForm().getSubject()); // Curr Subject
@@ -406,6 +406,11 @@ public class LSOController
                             catgDescList);
                     if (Vhlps != null && Vhlps.size() > 0)
                     {
+                        String catgDescListStr = StringUtils.collectionToDelimitedString(catgDescList, "|", "", "")
+                                .toUpperCase();
+                        log.info(
+                                "Mandatory Fields based on Category Combination in Case Error Form Redirection found for Category Combination : "
+                                        + catgDescListStr);
 
                         model.addAllAttributes(coLaDDLBSrv.adjustCountryLanguageDDLB(caseForm.getCountry(), Vhlps));
                     }
