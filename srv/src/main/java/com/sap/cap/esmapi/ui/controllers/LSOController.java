@@ -402,7 +402,7 @@ public class LSOController
 
                     Map<String, List<TY_KeyValue>> Vhlps = vhlpUISrv.getVHelpUIModelMap4LobCatgs(EnumCaseTypes.Learning,
                             catgDescList);
-                    if (Vhlps != null)
+                    if (Vhlps != null && Vhlps.size() > 0)
                     {
 
                         model.addAllAttributes(coLaDDLBSrv.adjustCountryLanguageDDLB(caseForm.getCountry(), Vhlps));
@@ -605,7 +605,7 @@ public class LSOController
 
                             Map<String, List<TY_KeyValue>> Vhlps = vhlpUISrv
                                     .getVHelpUIModelMap4LobCatgs(EnumCaseTypes.Learning, catgDescList);
-                            if (Vhlps != null)
+                            if (Vhlps != null && Vhlps.size() > 0)
                             {
 
                                 model.addAllAttributes(
@@ -1054,7 +1054,7 @@ public class LSOController
 
                             Map<String, List<TY_KeyValue>> Vhlps = vhlpUISrv
                                     .getVHelpUIModelMap4LobCatgs(EnumCaseTypes.Learning, catgDescList);
-                            if (Vhlps != null)
+                            if (Vhlps != null && Vhlps.size() > 0)
                             {
 
                                 model.addAllAttributes(
@@ -1158,7 +1158,7 @@ public class LSOController
 
                     Map<String, List<TY_KeyValue>> Vhlps = vhlpUISrv.getVHelpUIModelMap4LobCatgs(EnumCaseTypes.Learning,
                             catgDescList);
-                    if (Vhlps != null)
+                    if (Vhlps != null && Vhlps.size() > 0)
                     {
 
                         model.addAllAttributes(coLaDDLBSrv.adjustCountryLanguageDDLB(caseForm.getCountry(), Vhlps));
