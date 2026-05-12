@@ -267,10 +267,44 @@ public class LSOPostController
                     }
                 }
 
-                if (vhlpUISrv != null)
+                // Load Mandatory Fields on the Case Form as Per Category 1 and Category 2
+                // Descriptions in case a Valid combination is found in the Configuration
+
+                if (StringUtils.hasText(caseForm.getCatg2Desc()) && StringUtils.hasText(caseForm.getCatgDesc())
+                        && vhlpUISrv != null && coLaDDLBSrv != null)
                 {
-                    model.addAllAttributes(coLaDDLBSrv.adjustCountryLanguageDDLB(caseForm.getCountry(),
-                            vhlpUISrv.getVHelpUIModelMap4LobCatg(EnumCaseTypes.Learning, caseForm.getCatgDesc())));
+                    // Prepare alistt of category descriptions to be sent as criteria to get the
+                    // mandatory fields for the category combination
+                    List<String> catgDescList = new ArrayList<String>();
+                    catgDescList.add(caseForm.getCatgText());
+                    catgDescList.add(caseForm.getCatg2Text());
+
+                    Map<String, List<TY_KeyValue>> Vhlps = vhlpUISrv.getVHelpUIModelMap4LobCatgs(EnumCaseTypes.Learning,
+                            catgDescList);
+                    if (Vhlps != null)
+                    {
+
+                        model.addAllAttributes(coLaDDLBSrv.adjustCountryLanguageDDLB(caseForm.getCountry(), Vhlps));
+                    }
+                    else // Procced considering only level 1 Category as default
+                    {
+                        if (vhlpUISrv != null && coLaDDLBSrv != null)
+                        {
+                            model.addAllAttributes(coLaDDLBSrv.adjustCountryLanguageDDLB(caseForm.getCountry(),
+                                    vhlpUISrv.getVHelpUIModelMap4LobCatg(EnumCaseTypes.Learning,
+                                            caseForm.getCatgDesc())));
+                        }
+                    }
+
+                }
+                else // Procced considering only level 1 Category as default
+                {
+
+                    if (vhlpUISrv != null && coLaDDLBSrv != null)
+                    {
+                        model.addAllAttributes(coLaDDLBSrv.adjustCountryLanguageDDLB(caseForm.getCountry(),
+                                vhlpUISrv.getVHelpUIModelMap4LobCatg(EnumCaseTypes.Learning, caseForm.getCatgDesc())));
+                    }
                 }
 
                 model.addAttribute("caseForm", caseForm);
@@ -467,10 +501,45 @@ public class LSOPostController
                         }
                     }
 
-                    if (vhlpUISrv != null)
+                    // Load Mandatory Fields on the Case Form as Per Category 1 and Category 2
+                    // Descriptions in case a Valid combination is found in the Configuration
+
+                    if (StringUtils.hasText(caseForm.getCatg2Desc()) && StringUtils.hasText(caseForm.getCatgDesc())
+                            && vhlpUISrv != null && coLaDDLBSrv != null)
                     {
-                        model.addAllAttributes(coLaDDLBSrv.adjustCountryLanguageDDLB(caseForm.getCountry(),
-                                vhlpUISrv.getVHelpUIModelMap4LobCatg(EnumCaseTypes.Learning, caseForm.getCatgDesc())));
+                        // Prepare alistt of category descriptions to be sent as criteria to get the
+                        // mandatory fields for the category combination
+                        List<String> catgDescList = new ArrayList<String>();
+                        catgDescList.add(caseForm.getCatgText());
+                        catgDescList.add(caseForm.getCatg2Text());
+
+                        Map<String, List<TY_KeyValue>> Vhlps = vhlpUISrv
+                                .getVHelpUIModelMap4LobCatgs(EnumCaseTypes.Learning, catgDescList);
+                        if (Vhlps != null)
+                        {
+
+                            model.addAllAttributes(coLaDDLBSrv.adjustCountryLanguageDDLB(caseForm.getCountry(), Vhlps));
+                        }
+                        else // Procced considering only level 1 Category as default
+                        {
+                            if (vhlpUISrv != null && coLaDDLBSrv != null)
+                            {
+                                model.addAllAttributes(coLaDDLBSrv.adjustCountryLanguageDDLB(caseForm.getCountry(),
+                                        vhlpUISrv.getVHelpUIModelMap4LobCatg(EnumCaseTypes.Learning,
+                                                caseForm.getCatgDesc())));
+                            }
+                        }
+
+                    }
+                    else // Procced considering only level 1 Category as default
+                    {
+
+                        if (vhlpUISrv != null && coLaDDLBSrv != null)
+                        {
+                            model.addAllAttributes(coLaDDLBSrv.adjustCountryLanguageDDLB(caseForm.getCountry(),
+                                    vhlpUISrv.getVHelpUIModelMap4LobCatg(EnumCaseTypes.Learning,
+                                            caseForm.getCatgDesc())));
+                        }
                     }
 
                     // Case Form Model Set at last
@@ -672,10 +741,45 @@ public class LSOPostController
 
                         }
                     }
-                    if (vhlpUISrv != null && coLaDDLBSrv != null)
+                    // Load Mandatory Fields on the Case Form as Per Category 1 and Category 2
+                    // Descriptions in case a Valid combination is found in the Configuration
+
+                    if (StringUtils.hasText(caseForm.getCatg2Desc()) && StringUtils.hasText(caseForm.getCatgDesc())
+                            && vhlpUISrv != null && coLaDDLBSrv != null)
                     {
-                        model.addAllAttributes(coLaDDLBSrv.adjustCountryLanguageDDLB(caseForm.getCountry(),
-                                vhlpUISrv.getVHelpUIModelMap4LobCatg(EnumCaseTypes.Learning, caseForm.getCatgDesc())));
+                        // Prepare a list of category descriptions to be sent as criteria to get the
+                        // mandatory fields for the category combination
+                        List<String> catgDescList = new ArrayList<String>();
+                        catgDescList.add(caseForm.getCatgText());
+                        catgDescList.add(caseForm.getCatg2Text());
+
+                        Map<String, List<TY_KeyValue>> Vhlps = vhlpUISrv
+                                .getVHelpUIModelMap4LobCatgs(EnumCaseTypes.Learning, catgDescList);
+                        if (Vhlps != null)
+                        {
+
+                            model.addAllAttributes(coLaDDLBSrv.adjustCountryLanguageDDLB(caseForm.getCountry(), Vhlps));
+                        }
+                        else // Procced considering only level 1 Category as default
+                        {
+                            if (vhlpUISrv != null && coLaDDLBSrv != null)
+                            {
+                                model.addAllAttributes(coLaDDLBSrv.adjustCountryLanguageDDLB(caseForm.getCountry(),
+                                        vhlpUISrv.getVHelpUIModelMap4LobCatg(EnumCaseTypes.Learning,
+                                                caseForm.getCatgDesc())));
+                            }
+                        }
+
+                    }
+                    else // Procced considering only level 1 Category as default
+                    {
+
+                        if (vhlpUISrv != null && coLaDDLBSrv != null)
+                        {
+                            model.addAllAttributes(coLaDDLBSrv.adjustCountryLanguageDDLB(caseForm.getCountry(),
+                                    vhlpUISrv.getVHelpUIModelMap4LobCatg(EnumCaseTypes.Learning,
+                                            caseForm.getCatgDesc())));
+                        }
                     }
 
                     // Case Form Model Set at last
