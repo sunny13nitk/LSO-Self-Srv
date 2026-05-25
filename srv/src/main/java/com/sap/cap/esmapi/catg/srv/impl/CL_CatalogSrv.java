@@ -124,6 +124,7 @@ public class CL_CatalogSrv implements IF_CatalogSrv
                     // Add level 1 and level 2 categories to single list for scanning the category
                     // hierarchy for selected category id
                     catalogTree.getCategories().removeIf(x -> x.getId() == null);
+                    catalogTree.getCategorieslvl2().removeIf(x -> x.getId() == null);
                     catgTreeAll.addAll(catalogTree.getCategories());
                     catgTreeAll.addAll(catalogTree.getCategorieslvl2());
                     // Scan for Category in Catalog Tree
