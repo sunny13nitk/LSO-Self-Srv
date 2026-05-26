@@ -231,6 +231,7 @@
 						</goals>
 						<configuration>
 							<skip>${cdsdk-global}</skip>
+							<version>${cds.install-cdsdk.version}</version>
 						</configuration>
 					</execution>
 
