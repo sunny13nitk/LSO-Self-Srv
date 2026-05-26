@@ -1,12 +1,12 @@
 caseTypeEnum,catg,rank
 Learning,Learning Advisory,1
-Learning,Learning Virtual Class Support,2
-Learning,Booking & Order,3
-Learning,Certification & Stay Certified,4
-Learning,Exam - Scenario Based Assessment,5
-Learning,Exam - System Based Assessment,6
-Learning,Access & Universal ID,7
-Learning,Learning Experience – Technical Issues,8
+Learning,Learning Virtual Class Support,8
+Learning,Booking & Order,2
+Learning,Certification & Stay Certified,3
+Learning,Exam - Scenario Based Assessment,4
+Learning,Exam - System Based Assessment,5
+Learning,Access & Universal ID,6
+Learning,Learning Experience – Technical Issues,7
 Learning,Practice Systems,9
 Learning,SAP Learning Hub Admin Service,10
 Learning,Practice System Delivery (SAP Internal),11
