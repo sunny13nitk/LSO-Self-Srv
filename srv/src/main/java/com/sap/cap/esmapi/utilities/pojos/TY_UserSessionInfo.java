@@ -9,6 +9,7 @@ import com.sap.cap.esmapi.ui.pojos.TY_CaseEditFormAsync;
 import com.sap.cap.esmapi.ui.pojos.TY_CaseEdit_Form;
 import com.sap.cap.esmapi.ui.pojos.TY_CaseFormAsync;
 import com.sap.cap.esmapi.ui.pojos.TY_Case_Form;
+import com.sap.cap.esmapi.ui.pojos.TY_TokenResponse;
 import com.sap.cap.esmapi.utilities.srvCloudApi.destination.pojos.TY_DestinationProps;
 
 import lombok.AllArgsConstructor;
@@ -41,4 +42,5 @@ public class TY_UserSessionInfo
     private List<String> cnfCasesSess = new ArrayList<String>(); // Placeholder for Confirmed cases in session
     private String prevCatg; // Category selected Previous
     private String prevCatg2; // Category selected Previous
+    private TY_TokenResponse apihubToken; // API Hub Client Bearer cached in User Session
 }

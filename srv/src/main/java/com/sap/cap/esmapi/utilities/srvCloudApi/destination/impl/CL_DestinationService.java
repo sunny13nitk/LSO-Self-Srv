@@ -13,6 +13,7 @@ import com.sap.cap.esmapi.utilities.srvCloudApi.destination.intf.IF_DestinationS
 import com.sap.cap.esmapi.utilities.srvCloudApi.destination.pojos.TY_DestinationProps;
 import com.sap.cloud.sdk.cloudplatform.connectivity.Destination;
 import com.sap.cloud.sdk.cloudplatform.connectivity.DestinationAccessor;
+import com.sap.cloud.sdk.cloudplatform.connectivity.HttpDestination;
 import com.sap.cloud.sdk.cloudplatform.connectivity.exception.DestinationAccessException;
 
 import lombok.RequiredArgsConstructor;
@@ -106,6 +107,56 @@ public class CL_DestinationService implements IF_DestinationService
         }
 
         return token;
+    }
+
+    @Override
+    public HttpDestination getDestination(String destinationName) throws EX_ESMAPI
+    {
+        log.info("[Destination Service] Fetching destination: {}", destinationName);
+        try
+        {
+            return DestinationAccessor.getDestination(destinationName).asHttp();
+        }
+        catch (Exception e)
+        {
+            log.error("[Destination Service] Failed to fetch destination '{}': {}", destinationName, e.getMessage());
+            throw new EX_ESMAPI(
+                    "Unable to fetch destination: " + destinationName + " Details: " + e.getLocalizedMessage());
+        }
+    }
+
+    /**
+     * Get URL from destination
+     */
+    @Override
+    public String getUrl(HttpDestination destination) throws EX_ESMAPI
+
+    {
+        return destination.getUri().toString();
+    }
+
+    /**
+     * Get Username from destination
+     */
+    public String getUsername(HttpDestination destination) throws EX_ESMAPI
+    {
+        return (String) destination.get("User")
+                .getOrElseThrow(() -> new EX_ESMAPI("User property not found in destination"));
+    }
+
+    /**
+     * Get Password from destination
+     */
+    public String getPassword(HttpDestination destination) throws EX_ESMAPI
+    {
+        return (String) destination.get("Password")
+                .getOrElseThrow(() -> new EX_ESMAPI("Password property not found in destination"));
+    }
+
+    public String getApiKey(HttpDestination destination) throws EX_ESMAPI
+    {
+        return (String) destination.get("apiKey")
+                .getOrElseThrow(() -> new EX_ESMAPI("apiKey property not found in destination"));
     }
 
 }

@@ -49,6 +49,7 @@ public class GC_Constants
     public static final String gc_LocalProfile = "local";
 
     public static final String gc_role_employee_lso = "EmployeesRole"; // I/D/C Users ARM Role
+    public static final String gc_APIM_Destination = "EXTERNAL_HOOK_APIM"; // APIM Destination
 
     public static final String gc_role_contractor_lso = "ExternalsRole"; // P/S User(s)
 
@@ -68,5 +69,9 @@ public class GC_Constants
     public static final String gc_TokenAttrib_Email = "email";
     public static final String gc_TokenAttrib_scopes = "(Xsuaa) scopes";
     public static final String gc_API_IndCustomer = "Individual Customer Search API";
+
+    public static final String gc_APIM_PARTNERSAPI_LKEY = "ZLSS_SS";
+    public static final String gc_APIM_PFCT_ACCOUNT = "ACC";
+    public static final String gc_APIM_PFCT_IC = "INC";
 
 }

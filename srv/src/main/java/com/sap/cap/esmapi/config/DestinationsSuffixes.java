@@ -41,7 +41,8 @@ public class DestinationsSuffixes
             @Value("${dlAttPathString}") final String dlAttPathString,
             @Value("${destInternal}") final String destInternal, @Value("${destExternal}") final String destExternal,
             @Value("${destQualtrics}") final String destQualtrics,
-            @Value("${mimeTypesUrlPathString}") final String mimeTypesUrlPathString
+            @Value("${mimeTypesUrlPathString}") final String mimeTypesUrlPathString,
+            @Value("${partnersAPIMUrl}") final String partnersAPIMUrl
 
     )
 
@@ -51,7 +52,8 @@ public class DestinationsSuffixes
                 catgTreeUrlPathString, docSrvUrlPathString, emplSrvUrlPathString, vhlpUrlPathString,
                 caseDetailsUrlPathString, statusCfgUrlPathString, accByEmailUrlPathString, conByEmailUrlPathString,
                 empByIdUrlPathString, casesByAccUrlPathString, casesByEmplUrlPathString, customerUrlPathString,
-                prevAttPathString, dlAttPathString, destInternal, destExternal, destQualtrics, mimeTypesUrlPathString);
+                prevAttPathString, dlAttPathString, destInternal, destExternal, destQualtrics, mimeTypesUrlPathString,
+                partnersAPIMUrl);
 
         return destinationsSuffixes;
     }

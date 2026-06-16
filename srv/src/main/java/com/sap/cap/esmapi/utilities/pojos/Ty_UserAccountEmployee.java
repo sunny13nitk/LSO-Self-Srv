@@ -19,6 +19,8 @@ public class Ty_UserAccountEmployee
     private boolean employee;
     private boolean external;
     private String destination;
+    private String mdgAccount;
+    private boolean mdgAccountFound;
 
     @Override
     public String toString()

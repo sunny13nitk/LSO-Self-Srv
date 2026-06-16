@@ -19,7 +19,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.MessageSource;
@@ -58,14 +57,18 @@ import com.sap.cap.esmapi.utilities.enums.EnumStatus;
 import com.sap.cap.esmapi.utilities.pojos.TY_CaseDetails;
 import com.sap.cap.esmapi.utilities.pojos.TY_CaseESS;
 import com.sap.cap.esmapi.utilities.pojos.TY_DestinationsSuffix;
+import com.sap.cap.esmapi.utilities.pojos.TY_LKeyEMail;
 import com.sap.cap.esmapi.utilities.pojos.TY_Message;
 import com.sap.cap.esmapi.utilities.pojos.TY_NotesDetails;
+import com.sap.cap.esmapi.utilities.pojos.TY_PFCTConfigResp;
 import com.sap.cap.esmapi.utilities.pojos.TY_PreviousAttachments;
 import com.sap.cap.esmapi.utilities.pojos.TY_RLConfig;
 import com.sap.cap.esmapi.utilities.pojos.TY_SessionAttachment;
 import com.sap.cap.esmapi.utilities.pojos.TY_UserDetails;
 import com.sap.cap.esmapi.utilities.pojos.TY_UserSessionInfo;
 import com.sap.cap.esmapi.utilities.pojos.Ty_UserAccountEmployee;
+import com.sap.cap.esmapi.utilities.srv.intf.IF_APIHubSrv;
+import com.sap.cap.esmapi.utilities.srv.intf.IF_APIHubTokenSrv;
 import com.sap.cap.esmapi.utilities.srv.intf.IF_AttachmentsFetchSrv;
 import com.sap.cap.esmapi.utilities.srv.intf.IF_SessAttachmentsService;
 import com.sap.cap.esmapi.utilities.srv.intf.IF_UserSessionSrv;
@@ -82,65 +85,36 @@ import com.sap.cloud.security.token.Token;
 import com.sap.cloud.security.token.TokenClaims;
 
 import cds.gen.db.esmlogs.Esmappmsglog;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @SessionScope
 @Slf4j
+@RequiredArgsConstructor
 public class CL_UserSessionSrv implements IF_UserSessionSrv
 {
 
-    @Autowired
-    private MessageSource msgSrc;
+    private final MessageSource msgSrc;
 
-    @Autowired
-    private UserInfo userInfo;
-
-    @Autowired
-    private IF_SrvCloudAPI srvCloudApiSrv;
-
-    @Autowired
-    private IF_ESS_UISrv essSrv;
-
-    @Autowired
-    private TY_RLConfig rlConfig;
-
-    @Autowired
-    private TY_CatgCus catgCusSrv;
-
-    @Autowired
-    private IF_CatalogSrv catalogSrv;
-
-    @Autowired
-    private ApplicationEventPublisher applicationEventPublisher;
-
-    @Autowired
-    private IF_VHelpLOBUIModelSrv vHlpModelSrv;
-
-    @Autowired
-    private IF_HANALoggingSrv hanaLogSrv;
-
-    @Autowired
-    private IF_StatusSrv statusSrv;
-
-    @Autowired
-    private IF_SessAttachmentsService attSrv;
-
-    @Autowired
-    private IF_AttachmentsFetchSrv attFetchSrv;
-
-    @Autowired
-    private TY_DestinationsSuffix dS;
-
-    @Autowired
-    private IF_DestinationService destSrv;
-
-    @Autowired
-    private TY_SplCatgCus splCatgCus;
-
-    @Autowired
-    private ApplicationContext appCtxt;
-
+    private final UserInfo userInfo;
+    private final IF_SrvCloudAPI srvCloudApiSrv;
+    private final IF_ESS_UISrv essSrv;
+    private final TY_RLConfig rlConfig;
+    private final TY_CatgCus catgCusSrv;
+    private final IF_CatalogSrv catalogSrv;
+    private final ApplicationEventPublisher applicationEventPublisher;
+    private final IF_VHelpLOBUIModelSrv vHlpModelSrv;
+    private final IF_HANALoggingSrv hanaLogSrv;
+    private final IF_StatusSrv statusSrv;
+    private final IF_SessAttachmentsService attSrv;
+    private final IF_AttachmentsFetchSrv attFetchSrv;
+    private final TY_DestinationsSuffix dS;
+    private final IF_DestinationService destSrv;
+    private final TY_SplCatgCus splCatgCus;
+    private final ApplicationContext appCtxt;
+    private final IF_APIHubTokenSrv apimTokenSrv;
+    private final IF_APIHubSrv apimSrv;
     // Properties
     private TY_UserSessionInfo userSessInfo;
 
@@ -288,15 +262,56 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                         }
                     }
 
-                    usAccConEmpl.setUserEmail(userSessInfo.getTokenDetails().get(GC_Constants.gc_TokenAttrib_Email));
-                    log.info("Scanning Account for Email Address : " + usAccConEmpl.getUserEmail());
-                    usAccConEmpl.setAccountId(srvCloudApiSrv.getAccountIdByUserEmail(usAccConEmpl.getUserEmail(),
-                            userSessInfo.getDestinationProps()));
+                    log.info("Attempting to fetch APIM client bearer....");
+                    // Also Fetch APIM Token - Client Bearer and maintain in User session
+                    userSessInfo.setApihubToken(apimTokenSrv.getUserAccessToken(GC_Constants.gc_APIM_Destination));
 
-                    // Only seek Employee If Account/Contact not Found
-                    if (!StringUtils.hasText(usAccConEmpl.getAccountId()))
+                    log.info(" APIM client bearer set in user session....");
+
+                    usAccConEmpl.setUserEmail(userSessInfo.getTokenDetails().get(GC_Constants.gc_TokenAttrib_Email));
+                    log.info("Scanning Account/IC for Email Address : " + usAccConEmpl.getUserEmail());
+
+                    // Also seek the MDG account - Real Account and not IC based on data imported
+                    // from MDG
+                    if (StringUtils.hasText(userSessInfo.getApihubToken().getAccessToken()))
                     {
-                        log.info("No Account Identified for Logged in User Email : " + usAccConEmpl.getUserEmail());
+                        log.info(
+                                "APIM client Bearer found in Session ....invoking Account Scan to indentify both IC & Account  for email : {}",
+                                usAccConEmpl.getUserEmail());
+
+                        TY_LKeyEMail lKeyEMail = new TY_LKeyEMail(userSessInfo.getApihubToken().getAccessToken(),
+                                GC_Constants.gc_APIM_PARTNERSAPI_LKEY, usAccConEmpl.getUserEmail());
+
+                        List<TY_PFCTConfigResp> partners = apimSrv.getPartners4LKeyandEmail(lKeyEMail);
+                        if (CollectionUtils.isNotEmpty(partners))
+                        {
+                            Optional<TY_PFCTConfigResp> ico = partners.stream()
+                                    .filter(e -> e.getPfct().equals(GC_Constants.gc_APIM_PFCT_IC)).findFirst();
+                            if (ico.isPresent())
+                            {
+                                usAccConEmpl.setAccountId(ico.get().getId());
+                                log.info("IC Identified for Logged in User Email : " + usAccConEmpl.getUserEmail()
+                                        + " Account ID : " + ico.get().getId());
+                            }
+
+                            Optional<TY_PFCTConfigResp> aco = partners.stream()
+                                    .filter(e -> e.getPfct().equals(GC_Constants.gc_APIM_PFCT_ACCOUNT)).findFirst();
+                            if (aco.isPresent())
+                            {
+                                usAccConEmpl.setMdgAccount(aco.get().getId());
+                                usAccConEmpl.setMdgAccountFound(true);
+                                log.info("Account Identified for Logged in User Email : " + usAccConEmpl.getUserEmail()
+                                        + " MDG Account ID : " + aco.get().getId());
+                            }
+                        }
+
+                    }
+
+                    // Only seek Employee If Account and IC neither is Found
+                    if (!StringUtils.hasText(usAccConEmpl.getAccountId())
+                            && !StringUtils.hasText(usAccConEmpl.getMdgAccount()))
+                    {
+                        log.info("No Account/IC Identified for Logged in User Email : " + usAccConEmpl.getUserEmail());
                         // If not an External Employee - Only then Seek Employee
                         if (!usAccConEmpl.isExternal())
                         {
