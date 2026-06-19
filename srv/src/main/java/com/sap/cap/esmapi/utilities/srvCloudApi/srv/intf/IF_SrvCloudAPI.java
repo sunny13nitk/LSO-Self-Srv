@@ -47,6 +47,9 @@ public interface IF_SrvCloudAPI
         public List<TY_CaseESS> getCases4User(Ty_UserAccountEmployee userDetails, EnumCaseTypes caseType,
                         TY_DestinationProps desProps) throws IOException;
 
+        public List<TY_CaseESS> getCases4Userv2(Ty_UserAccountEmployee userDetails, EnumCaseTypes caseType,
+                        TY_DestinationProps desProps) throws IOException;
+
         public List<TY_CaseGuidId> getCaseGuidIdList(TY_DestinationProps desProps);
 
         public Long getNumberofCases(TY_DestinationProps desProps) throws IOException;

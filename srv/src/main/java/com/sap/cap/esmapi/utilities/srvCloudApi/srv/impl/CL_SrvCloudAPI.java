@@ -208,7 +208,7 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
                                     JsonNode caseEnt = casesItr.next();
                                     if (caseEnt != null)
                                     {
-                                        String caseid = null, caseguid = null, caseType = null,
+                                        String caseid = null, caseguid = null, caseType = null, mdgAccount = null,
                                                 caseTypeDescription = null, subject = null, status = null,
                                                 createdOn = null, accountId = null, contactId = null, origin = null,
                                                 updatedOn = null;
@@ -455,8 +455,8 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
 
                                             casesESSList.add(new TY_CaseESS(caseguid, caseid, caseType,
                                                     caseTypeDescription, subject, status, accountId, contactId,
-                                                    createdOn, dateC, dateFormattedC, odtC, updatedOn, dateU,
-                                                    dateFormattedU, odtU, origin, canConfirm));
+                                                    mdgAccount, createdOn, dateC, dateFormattedC, odtC, updatedOn,
+                                                    dateU, dateFormattedU, odtU, origin, canConfirm));
 
                                         }
 
@@ -1923,8 +1923,8 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
 
                                                 casesESSList.add(new TY_CaseESS(caseguid, caseid, caseType,
                                                         caseTypeDescription, subject, status, accountId, contactId,
-                                                        createdOn, dateC, dateFormattedC, odtC, updatedOn, dateU,
-                                                        dateFormattedU, odtU, origin, canConfirm));
+                                                        createdOn, dateFormattedU, dateC, dateFormattedC, odtC,
+                                                        updatedOn, dateU, dateFormattedU, odtU, origin, canConfirm));
 
                                             }
 
@@ -2255,8 +2255,8 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
                 }
 
                 casesByCaseType.add(new TY_CaseESS(caseguid, caseid, caseTypeVar, caseTypeDescription, subject,
-                        statusDesc, accountId, employeeId, createdOn, dateC, dateFormattedC, odtC, updatedOn, dateU,
-                        dateFormattedU, odtU, origin, canConfirm));
+                        statusDesc, accountId, employeeId, createdOn, dateFormattedU, dateC, dateFormattedC, odtC,
+                        updatedOn, dateU, dateFormattedU, odtU, origin, canConfirm));
             }
 
             return casesByCaseType;
@@ -3650,6 +3650,14 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
         {
             throw new EX_ESMAPI(e.getMessage());
         }
+    }
+
+    @Override
+    public List<TY_CaseESS> getCases4Userv2(Ty_UserAccountEmployee userDetails, EnumCaseTypes caseType,
+            TY_DestinationProps desProps) throws IOException
+    {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getCases4Userv2'");
     }
 
 }

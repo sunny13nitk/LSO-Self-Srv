@@ -1,7 +1,6 @@
 package com.sap.cap.esmapi.ui.srv.impl;
 
 import java.io.IOException;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -116,7 +115,7 @@ public class CL_ESS_UISrv implements IF_ESS_UISrv
     @Override
     public List<TY_CaseESS> getCases4User(Ty_UserAccountEmployee userDetails, EnumCaseTypes caseType) throws IOException
     {
-        List<TY_CaseESS> cases = srvCloudApiSrv.getCases4User(userDetails, caseType,
+        List<TY_CaseESS> cases = srvCloudApiSrv.getCases4Userv2(userDetails, caseType,
                 userSessionSrv.getDestinationDetails4mUserSession());
 
         return cases;

@@ -42,7 +42,7 @@ public class DestinationsSuffixes
             @Value("${destInternal}") final String destInternal, @Value("${destExternal}") final String destExternal,
             @Value("${destQualtrics}") final String destQualtrics,
             @Value("${mimeTypesUrlPathString}") final String mimeTypesUrlPathString,
-            @Value("${partnersAPIMUrl}") final String partnersAPIMUrl
+            @Value("${partnersAPIMUrl}") final String partnersAPIMUrl, @Value("${casesSearch}") final String casesSearch
 
     )
 
@@ -53,7 +53,7 @@ public class DestinationsSuffixes
                 caseDetailsUrlPathString, statusCfgUrlPathString, accByEmailUrlPathString, conByEmailUrlPathString,
                 empByIdUrlPathString, casesByAccUrlPathString, casesByEmplUrlPathString, customerUrlPathString,
                 prevAttPathString, dlAttPathString, destInternal, destExternal, destQualtrics, mimeTypesUrlPathString,
-                partnersAPIMUrl);
+                partnersAPIMUrl, casesSearch);
 
         return destinationsSuffixes;
     }

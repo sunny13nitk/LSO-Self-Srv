@@ -22,6 +22,7 @@ public class TY_CaseESS
     private String statusDesc;
     private String accountId;
     private String employeeId;
+    private String mdgAccount;
     private String createdOn;
     private Date creationDate;
     private String formattedDate;
