@@ -1045,7 +1045,10 @@ public class EV_HDLR_CaseFormSubmit
                 log.error(msg);
                 TY_Message logMsg = new TY_Message(evCaseFormSubmit.getPayload().getUserId(),
                                 Timestamp.from(Instant.now()), EnumStatus.Error, EnumMessageType.ERR_CASE_CREATE,
-                                evCaseFormSubmit.getPayload().getSubmGuid(), msg);
+                                evCaseFormSubmit.getPayload().getSubmGuid(), msg,
+                                evCaseFormSubmit.getPayload().getCaseForm().getCountry(),
+                                evCaseFormSubmit.getPayload().getCaseForm().getCatgText(),
+                                evCaseFormSubmit.getPayload().getCaseForm().getCatg2Text());
 
                 // Instantiate and Fire the Event
                 EV_LogMessage logMsgEvent = new EV_LogMessage((Object) evCaseFormSubmit.getPayload().getSubmGuid(),
@@ -1069,7 +1072,10 @@ public class EV_HDLR_CaseFormSubmit
 
                 TY_Message logMsg = new TY_Message(evCaseFormSubmit.getPayload().getUserId(),
                                 Timestamp.from(Instant.now()), EnumStatus.Success, EnumMessageType.SUCC_CASE_CREATE,
-                                evCaseFormSubmit.getPayload().getSubmGuid(), msg);
+                                evCaseFormSubmit.getPayload().getSubmGuid(), msg,
+                                evCaseFormSubmit.getPayload().getCaseForm().getCountry(),
+                                evCaseFormSubmit.getPayload().getCaseForm().getCatgText(),
+                                evCaseFormSubmit.getPayload().getCaseForm().getCatg2Text());
 
                 // Instantiate and Fire the Event
                 EV_LogMessage logMsgEvent = new EV_LogMessage((Object) evCaseFormSubmit.getPayload().getSubmGuid(),
@@ -1086,7 +1092,10 @@ public class EV_HDLR_CaseFormSubmit
                 log.error(msg);
                 TY_Message logMsg = new TY_Message(evCaseFormSubmit.getPayload().getUserId(),
                                 Timestamp.from(Instant.now()), EnumStatus.Error, EnumMessageType.ERR_CASE_CATG,
-                                evCaseFormSubmit.getPayload().getSubmGuid(), msg);
+                                evCaseFormSubmit.getPayload().getSubmGuid(), msg,
+                                evCaseFormSubmit.getPayload().getCaseForm().getCountry(),
+                                evCaseFormSubmit.getPayload().getCaseForm().getCatgText(),
+                                evCaseFormSubmit.getPayload().getCaseForm().getCatg2Text());
 
                 // Instantiate and Fire the Event
                 EV_LogMessage logMsgEvent = new EV_LogMessage((Object) evCaseFormSubmit.getPayload().getSubmGuid(),

@@ -8,6 +8,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -73,7 +76,19 @@ public class CL_HANALoggingSrv implements IF_HANALoggingSrv
                 logEntity.put("status", logMsg.getStatus().toString()); // Status
                 logEntity.put("msgtype", logMsg.getMsgType().toString()); // Message Type
                 logEntity.put("objectid", logMsg.getObjectId()); // Object ID
-                logEntity.put("message", logMsg.getMessage()); // Message Text
+
+                String baseMsg = logMsg.getMessage();
+                if (StringUtils.hasText(logMsg.getCountry()) || StringUtils.hasText(logMsg.getCategory1())
+                        || StringUtils.hasText(logMsg.getCategory2()))
+                {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    ObjectNode meta = objectMapper.createObjectNode();
+                    meta.put("country", logMsg.getCountry());
+                    meta.put("category1", logMsg.getCategory1());
+                    meta.put("category2", logMsg.getCategory2());
+                    baseMsg = baseMsg + "\n " + meta.toString();
+                }
+                logEntity.put("message", baseMsg); // Message Text
 
                 if (logEntity != null)
                 {

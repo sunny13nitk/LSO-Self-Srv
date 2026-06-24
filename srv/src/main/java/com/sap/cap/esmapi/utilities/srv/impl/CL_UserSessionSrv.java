@@ -460,7 +460,10 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                                 TY_Message logMsg = new TY_Message(caseFormAsyncSpl.getCaseFormAsync().getUserId(),
                                         caseFormAsyncSpl.getCaseFormAsync().getTimestamp(), EnumStatus.Success,
                                         EnumMessageType.SUCC_CASE_SUBM,
-                                        caseFormAsyncSpl.getCaseFormAsync().getSubmGuid(), msg);
+                                        caseFormAsyncSpl.getCaseFormAsync().getSubmGuid(), msg,
+                                        caseFormAsyncSpl.getCaseFormAsync().getCaseForm().getCountry(),
+                                        caseFormAsyncSpl.getCaseFormAsync().getCaseForm().getCatgText(),
+                                        caseFormAsyncSpl.getCaseFormAsync().getCaseForm().getCatg2Text());
                                 userSessInfo.getMessagesStack().add(logMsg);
                                 // Instantiate and Fire the Event : Syncronous processing
                                 EV_LogMessage logMsgEvent = new EV_LogMessage(this, logMsg);
@@ -723,7 +726,10 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
 
                     // Logging Framework
                     TY_Message logMsg = new TY_Message(caseFormAsync.getUserId(), caseFormAsync.getTimestamp(),
-                            EnumStatus.Success, EnumMessageType.SUCC_CASE_SUBM, caseFormAsync.getSubmGuid(), msg);
+                            EnumStatus.Success, EnumMessageType.SUCC_CASE_SUBM, caseFormAsync.getSubmGuid(), msg,
+                            caseFormAsync.getCaseForm().getCountry(),
+                            caseFormAsync.getCaseForm().getCatgText(),
+                            caseFormAsync.getCaseForm().getCatg2Text());
                     userSessInfo.getMessagesStack().add(logMsg);
                     // Instantiate and Fire the Event : Syncronous processing
                     EV_LogMessage logMsgEvent = new EV_LogMessage(this, logMsg);
