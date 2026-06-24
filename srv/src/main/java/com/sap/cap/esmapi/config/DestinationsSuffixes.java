@@ -1,6 +1,5 @@
 package com.sap.cap.esmapi.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +16,7 @@ public class DestinationsSuffixes
 {
 
     @Bean
-    @Autowired // For PropertySourcesPlaceholderConfigurer
+    // @Autowired // For PropertySourcesPlaceholderConfigurer
     public TY_DestinationsSuffix Destinations(@Value("${casesurlPathString}") final String casesUrlPathString,
             @Value("${cpurlPathString}") final String cpUrlPathString,
             @Value("${accountsurlPathString}") final String acUrlPathString,
@@ -42,7 +41,8 @@ public class DestinationsSuffixes
             @Value("${destInternal}") final String destInternal, @Value("${destExternal}") final String destExternal,
             @Value("${destQualtrics}") final String destQualtrics,
             @Value("${mimeTypesUrlPathString}") final String mimeTypesUrlPathString,
-            @Value("${partnersAPIMUrl}") final String partnersAPIMUrl, @Value("${casesSearch}") final String casesSearch
+            @Value("${partnersAPIMUrl:NOT_FOUND}") final String partnersAPIMUrl,
+            @Value("${casesSearch}") final String casesSearch
 
     )
 
@@ -55,6 +55,7 @@ public class DestinationsSuffixes
                 prevAttPathString, dlAttPathString, destInternal, destExternal, destQualtrics, mimeTypesUrlPathString,
                 partnersAPIMUrl, casesSearch);
 
+        System.out.println("partnersAPIMUrl=" + partnersAPIMUrl);
         return destinationsSuffixes;
     }
 
