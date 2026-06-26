@@ -146,7 +146,8 @@ public class LSOController
 
                                 log.info("User Details Bound from Session!");
                                 if (StringUtils.hasText(userSessSrv.getUserDetails4mSession().getAccountId())
-                                        || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId()))
+                                        || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId())
+                                        || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getMdgAccount()))
                                 {
                                     vw = lsoCaseListViewLXSS;
                                     if (!CollectionUtils.isEmpty(catgCusSrv.getCustomizations()))
