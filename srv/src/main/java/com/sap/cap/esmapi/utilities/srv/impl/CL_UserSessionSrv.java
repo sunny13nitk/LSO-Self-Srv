@@ -308,6 +308,8 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                     }
 
                     // Only seek Employee If Account and IC neither is Found
+                    // Here is the big logical Change
+
                     if (!StringUtils.hasText(usAccConEmpl.getAccountId())
                             && !StringUtils.hasText(usAccConEmpl.getMdgAccount()))
                     {

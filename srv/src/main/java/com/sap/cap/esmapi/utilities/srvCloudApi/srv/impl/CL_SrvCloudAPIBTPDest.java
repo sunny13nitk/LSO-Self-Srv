@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.IDN;
 import java.net.URI;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.OffsetDateTime;
@@ -5589,6 +5591,9 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
     {
 
         List<String> filters = new ArrayList<>();
+        log.info("Building Cases Search URL for User: " + userDetails.getUserId() + " with AccountId: "
+                + userDetails.getAccountId() + ", EmployeeId: " + userDetails.getEmployeeId() + ", MdgAccount: "
+                + userDetails.getMdgAccount());
 
         // accountId -> individualCustomer.id
         if (StringUtils.hasText(userDetails.getAccountId()))
@@ -5619,6 +5624,8 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
         }
 
         String userFilter = String.join(" or ", filters);
+        // Encode spaces as %20 instead of +
+        userFilter = URLEncoder.encode(userFilter, StandardCharsets.UTF_8).replace("+", "%20");
 
         return baseUrl.replace("{USER_FILTER}", userFilter);
     }
