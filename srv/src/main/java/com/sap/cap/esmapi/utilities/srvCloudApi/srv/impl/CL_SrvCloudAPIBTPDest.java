@@ -5247,6 +5247,10 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                         {
                             throw new RuntimeException("Failed with HTTP error code : " + statusCode);
                         }
+                        else
+                        {
+                            log.info("Cases Search API v2 invoked successfully: " + statusCode);
+                        }
 
                         // Try and Get Entity from Response
                         HttpEntity entity = response.getEntity();
