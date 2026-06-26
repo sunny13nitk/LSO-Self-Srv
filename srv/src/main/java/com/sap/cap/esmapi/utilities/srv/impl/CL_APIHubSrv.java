@@ -62,7 +62,7 @@ public class CL_APIHubSrv implements IF_APIHubSrv
                 log.info(lkeyEmail.getEmail());
                 // # TEst- end
 
-                StringsUtility.replaceURLwithParams(url, new String[]
+                url = StringsUtility.replaceURLwithParams(url, new String[]
                 { lkeyEmail.getLkey(), lkeyEmail.getEmail() }, GC_Constants.gc_UrlReplParam);
 
                 log.info("POST Transformation URL..... {}", url);
