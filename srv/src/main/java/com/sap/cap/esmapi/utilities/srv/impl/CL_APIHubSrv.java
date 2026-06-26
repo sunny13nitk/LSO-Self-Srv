@@ -56,6 +56,12 @@ public class CL_APIHubSrv implements IF_APIHubSrv
                 String url = desSuffix.getPartnersAPIMUrl();
                 log.info("Before Transformation URL..... {}", url);
 
+                // # TEst- Start
+                log.info("Pass Params....");
+                log.info(lkeyEmail.getLkey());
+                log.info(lkeyEmail.getEmail());
+                // # TEst- end
+
                 StringsUtility.replaceURLwithParams(url, new String[]
                 { lkeyEmail.getLkey(), lkeyEmail.getEmail() }, GC_Constants.gc_UrlReplParam);
 

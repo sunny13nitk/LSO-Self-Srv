@@ -8,6 +8,9 @@ import org.springframework.util.StringUtils;
 
 import com.sap.cap.esmapi.exceptions.EX_ESMAPI;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class StringsUtility
 {
     public static String replaceURLwithParams(String baseString, String[] replStrings, String separator)
@@ -19,6 +22,9 @@ public class StringsUtility
             // Check the Occurences and REplacements Count
             int countOccurances = org.apache.commons.lang3.StringUtils.countMatches(baseString, separator);
             int countREpl = replStrings.length;
+
+            log.info("Ocurences to Replace :  " + countOccurances);
+            log.info("Replacement Values :  " + countREpl);
 
             // Substitute all occurences with 1st repl
             if (countOccurances > countREpl)

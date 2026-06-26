@@ -41,8 +41,7 @@ public class DestinationsSuffixes
             @Value("${destInternal}") final String destInternal, @Value("${destExternal}") final String destExternal,
             @Value("${destQualtrics}") final String destQualtrics,
             @Value("${mimeTypesUrlPathString}") final String mimeTypesUrlPathString,
-            @Value("${partnersAPIMUrl:NOT_FOUND}") final String partnersAPIMUrl,
-            @Value("${casesSearch}") final String casesSearch
+            @Value("${partnersAPIMUrl}") final String partnersAPIMUrl, @Value("${casesSearch}") final String casesSearch
 
     )
 
