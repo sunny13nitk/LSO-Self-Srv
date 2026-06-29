@@ -110,6 +110,8 @@ public class EV_HDLR_CaseFormSubmit
                                                                                 .getCaseForm().getMdgAccount()))
                                                                 {
                                                                         log.info("External User Scenario -- MDG Account Found");
+                                                                        createCase4IndCustomer(evCaseFormSubmit,
+                                                                                        desProps, cusItemO);
 
                                                                 }
                                                                 else if (!StringUtils.hasText(evCaseFormSubmit

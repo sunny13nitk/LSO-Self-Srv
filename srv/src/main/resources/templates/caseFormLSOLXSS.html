@@ -324,6 +324,7 @@
                <form id="caseForm" th:object="${caseForm}" enctype="multipart/form-data" th:action="@{/post/saveCase}"
                   method="post">
                   <input type="hidden" th:field="*{accId}" />
+                  <input type="hidden" th:field="*{mdgAccount}" />
                   <input type="hidden" th:field="*{caseTxnType}" />
                   <input type="hidden" th:field="*{catgChange}" id="catgChange" />
                   <input type="hidden" th:field="*{catg2Change}" id="catg2Change" />
