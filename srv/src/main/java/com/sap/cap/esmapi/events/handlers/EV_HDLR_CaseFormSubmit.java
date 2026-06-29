@@ -105,6 +105,13 @@ public class EV_HDLR_CaseFormSubmit
                                                         }
                                                         else
                                                         {
+                                                                log.info("Case Form Payload Partners : Account -MDG { }, IC { }",
+                                                                                evCaseFormSubmit.getPayload()
+                                                                                                .getCaseForm()
+                                                                                                .getMdgAccount(),
+                                                                                evCaseFormSubmit.getPayload()
+                                                                                                .getCaseForm()
+                                                                                                .getAccId());
                                                                 log.info("External User Scenario");
                                                                 if (StringUtils.hasText(evCaseFormSubmit.getPayload()
                                                                                 .getCaseForm().getMdgAccount()))
@@ -114,7 +121,7 @@ public class EV_HDLR_CaseFormSubmit
                                                                                         desProps, cusItemO);
 
                                                                 }
-                                                                else if (!StringUtils.hasText(evCaseFormSubmit
+                                                                else if (StringUtils.hasText(evCaseFormSubmit
                                                                                 .getPayload().getCaseForm().getAccId()))
                                                                 {
                                                                         log.info("External User Scenario -- Ind. Customer Found. Account Not Found");
