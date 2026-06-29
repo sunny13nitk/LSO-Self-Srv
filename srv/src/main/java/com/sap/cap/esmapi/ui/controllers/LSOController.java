@@ -248,6 +248,7 @@ public class LSOController
                     else
                     {
                         caseForm.setAccId(userSessSrv.getUserDetails4mSession().getAccountId()); // hidden
+                        caseForm.setMdgAccount(userSessSrv.getUserDetails4mSession().getMdgAccount()); // hidden
                     }
 
                     caseForm.setCaseTxnType(cusItemO.get().getCaseType()); // hidden

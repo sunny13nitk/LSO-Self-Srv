@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class TY_Case_Form
 {
     private String accId;
+    private String mdgAccount;
     private String caseTxnType;
     private String catgDesc;
     private String catg2Desc;

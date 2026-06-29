@@ -105,9 +105,21 @@ public class EV_HDLR_CaseFormSubmit
                                                         }
                                                         else
                                                         {
-                                                                log.info("External User -- Ind. Customer Scenario");
-                                                                createCase4IndCustomer(evCaseFormSubmit, desProps,
-                                                                                cusItemO);
+                                                                log.info("External User Scenario");
+                                                                if (StringUtils.hasText(evCaseFormSubmit.getPayload()
+                                                                                .getCaseForm().getMdgAccount()))
+                                                                {
+                                                                        log.info("External User Scenario -- MDG Account Found");
+
+                                                                }
+                                                                else if (!StringUtils.hasText(evCaseFormSubmit
+                                                                                .getPayload().getCaseForm().getAccId()))
+                                                                {
+                                                                        log.info("External User Scenario -- Ind. Customer Found. Account Not Found");
+                                                                        createCase4IndCustomer(evCaseFormSubmit,
+                                                                                        desProps, cusItemO);
+                                                                }
+
                                                         }
 
                                                 }
@@ -680,12 +692,24 @@ public class EV_HDLR_CaseFormSubmit
         {
                 TY_Case_Customer_SrvCloud newCaseEntity4Customer;
                 newCaseEntity4Customer = new TY_Case_Customer_SrvCloud();
-                // Account must be present
-                if (StringUtils.hasText(evCaseFormSubmit.getPayload().getCaseForm().getAccId()))
+                // Account or IC must be present, if both prefer Account otherwise IC
+                if (StringUtils.hasText(evCaseFormSubmit.getPayload().getCaseForm().getAccId())
+                                || StringUtils.hasText(evCaseFormSubmit.getPayload().getCaseForm().getMdgAccount()))
                 {
-                        newCaseEntity4Customer.setAccount(new TY_Account_CaseCreate(
-                                        evCaseFormSubmit.getPayload().getCaseForm().getAccId())); // Account
-                                                                                                  // ID
+
+                        if (StringUtils.hasText(evCaseFormSubmit.getPayload().getCaseForm().getMdgAccount()))
+                        {
+                                // On Account Node Set the MDG Account if present as the Account
+                                newCaseEntity4Customer.setAccount(new TY_Account_CaseCreate(
+                                                evCaseFormSubmit.getPayload().getCaseForm().getMdgAccount()));
+                        }
+                        else if (StringUtils.hasText(evCaseFormSubmit.getPayload().getCaseForm().getAccId()))
+                        {
+                                // On Account Node Set the IC if Mdg Account is not present and IC is present as
+                                // the Account
+                                newCaseEntity4Customer.setAccount(new TY_Account_CaseCreate(
+                                                evCaseFormSubmit.getPayload().getCaseForm().getAccId()));
+                        }
 
                         // Case Txn. Type
                         newCaseEntity4Customer

@@ -248,8 +248,6 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                                 {
                                     log.info("Destination connection established successfully for -  "
                                             + usAccConEmpl.getDestination());
-                                    // #TEST
-                                    log.info(desProps.toString());
                                     userSessInfo.setDestinationProps(desProps);
                                 }
                             }
