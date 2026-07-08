@@ -2189,28 +2189,65 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                     {
                         // system would check this email to identify corresponding Individual Customer
                         // only
-                        log.info("External Scenario. Scanning for Individual Customer for affected User by email..."
-                                + userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail());
+                        log.info(
+                                "External Scenario. Scanning for Account/Individual Customer for affected User by email..."
+                                        + userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail());
                         // Add try -catch since API call for diagnosis
                         try
                         {
-                            String indCustomerId = srvCloudApiSrv.getAccountIdByUserEmail(
-                                    userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail(),
-                                    userSessInfo.getDestinationProps());
+                            TY_LKeyEMail lKeyEMail = new TY_LKeyEMail(userSessInfo.getApihubToken().getAccessToken(),
+                                    GC_Constants.gc_APIM_PARTNERSAPI_LKEY,
+                                    userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail());
+                            List<TY_PFCTConfigResp> partners = apimSrv.getPartners4LKeyandEmail(lKeyEMail);
 
-                            if (StringUtils.hasText(indCustomerId))
+                            if (CollectionUtils.isNotEmpty(partners))
                             {
-                                log.info("Individual Customer identified as " + indCustomerId);
-                                this.userSessInfo.getCurrentForm4Submission().getCaseForm().setReporter(indCustomerId);
-                                this.userSessInfo.getCurrentForm4Submission().getCaseForm().setReporterEmployee(false);
+
+                                Optional<TY_PFCTConfigResp> aco = partners.stream()
+                                        .filter(e -> e.getPfct().equals(GC_Constants.gc_APIM_PFCT_ACCOUNT)).findFirst();
+                                if (aco.isPresent())
+                                {
+                                    log.info("Account identified as " + aco.get().getId() + " for User Email : "
+                                            + userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail());
+                                    this.userSessInfo.getCurrentForm4Submission().getCaseForm()
+                                            .setReporter(aco.get().getId());
+                                    this.userSessInfo.getCurrentForm4Submission().getCaseForm()
+                                            .setReporterEmployee(false);
+                                    this.userSessInfo.getCurrentForm4Submission().getCaseForm()
+                                            .setReporterAccount(true);
+                                }
+                                if (!StringUtils.hasText(
+                                        this.userSessInfo.getCurrentForm4Submission().getCaseForm().getReporter()))
+                                {
+                                    Optional<TY_PFCTConfigResp> ico = partners.stream()
+                                            .filter(e -> e.getPfct().equals(GC_Constants.gc_APIM_PFCT_IC)).findFirst();
+                                    if (ico.isPresent())
+                                    {
+                                        log.info("Individual Customer identified as " + ico.get().getId()
+                                                + " for User Email : "
+                                                + userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail());
+                                        this.userSessInfo.getCurrentForm4Submission().getCaseForm()
+                                                .setReporter(ico.get().getId());
+                                        this.userSessInfo.getCurrentForm4Submission().getCaseForm()
+                                                .setReporterEmployee(false);
+                                        this.userSessInfo.getCurrentForm4Submission().getCaseForm()
+                                                .setReporterAccount(false);
+                                    }
+                                }
+
                             }
-                            else
+                            else if (!StringUtils
+                                    .hasText(this.userSessInfo.getCurrentForm4Submission().getCaseForm().getReporter()))
                             {
+                                log.info("No Account or Individual Customer identified for User Email : "
+                                        + userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail());
                                 // Payload Error - Invalid Email
                                 handleEmpCustomerNotFoundError(
                                         userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail());
                                 return false;
+
                             }
+
                         }
                         catch (Exception e)
                         {
@@ -2227,43 +2264,85 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                     else // Internal Scenario
                     {
 
-                        log.info("Internal Scenario. Scanning for Individual Customer for affected User by email..."
-                                + userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail());
+                        log.info(
+                                "Internal Scenario. Scanning for Account/IC and then Employee for affected User by email..."
+                                        + userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail());
+
                         try
                         {
-                            String indCustomerId = srvCloudApiSrv.getAccountIdByUserEmail(
-                                    userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail(),
-                                    userSessInfo.getDestinationProps());
-                            if (StringUtils.hasText(indCustomerId))
+                            TY_LKeyEMail lKeyEMail = new TY_LKeyEMail(userSessInfo.getApihubToken().getAccessToken(),
+                                    GC_Constants.gc_APIM_ADDUSERAPI_LKEY,
+                                    userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail());
+                            List<TY_PFCTConfigResp> partners = apimSrv.getPartners4LKeyandEmail(lKeyEMail);
+
+                            if (CollectionUtils.isNotEmpty(partners))
                             {
-                                log.info("Individual Customer identified as " + indCustomerId);
-                                this.userSessInfo.getCurrentForm4Submission().getCaseForm().setReporter(indCustomerId);
-                                this.userSessInfo.getCurrentForm4Submission().getCaseForm().setReporterEmployee(false);
-                            }
-                            else // Seek an Employee with the email address
-                            {
-                                log.info(
-                                        "Individual Customer not Identified for the affected User Email. Scanning for the Employee..");
-                                String employeeId = srvCloudApiSrv.getEmployeeIdByUserEmail(
-                                        userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail(),
-                                        userSessInfo.getDestinationProps());
-                                if (StringUtils.hasText(employeeId))
+
+                                Optional<TY_PFCTConfigResp> aco = partners.stream()
+                                        .filter(e -> e.getPfct().equals(GC_Constants.gc_APIM_PFCT_ACCOUNT)).findFirst();
+                                if (aco.isPresent())
                                 {
-                                    log.info("Employee identified as " + employeeId);
-                                    this.userSessInfo.getCurrentForm4Submission().getCaseForm().setReporter(employeeId);
+                                    log.info("Account identified as " + aco.get().getId() + " for User Email : "
+                                            + userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail());
                                     this.userSessInfo.getCurrentForm4Submission().getCaseForm()
-                                            .setReporterEmployee(true);
+                                            .setReporter(aco.get().getId());
+                                    this.userSessInfo.getCurrentForm4Submission().getCaseForm()
+                                            .setReporterEmployee(false);
+
+                                    this.userSessInfo.getCurrentForm4Submission().getCaseForm()
+                                            .setReporterAccount(true);
+
                                 }
-                                else
+
+                                if (!StringUtils.hasText(
+                                        this.userSessInfo.getCurrentForm4Submission().getCaseForm().getReporter()))
                                 {
-                                    // Payload Error - Invalid Email
-                                    handleEmpCustomerNotFoundError(
-                                            userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail());
-                                    return false;
+                                    Optional<TY_PFCTConfigResp> ico = partners.stream()
+                                            .filter(e -> e.getPfct().equals(GC_Constants.gc_APIM_PFCT_IC)).findFirst();
+                                    if (ico.isPresent())
+                                    {
+                                        log.info("Individual Customer identified as " + ico.get().getId()
+                                                + " for User Email : "
+                                                + userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail());
+                                        this.userSessInfo.getCurrentForm4Submission().getCaseForm()
+                                                .setReporter(ico.get().getId());
+                                        this.userSessInfo.getCurrentForm4Submission().getCaseForm()
+                                                .setReporterEmployee(false);
+                                        this.userSessInfo.getCurrentForm4Submission().getCaseForm()
+                                                .setReporterAccount(false);
+                                    }
+                                }
+
+                                if (!StringUtils.hasText(
+                                        this.userSessInfo.getCurrentForm4Submission().getCaseForm().getReporter()))
+                                {
+                                    Optional<TY_PFCTConfigResp> eo = partners.stream()
+                                            .filter(e -> e.getPfct().equals(GC_Constants.gc_APIM_PFCT_EMP)).findFirst();
+                                    if (eo.isPresent())
+                                    {
+                                        log.info("Employee identified as " + eo.get().getId() + " for User Email : "
+                                                + userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail());
+                                        this.userSessInfo.getCurrentForm4Submission().getCaseForm()
+                                                .setReporter(eo.get().getId());
+                                        this.userSessInfo.getCurrentForm4Submission().getCaseForm()
+                                                .setReporterEmployee(true);
+                                        this.userSessInfo.getCurrentForm4Submission().getCaseForm()
+                                                .setReporterAccount(false);
+                                    }
                                 }
 
                             }
+                            else if (!StringUtils
+                                    .hasText(this.userSessInfo.getCurrentForm4Submission().getCaseForm().getReporter()))
+                            {
+                                log.info("No Account or Individual Customer or Employee identified for User Email : "
+                                        + userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail());
+                                // Payload Error - Invalid Email
+                                handleEmpCustomerNotFoundError(
+                                        userSessInfo.getCurrentForm4Submission().getCaseForm().getAddEmail());
+                                return false;
 
+                            }
                         }
 
                         catch (Exception e)

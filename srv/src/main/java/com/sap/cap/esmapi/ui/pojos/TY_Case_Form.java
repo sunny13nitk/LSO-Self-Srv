@@ -25,6 +25,7 @@ public class TY_Case_Form
     private String addEmail; // accomodate additional email address for reporter
     private String reporter;
     private boolean reporterEmployee;
+    private boolean reporterAccount;
     private boolean countryMandatory;
     private boolean langMandatory;
     private boolean employee;

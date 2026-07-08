@@ -105,11 +105,12 @@ public class EV_HDLR_CaseFormSubmit
                                                         }
                                                         else
                                                         {
-                                                                log.info("Case Form Payload Partners : Account -MDG { }, IC { }",
-                                                                                evCaseFormSubmit.getPayload()
+                                                                log.info("Case Form Payload Partners : Account -MDG : "
+                                                                                + evCaseFormSubmit.getPayload()
                                                                                                 .getCaseForm()
-                                                                                                .getMdgAccount(),
-                                                                                evCaseFormSubmit.getPayload()
+                                                                                                .getMdgAccount()
+                                                                                + " IC :"
+                                                                                + evCaseFormSubmit.getPayload()
                                                                                                 .getCaseForm()
                                                                                                 .getAccId());
                                                                 log.info("External User Scenario");

@@ -71,8 +71,10 @@ public class GC_Constants
     public static final String gc_API_IndCustomer = "Individual Customer Search API";
 
     public static final String gc_APIM_PARTNERSAPI_LKEY = "ZLSS_SS";
+    public static final String gc_APIM_ADDUSERAPI_LKEY = "ZLSS_ADUSR";
     public static final String gc_APIM_PFCT_ACCOUNT = "ACC";
     public static final String gc_APIM_PFCT_IC = "INC";
+    public static final String gc_APIM_PFCT_EMP = "EMP";
     public static final String gc_IndividualCustomerId = "individualCustomer.id";
     public static final String gc_EmployeeId = "employee.id";
     public static final String gc_AccountId = "account.id";
