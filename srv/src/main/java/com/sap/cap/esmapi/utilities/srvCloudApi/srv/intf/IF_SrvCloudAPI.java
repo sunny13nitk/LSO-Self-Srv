@@ -19,9 +19,9 @@ import com.sap.cap.esmapi.utilities.pojos.TY_CaseDetails;
 import com.sap.cap.esmapi.utilities.pojos.TY_CaseESS;
 import com.sap.cap.esmapi.utilities.pojos.TY_CaseGuidId;
 import com.sap.cap.esmapi.utilities.pojos.TY_CasePatchInfo;
+import com.sap.cap.esmapi.utilities.pojos.TY_Case_AddUserIC_SrvCloud;
 import com.sap.cap.esmapi.utilities.pojos.TY_Case_CustomerAddUser_SrvCloud;
 import com.sap.cap.esmapi.utilities.pojos.TY_Case_Customer_SrvCloud;
-import com.sap.cap.esmapi.utilities.pojos.TY_Case_EmployeeAddUserIC_SrvCloud;
 import com.sap.cap.esmapi.utilities.pojos.TY_Case_EmployeeAddUser_SrvCloud;
 import com.sap.cap.esmapi.utilities.pojos.TY_Case_Employee_SrvCloud;
 import com.sap.cap.esmapi.utilities.pojos.TY_Case_SrvCloud_Reply;
@@ -77,8 +77,8 @@ public interface IF_SrvCloudAPI
         public String createCase4EmployeeAddUser(TY_Case_EmployeeAddUser_SrvCloud caseEntity,
                         TY_DestinationProps desProps) throws EX_ESMAPI;
 
-        public String createCase4EmployeeAddUserIC(TY_Case_EmployeeAddUserIC_SrvCloud caseEntity,
-                        TY_DestinationProps desProps) throws EX_ESMAPI;
+        public String createCase4EmployeeAddUserIC(TY_Case_AddUserIC_SrvCloud caseEntity, TY_DestinationProps desProps)
+                        throws EX_ESMAPI;
 
         public String createCase4CustomerAddUser(TY_Case_CustomerAddUser_SrvCloud caseEntity,
                         TY_DestinationProps desProps) throws EX_ESMAPI;
@@ -126,5 +126,7 @@ public interface IF_SrvCloudAPI
 
         public ResponseEntity<List<String>> getAllowedAttachmentTypes(TY_DestinationProps desProps)
                         throws EX_ESMAPI, IOException;
+
+        public String createCase(Object payload, TY_DestinationProps destinationProps) throws EX_ESMAPI;
 
 }

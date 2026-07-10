@@ -26,7 +26,7 @@ public class APIMWebClientConfig
 
     private final IF_DestinationService desSrv;
 
-    @Bean
+    @Bean("apiMWebClient")
     public WebClient apimWebClient(WebClient.Builder builder)
     {
         if (desSrv != null)

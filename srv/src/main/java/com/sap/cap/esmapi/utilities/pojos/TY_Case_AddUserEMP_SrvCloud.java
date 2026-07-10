@@ -14,7 +14,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class TY_Case_EmployeeAddUserIC_SrvCloud
+public class TY_Case_AddUserEMP_SrvCloud
 {
 
     @JsonIgnore

@@ -38,13 +38,15 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -67,9 +69,9 @@ import com.sap.cap.esmapi.utilities.pojos.TY_CaseDetails;
 import com.sap.cap.esmapi.utilities.pojos.TY_CaseESS;
 import com.sap.cap.esmapi.utilities.pojos.TY_CaseGuidId;
 import com.sap.cap.esmapi.utilities.pojos.TY_CasePatchInfo;
+import com.sap.cap.esmapi.utilities.pojos.TY_Case_AddUserIC_SrvCloud;
 import com.sap.cap.esmapi.utilities.pojos.TY_Case_CustomerAddUser_SrvCloud;
 import com.sap.cap.esmapi.utilities.pojos.TY_Case_Customer_SrvCloud;
-import com.sap.cap.esmapi.utilities.pojos.TY_Case_EmployeeAddUserIC_SrvCloud;
 import com.sap.cap.esmapi.utilities.pojos.TY_Case_EmployeeAddUser_SrvCloud;
 import com.sap.cap.esmapi.utilities.pojos.TY_Case_Employee_SrvCloud;
 import com.sap.cap.esmapi.utilities.pojos.TY_Case_SrvCloud_Confirm;
@@ -88,31 +90,32 @@ import com.sap.cap.esmapi.utilities.srvCloudApi.destination.pojos.TY_Destination
 import com.sap.cap.esmapi.utilities.srvCloudApi.srv.intf.IF_SrvCloudAPI;
 import com.sap.cap.esmapi.vhelps.pojos.TY_KeyValue;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 @Profile(GC_Constants.gc_BTPProfile) // BTP Profile
 public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
 {
 
-    @Autowired
-    private TY_DestinationsSuffix dS;
+    private final TY_DestinationsSuffix dS;
 
-    @Autowired
-    private IF_APISrv apiSrv;
+    private final IF_APISrv apiSrv;
 
-    @Autowired
-    private TY_CatgCus caseTypeCus;
+    private final TY_CatgCus caseTypeCus;
 
-    @Autowired
-    private TY_RLConfig rlConfig;
+    private final TY_RLConfig rlConfig;
 
-    @Autowired
-    private MessageSource msgSrc;
+    private final MessageSource msgSrc;
 
-    @Autowired
-    private TY_PortalStatusTransitions statusTransitions;
+    private final TY_PortalStatusTransitions statusTransitions;
+
+    private final ObjectMapper objectMapper;
+
+    @Qualifier("srvCloudWebClient")
+    private final WebClient srvCloudWebClient;
 
     @Override
     public JsonNode getAllCases(TY_DestinationProps desProps) throws IOException
@@ -4042,6 +4045,66 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
     }
 
     @Override
+    public String createCase(Object payload, TY_DestinationProps desProps) throws EX_ESMAPI
+    {
+
+        String casePOSTURL = getPOSTURL4BaseUrl(
+                CL_URLUtility.getUrl4DestinationAPI(dS.getCasesPathString(), desProps.getBaseUrl()));
+
+        if (!StringUtils.hasText(casePOSTURL))
+        {
+            throw new EX_ESMAPI("Unable to determine Service Cloud Case URL.");
+        }
+
+        try
+        {
+            log.info("Creating Service Cloud Case...");
+            log.debug("Case Payload : {}", objectMapper.writeValueAsString(payload));
+
+            ResponseEntity<String> response = srvCloudWebClient.post().uri(casePOSTURL)
+                    .header(HttpHeaders.AUTHORIZATION, desProps.getAuthToken()).contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(payload).retrieve().toEntity(String.class).block();
+
+            if (response == null)
+            {
+                throw new EX_ESMAPI(msgSrc.getMessage("ERR_NOTES_POST", new Object[]
+                { "No response received" }, Locale.ENGLISH));
+            }
+
+            if (!response.getStatusCode().is2xxSuccessful())
+            {
+                log.error("Case Creation Failed. Status : {}, Response : {}", response.getStatusCode().value(),
+                        response.getBody());
+
+                throw new EX_ESMAPI(msgSrc.getMessage("ERR_NOTES_POST", new Object[]
+                { response.getBody() }, Locale.ENGLISH));
+            }
+
+            JsonNode responseNode = objectMapper.readTree(response.getBody());
+
+            String caseId = responseNode.path("value").path("displayId").asText(null);
+
+            log.info("Service Cloud Case Created Successfully. Case ID : {}", caseId);
+
+            return caseId;
+        }
+        catch (JsonProcessingException e)
+        {
+            throw new EX_ESMAPI(msgSrc.getMessage("ERR_NEW_NOTES_JSON", new Object[]
+            { e.getLocalizedMessage() }, Locale.ENGLISH));
+        }
+        catch (EX_ESMAPI e)
+        {
+            throw e;
+        }
+        catch (Exception e)
+        {
+            throw new EX_ESMAPI(msgSrc.getMessage("ERR_NOTES_POST", new Object[]
+            { e.getLocalizedMessage() }, Locale.ENGLISH));
+        }
+    }
+
+    @Override
     public List<TY_PreviousAttachments> getAttachments4Case(String caseGuid, TY_DestinationProps desProps)
             throws EX_ESMAPI, IOException
     {
@@ -5068,8 +5131,8 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
     }
 
     @Override
-    public String createCase4EmployeeAddUserIC(TY_Case_EmployeeAddUserIC_SrvCloud caseEntity,
-            TY_DestinationProps desProps) throws EX_ESMAPI
+    public String createCase4EmployeeAddUserIC(TY_Case_AddUserIC_SrvCloud caseEntity, TY_DestinationProps desProps)
+            throws EX_ESMAPI
     {
         String caseId = null;
 

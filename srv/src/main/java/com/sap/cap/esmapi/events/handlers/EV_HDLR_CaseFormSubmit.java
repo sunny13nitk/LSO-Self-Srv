@@ -29,9 +29,9 @@ import com.sap.cap.esmapi.utilities.pojos.TY_Account_CaseCreate;
 import com.sap.cap.esmapi.utilities.pojos.TY_AddUserCaseCreate;
 import com.sap.cap.esmapi.utilities.pojos.TY_AttachmentResponse;
 import com.sap.cap.esmapi.utilities.pojos.TY_Attachment_CaseCreate;
+import com.sap.cap.esmapi.utilities.pojos.TY_Case_AddUserIC_SrvCloud;
 import com.sap.cap.esmapi.utilities.pojos.TY_Case_CustomerAddUser_SrvCloud;
 import com.sap.cap.esmapi.utilities.pojos.TY_Case_Customer_SrvCloud;
-import com.sap.cap.esmapi.utilities.pojos.TY_Case_EmployeeAddUserIC_SrvCloud;
 import com.sap.cap.esmapi.utilities.pojos.TY_Case_EmployeeAddUser_SrvCloud;
 import com.sap.cap.esmapi.utilities.pojos.TY_Case_Employee_SrvCloud;
 import com.sap.cap.esmapi.utilities.pojos.TY_CatgLvl1_CaseCreate;
@@ -97,7 +97,7 @@ public class EV_HDLR_CaseFormSubmit
                                                         if (StringUtils.hasText(evCaseFormSubmit.getPayload()
                                                                         .getCaseForm().getReporter()))
                                                         {
-                                                                log.info("External User -- Reporter as Ind. Customer Scenario");
+                                                                log.info("CaseForm has additional User Identified as Reporter....Evaluating Partner Type...");
                                                                 // Only Individual Customer(s) as Reporters for External
                                                                 // Scenario
                                                                 createCase4IndCustomerAddUser(evCaseFormSubmit,
@@ -172,8 +172,8 @@ public class EV_HDLR_CaseFormSubmit
         private void createCase4EmployeeAddUserIndCustomer(EV_CaseFormSubmit evCaseFormSubmit,
                         TY_DestinationProps desProps, Optional<TY_CatgCusItem> cusItemO)
         {
-                TY_Case_EmployeeAddUserIC_SrvCloud newCaseEntity4Employee;
-                newCaseEntity4Employee = new TY_Case_EmployeeAddUserIC_SrvCloud();
+                TY_Case_AddUserIC_SrvCloud newCaseEntity4Employee;
+                newCaseEntity4Employee = new TY_Case_AddUserIC_SrvCloud();
                 // Account must be present
                 if (StringUtils.hasText(evCaseFormSubmit.getPayload().getCaseForm().getAccId()))
                 {

@@ -2,6 +2,7 @@ package com.sap.cap.esmapi.utilities.srv.impl;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ public class CL_APIHubSrv implements IF_APIHubSrv
 {
     private final IF_DestinationService desSrv;
 
+    @Qualifier("apiMWebClient")
     private final WebClient apimClient;
 
     private final TY_DestinationsSuffix desSuffix;

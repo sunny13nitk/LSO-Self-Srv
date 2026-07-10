@@ -51,9 +51,9 @@ import com.sap.cap.esmapi.utilities.pojos.TY_CaseDetails;
 import com.sap.cap.esmapi.utilities.pojos.TY_CaseESS;
 import com.sap.cap.esmapi.utilities.pojos.TY_CaseGuidId;
 import com.sap.cap.esmapi.utilities.pojos.TY_CasePatchInfo;
+import com.sap.cap.esmapi.utilities.pojos.TY_Case_AddUserIC_SrvCloud;
 import com.sap.cap.esmapi.utilities.pojos.TY_Case_CustomerAddUser_SrvCloud;
 import com.sap.cap.esmapi.utilities.pojos.TY_Case_Customer_SrvCloud;
-import com.sap.cap.esmapi.utilities.pojos.TY_Case_EmployeeAddUserIC_SrvCloud;
 import com.sap.cap.esmapi.utilities.pojos.TY_Case_EmployeeAddUser_SrvCloud;
 import com.sap.cap.esmapi.utilities.pojos.TY_Case_Employee_SrvCloud;
 import com.sap.cap.esmapi.utilities.pojos.TY_Case_SrvCloud_Confirm;
@@ -3429,8 +3429,8 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
     }
 
     @Override
-    public String createCase4EmployeeAddUserIC(TY_Case_EmployeeAddUserIC_SrvCloud caseEntity,
-            TY_DestinationProps desProps) throws EX_ESMAPI
+    public String createCase4EmployeeAddUserIC(TY_Case_AddUserIC_SrvCloud caseEntity, TY_DestinationProps desProps)
+            throws EX_ESMAPI
     {
 
         String caseId = null;
@@ -3658,6 +3658,13 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
     {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getCases4Userv2'");
+    }
+
+    @Override
+    public String createCase(Object payload, TY_DestinationProps destinationProps) throws EX_ESMAPI
+    {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'createCase'");
     }
 
 }
