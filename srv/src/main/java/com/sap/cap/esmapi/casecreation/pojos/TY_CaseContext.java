@@ -5,6 +5,8 @@ import java.util.List;
 
 import com.sap.cap.esmapi.casecreation.enums.EnumCaseScenario;
 import com.sap.cap.esmapi.events.event.EV_CaseFormSubmit;
+import com.sap.cap.esmapi.utilities.pojos.TY_Attachment_CaseCreate;
+import com.sap.cap.esmapi.utilities.pojos.TY_Description_CaseCreate;
 import com.sap.cap.esmapi.utilities.srvCloudApi.destination.pojos.TY_DestinationProps;
 
 import lombok.AllArgsConstructor;
@@ -25,8 +27,8 @@ public class TY_CaseContext
     private TY_DestinationProps destinationProps;
 
     // Runtime generated artifacts
-    private String noteId;
+    private TY_Description_CaseCreate description;
 
-    private List<String> attachmentIds = new ArrayList<>();
+    private List<TY_Attachment_CaseCreate> attachments = new ArrayList<>();
 
 }

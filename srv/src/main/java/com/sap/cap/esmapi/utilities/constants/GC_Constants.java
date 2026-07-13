@@ -38,6 +38,7 @@ public class GC_Constants
 
     public static final String gc_PFCT_ADDUSER = "Z03";
 
+    public static final String gc_PFCT_ACCOUNT = "ZACCOUNT";
     public static final String gc_DEVProfile = "dev";
 
     public static final String gc_TESTProfile = "test";

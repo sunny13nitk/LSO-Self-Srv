@@ -1,5 +1,7 @@
 package com.sap.cap.esmapi.casecreation.enums;
 
+import java.util.Objects;
+
 public enum EnumCaseScenario
 {
     IC(EnumMainPartnerType.INDIVIDUAL_CUSTOMER, EnumReporterType.NONE),
@@ -39,5 +41,22 @@ public enum EnumCaseScenario
     public EnumReporterType getReporterType()
     {
         return reporterType;
+    }
+
+    public static EnumCaseScenario resolve(EnumMainPartnerType mainPartnerType, EnumReporterType reporterType)
+    {
+        Objects.requireNonNull(mainPartnerType, "Main Partner Type cannot be null.");
+        Objects.requireNonNull(reporterType, "Reporter Type cannot be null.");
+
+        for (EnumCaseScenario scenario : values())
+        {
+            if (scenario.mainPartnerType == mainPartnerType && scenario.reporterType == reporterType)
+            {
+                return scenario;
+            }
+        }
+
+        throw new IllegalArgumentException(String.format("Unsupported Case Scenario [Main Partner=%s, Reporter=%s]",
+                mainPartnerType, reporterType));
     }
 }
