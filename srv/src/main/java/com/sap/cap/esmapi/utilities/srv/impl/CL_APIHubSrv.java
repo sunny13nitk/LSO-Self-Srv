@@ -2,6 +2,7 @@ package com.sap.cap.esmapi.utilities.srv.impl;
 
 import java.util.List;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -19,21 +20,22 @@ import com.sap.cap.esmapi.utilities.srv.intf.IF_APIHubSrv;
 import com.sap.cap.esmapi.utilities.srvCloudApi.destination.intf.IF_DestinationService;
 import com.sap.cloud.sdk.cloudplatform.connectivity.HttpDestination;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class CL_APIHubSrv implements IF_APIHubSrv
 {
-    private final IF_DestinationService desSrv;
+    @Autowired
+    private IF_DestinationService desSrv;
 
+    @Autowired
     @Qualifier("apiMWebClient")
-    private final WebClient apimClient;
+    private WebClient apimClient;
 
-    private final TY_DestinationsSuffix desSuffix;
+    @Autowired
+    private TY_DestinationsSuffix desSuffix;
 
     @Override
     public List<TY_PFCTConfigResp> getPartners4LKeyandEmail(TY_LKeyEMail lkeyEmail) throws EX_ESMAPI

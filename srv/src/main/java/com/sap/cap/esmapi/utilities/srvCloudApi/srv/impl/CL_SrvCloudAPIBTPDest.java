@@ -38,6 +38,7 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Profile;
@@ -90,32 +91,38 @@ import com.sap.cap.esmapi.utilities.srvCloudApi.destination.pojos.TY_Destination
 import com.sap.cap.esmapi.utilities.srvCloudApi.srv.intf.IF_SrvCloudAPI;
 import com.sap.cap.esmapi.vhelps.pojos.TY_KeyValue;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 @Profile(GC_Constants.gc_BTPProfile) // BTP Profile
 public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
 {
 
-    private final TY_DestinationsSuffix dS;
+    @Autowired
+    private TY_DestinationsSuffix dS;
 
-    private final IF_APISrv apiSrv;
+    @Autowired
+    private IF_APISrv apiSrv;
 
-    private final TY_CatgCus caseTypeCus;
+    @Autowired
+    private TY_CatgCus caseTypeCus;
 
-    private final TY_RLConfig rlConfig;
+    @Autowired
+    private TY_RLConfig rlConfig;
 
-    private final MessageSource msgSrc;
+    @Autowired
+    private MessageSource msgSrc;
 
-    private final TY_PortalStatusTransitions statusTransitions;
+    @Autowired
+    private TY_PortalStatusTransitions statusTransitions;
 
-    private final ObjectMapper objectMapper;
+    @Autowired
+    private ObjectMapper objectMapper;
 
+    @Autowired
     @Qualifier("srvCloudWebClient")
-    private final WebClient srvCloudWebClient;
+    private WebClient srvCloudWebClient;
 
     @Override
     public JsonNode getAllCases(TY_DestinationProps desProps) throws IOException
