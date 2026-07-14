@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 public class TY_CaseEditFormAsync
 {
     private TY_CaseEdit_Form caseReply;
+    private String mdgAccount;
     private String submGuid;
     private String userId;
     private Timestamp timestamp;

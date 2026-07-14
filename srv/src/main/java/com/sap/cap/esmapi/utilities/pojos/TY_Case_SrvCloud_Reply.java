@@ -19,5 +19,6 @@ public class TY_Case_SrvCloud_Reply
     private String status;
     private List<TY_CaseReplyNote> notes;
     private List<TY_Attachment_CaseCreate> attachments;
-
+    private TY_Account_CaseCreate account;
+    private TY_Account_CaseCreate individualCustomer;
 }

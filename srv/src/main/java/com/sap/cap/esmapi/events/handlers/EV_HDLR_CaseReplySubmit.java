@@ -18,6 +18,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import com.sap.cap.esmapi.casecreation.srv.impl.CL_CasePayloadBuilder;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgCus;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgCusItem;
 import com.sap.cap.esmapi.events.event.EV_CaseReplySubmit;
@@ -25,6 +26,7 @@ import com.sap.cap.esmapi.events.event.EV_LogMessage;
 import com.sap.cap.esmapi.exceptions.EX_ESMAPI;
 import com.sap.cap.esmapi.utilities.enums.EnumMessageType;
 import com.sap.cap.esmapi.utilities.enums.EnumStatus;
+import com.sap.cap.esmapi.utilities.pojos.TY_Account_CaseCreate;
 import com.sap.cap.esmapi.utilities.pojos.TY_AttachmentResponse;
 import com.sap.cap.esmapi.utilities.pojos.TY_Attachment_CaseCreate;
 import com.sap.cap.esmapi.utilities.pojos.TY_CaseDetails;
@@ -43,6 +45,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class EV_HDLR_CaseReplySubmit
 {
+    private final CL_CasePayloadBuilder CL_CasePayloadBuilder;
+
     @Autowired
     private MessageSource msgSrc;
 
@@ -54,6 +58,11 @@ public class EV_HDLR_CaseReplySubmit
 
     @Autowired
     private TY_CatgCus config;
+
+    EV_HDLR_CaseReplySubmit(CL_CasePayloadBuilder CL_CasePayloadBuilder)
+    {
+        this.CL_CasePayloadBuilder = CL_CasePayloadBuilder;
+    }
 
     @Async
     @EventListener
@@ -112,106 +121,107 @@ public class EV_HDLR_CaseReplySubmit
                                     caseReplyPayload.getNotes().addAll(caseNotesExisting);
                                 }
 
-                            }
-
-                            // Handle for Case Reply Current
-                            if (StringUtils.hasText(evCaseReply.getPayload().getCaseReply().getReply()))
-                            {
-                                // Reply Note Type Scan
-                                Optional<TY_CatgCusItem> cfgO = config.getCustomizations().stream()
-                                        .filter(c -> c.getCaseType().equals(
-                                                evCaseReply.getPayload().getCaseReply().getCaseDetails().getCaseType()))
-                                        .findFirst();
-                                if (cfgO.isPresent())
+                                // Handle for Case Reply Current
+                                if (StringUtils.hasText(evCaseReply.getPayload().getCaseReply().getReply()))
                                 {
-                                    // Create REply in Configured Note Type
-                                    if (StringUtils.hasText(cfgO.get().getReplyNoteType()))
+                                    // Reply Note Type Scan
+                                    Optional<TY_CatgCusItem> cfgO = config
+                                            .getCustomizations().stream().filter(c -> c.getCaseType().equals(evCaseReply
+                                                    .getPayload().getCaseReply().getCaseDetails().getCaseType()))
+                                            .findFirst();
+                                    if (cfgO.isPresent())
                                     {
-
-                                        // #JIRA - ESMLSO-516
-                                        /*
-                                         * Scramble Description for CC Information
-                                         */
-                                        String scrambledTxt = CL_ScramblingUtils
-                                                .scrambleText(evCaseReply.getPayload().getCaseReply().getReply());
-                                        if (StringUtils.hasText(scrambledTxt))
+                                        // Create REply in Configured Note Type
+                                        if (StringUtils.hasText(cfgO.get().getReplyNoteType()))
                                         {
+
+                                            // #JIRA - ESMLSO-516
+                                            /*
+                                             * Scramble Description for CC Information
+                                             */
+                                            String scrambledTxt = CL_ScramblingUtils
+                                                    .scrambleText(evCaseReply.getPayload().getCaseReply().getReply());
+                                            if (StringUtils.hasText(scrambledTxt))
+                                            {
+                                                // Create Note and Get Guid back
+                                                String noteId = srvCloudApiSrv.createNotes(new TY_NotesCreate(false,
+                                                        scrambledTxt, cfgO.get().getReplyNoteType()), desProps);
+                                                if (StringUtils.hasText(noteId))
+                                                {
+                                                    caseReplyPayload.getNotes().add(new TY_CaseReplyNote(scrambledTxt,
+                                                            null, noteId, cfgO.get().getReplyNoteType()));
+                                                }
+                                            }
+                                        }
+                                        else
+                                        {
+                                            // Create REply in Default Note Type
                                             // Create Note and Get Guid back
-                                            String noteId = srvCloudApiSrv.createNotes(new TY_NotesCreate(false,
-                                                    scrambledTxt, cfgO.get().getReplyNoteType()), desProps);
-                                            if (StringUtils.hasText(noteId))
+                                            // #JIRA - ESMLSO-516
+                                            /*
+                                             * Scramble Description for CC Information
+                                             */
+                                            String scrambledTxt = CL_ScramblingUtils
+                                                    .scrambleText(evCaseReply.getPayload().getCaseReply().getReply());
+                                            if (StringUtils.hasText(scrambledTxt))
                                             {
-                                                caseReplyPayload.getNotes().add(new TY_CaseReplyNote(scrambledTxt, null,
-                                                        noteId, cfgO.get().getReplyNoteType()));
+                                                String noteId = srvCloudApiSrv.createNotes(
+                                                        new TY_NotesCreate(false, scrambledTxt, null), desProps);
+                                                if (StringUtils.hasText(noteId))
+                                                {
+                                                    caseReplyPayload.getNotes().add(
+                                                            new TY_CaseReplyNote(scrambledTxt, null, noteId, null));
+                                                }
                                             }
+
                                         }
                                     }
-                                    else
+
+                                }
+
+                                // Check if Attachment needs to be Created
+                                if (CollectionUtils.isNotEmpty(evCaseReply.getPayload().getAttRespList()))
+                                {
+                                    // Prepare POJOdetails for TY_Case_SrvCloud newCaseEntity
+                                    List<TY_Attachment_CaseCreate> caseAttachmentsNew = new ArrayList<TY_Attachment_CaseCreate>();
+                                    for (TY_AttachmentResponse attR : evCaseReply.getPayload().getAttRespList())
                                     {
-                                        // Create REply in Default Note Type
-                                        // Create Note and Get Guid back
-                                        // #JIRA - ESMLSO-516
-                                        /*
-                                         * Scramble Description for CC Information
-                                         */
-                                        String scrambledTxt = CL_ScramblingUtils
-                                                .scrambleText(evCaseReply.getPayload().getCaseReply().getReply());
-                                        if (StringUtils.hasText(scrambledTxt))
+
+                                        if (StringUtils.hasText(attR.getId())
+                                                && StringUtils.hasText(attR.getUploadUrl()))
                                         {
-                                            String noteId = srvCloudApiSrv.createNotes(
-                                                    new TY_NotesCreate(false, scrambledTxt, null), desProps);
-                                            if (StringUtils.hasText(noteId))
-                                            {
-                                                caseReplyPayload.getNotes()
-                                                        .add(new TY_CaseReplyNote(scrambledTxt, null, noteId, null));
-                                            }
+                                            log.info("Attachment with id : " + attR.getId()
+                                                    + " already Persisted in Document Container..");
+
+                                            TY_Attachment_CaseCreate caseAttachment = new TY_Attachment_CaseCreate(
+                                                    attR.getId());
+                                            caseAttachmentsNew.add(caseAttachment);
+
                                         }
-
                                     }
+                                    caseReplyPayload.setAttachments(caseAttachmentsNew);
+
                                 }
 
-                            }
+                                // Pass the External User Flag for External User Logon
+                                caseReplyPayload.setExternal(evCaseReply.getPayload().getCaseReply().isExternal());
 
-                            // Check if Attachment needs to be Created
-                            if (CollectionUtils.isNotEmpty(evCaseReply.getPayload().getAttRespList()))
-                            {
-                                // Prepare POJOdetails for TY_Case_SrvCloud newCaseEntity
-                                List<TY_Attachment_CaseCreate> caseAttachmentsNew = new ArrayList<TY_Attachment_CaseCreate>();
-                                for (TY_AttachmentResponse attR : evCaseReply.getPayload().getAttRespList())
+                                if (caseReplyPayload != null)
                                 {
 
-                                    if (StringUtils.hasText(attR.getId()) && StringUtils.hasText(attR.getUploadUrl()))
+                                    applyMainPartnerOverride(caseReplyPayload, evCaseReply);
+                                    // Invoke Srv cloud API to Patch/Update the Case
+                                    if (srvCloudApiSrv.updateCasewithReply(
+                                            new TY_CasePatchInfo(caseDetails.getCaseGuid(),
+                                                    evCaseReply.getPayload().getCaseReply().getCaseDetails()
+                                                            .getCaseId(),
+                                                    caseDetails.getETag()),
+                                            caseReplyPayload, desProps))
                                     {
-                                        log.info("Attachment with id : " + attR.getId()
-                                                + " already Persisted in Document Container..");
-
-                                        TY_Attachment_CaseCreate caseAttachment = new TY_Attachment_CaseCreate(
-                                                attR.getId());
-                                        caseAttachmentsNew.add(caseAttachment);
-
+                                        handleCaseSuccUpdated(
+                                                evCaseReply.getPayload().getCaseReply().getCaseDetails().getCaseId(),
+                                                evCaseReply.getPayload().getSubmGuid(), evCaseReply);
                                     }
-                                }
-                                caseReplyPayload.setAttachments(caseAttachmentsNew);
-
-                            }
-
-                            // Pass the External User Flag for External User Logon
-                            caseReplyPayload.setExternal(evCaseReply.getPayload().getCaseReply().isExternal());
-
-                            if (caseReplyPayload != null)
-                            {
-                                // Invoke Srv cloud API to Patch/Update the Case
-                                if (srvCloudApiSrv
-                                        .updateCasewithReply(
-                                                new TY_CasePatchInfo(caseDetails.getCaseGuid(),
-                                                        evCaseReply.getPayload().getCaseReply().getCaseDetails()
-                                                                .getCaseId(),
-                                                        caseDetails.getETag()),
-                                                caseReplyPayload, desProps))
-                                {
-                                    handleCaseSuccUpdated(
-                                            evCaseReply.getPayload().getCaseReply().getCaseDetails().getCaseId(),
-                                            evCaseReply.getPayload().getSubmGuid(), evCaseReply);
                                 }
                             }
                         }
@@ -225,6 +235,28 @@ public class EV_HDLR_CaseReplySubmit
                 }
 
             }
+        }
+    }
+
+    private void applyMainPartnerOverride(TY_Case_SrvCloud_Reply payload, EV_CaseReplySubmit event)
+    {
+        String mdgAccount = event.getPayload().getMdgAccount();
+
+        if (payload.isExternal())
+        {
+            log.info(
+                    "External User Case Reply Submission - Main Partner Override can only be applied in this scenario. Scanning for MDG Account in Session.");
+
+            if (!StringUtils.hasText(mdgAccount))
+            {
+                log.debug("No MDG Account found in user session. Main partner will not be modified.");
+                return;
+            }
+
+            log.info("MDG Account found in session. Updating case payload with Account [{}].", mdgAccount);
+
+            payload.setAccount(new TY_Account_CaseCreate(mdgAccount));
+            payload.setIndividualCustomer(new TY_Account_CaseCreate(""));
         }
     }
 
