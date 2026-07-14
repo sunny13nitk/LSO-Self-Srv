@@ -211,7 +211,7 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                         if (!userSessInfo.getTokenDetails().get(GC_Constants.gc_TokenAttrib_UserName)
                                 .matches(rlConfig.getInternalUsersRegex()))
                         {
-                            log.info("User Marked as External User!");
+                            log.info("User Marked as External User!"); // Only P/S User(s)
                             usAccConEmpl.setExternal(true);
                             if (dS != null)
                             {
@@ -225,7 +225,7 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                         }
                         else
                         {
-                            log.info("User Marked as Internal User!");
+                            log.info("User Marked as Internal User!"); // Only I/D/C User(s)
                             if (dS != null)
                             {
                                 if (StringUtils.hasText(dS.getDestInternal()))

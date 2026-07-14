@@ -245,7 +245,7 @@ public class EV_HDLR_CaseReplySubmit
     {
         String mdgAccount = event.getPayload().getMdgAccount();
 
-        if (payload.isExternal())
+        // # Uncomment if (payload.isExternal())
         {
             log.info(
                     "External User Case Reply Submission - Main Partner Override can only be applied in this scenario. Scanning for MDG Account in Session.");
@@ -271,6 +271,16 @@ public class EV_HDLR_CaseReplySubmit
         { string, submId }, Locale.ENGLISH);
 
         log.info(msg);
+
+        if (evCaseReply.getPayload().getCaseReply().isExternal()
+                && StringUtils.hasText(evCaseReply.getPayload().getMdgAccount()))
+        {
+            log.info(
+                    "External User Case Reply Submission - Main Partner Override applied. MDG Account [{}] will be logged.",
+                    evCaseReply.getPayload().getMdgAccount());
+            msg += " Main Partner Override applied. MDG Account [" + evCaseReply.getPayload().getMdgAccount()
+                    + "] will be logged.";
+        }
         TY_Message logMsg = new TY_Message(evCaseReply.getPayload().getUserId(), Timestamp.from(Instant.now()),
                 EnumStatus.Success, EnumMessageType.SUCC_CASE_REPL_SAVE, evCaseReply.getPayload().getSubmGuid(), msg);
 
