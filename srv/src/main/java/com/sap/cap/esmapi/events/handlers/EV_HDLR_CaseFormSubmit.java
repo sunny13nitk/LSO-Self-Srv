@@ -52,7 +52,7 @@ public class EV_HDLR_CaseFormSubmit
                 {
                         String caseId = caseCreationSrv.createCase(evCaseFormSubmit);
                         log.info("Case created successfully with ID: {}", caseId);
-                        handleCaseSuccess(evCaseFormSubmit, cusItemO, caseId);
+                        handleCaseSuccCreated(evCaseFormSubmit, cusItemO, caseId);
                 }
                 catch (EX_ESMAPI ex)
                 {
@@ -80,7 +80,7 @@ public class EV_HDLR_CaseFormSubmit
                 // Instantiate and Fire the Event
                 EV_LogMessage logMsgEvent = new EV_LogMessage((Object) evCaseFormSubmit.getPayload().getSubmGuid(),
                                 logMsg);
-                applicationEventPublisher.publishEvent(logMsgEvent);
+                publisher.publishEvent(logMsgEvent);
 
                 // Should be handled Centrally via Aspect
                 throw new EX_ESMAPI(msg);
@@ -108,26 +108,6 @@ public class EV_HDLR_CaseFormSubmit
                 EV_LogMessage logMsgEvent = new EV_LogMessage((Object) evCaseFormSubmit.getPayload().getSubmGuid(),
                                 logMsg);
                 publisher.publishEvent(logMsgEvent);
-        }
-
-        private void handleCaseCreationError(EV_CaseFormSubmit evCaseFormSubmit, Exception e)
-        {
-                String msg;
-                msg = msgSrc.getMessage("ERR_CASE_POST", new Object[]
-                { e.getLocalizedMessage(), evCaseFormSubmit.getPayload().getSubmGuid() }, Locale.ENGLISH);
-
-                log.error(msg);
-                TY_Message logMsg = new TY_Message(evCaseFormSubmit.getPayload().getUserId(),
-                                Timestamp.from(Instant.now()), EnumStatus.Error, EnumMessageType.ERR_CASE_CATG,
-                                evCaseFormSubmit.getPayload().getSubmGuid(), msg);
-
-                // Instantiate and Fire the Event
-                EV_LogMessage logMsgEvent = new EV_LogMessage((Object) evCaseFormSubmit.getPayload().getSubmGuid(),
-                                logMsg);
-                publisher.publishEvent(logMsgEvent);
-
-                // Should be handled Centrally via Aspect
-                throw new EX_ESMAPI(msg);
         }
 
 }
