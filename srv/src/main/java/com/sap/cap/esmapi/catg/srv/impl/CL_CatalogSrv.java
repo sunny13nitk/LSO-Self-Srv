@@ -123,10 +123,9 @@ public class CL_CatalogSrv implements IF_CatalogSrv
                     // Remove blank Categories from Catalog Tree Used for UI Presentation
                     // Add level 1 and level 2 categories to single list for scanning the category
                     // hierarchy for selected category id
-                    catalogTree.getCategories().removeIf(x -> x.getId() == null);
-                    catalogTree.getCategorieslvl2().removeIf(x -> x.getId() == null);
-                    catgTreeAll.addAll(catalogTree.getCategories());
-                    catgTreeAll.addAll(catalogTree.getCategorieslvl2());
+                    //Instead of removing permanently, adding only non null category
+                    catalogTree.getCategories().stream().filter(x -> x.getId() != null).forEach(catgTreeAll::add);
+                    catalogTree.getCategorieslvl2().stream().filter(x -> x.getId() != null).forEach(catgTreeAll::add);
                     // Scan for Category in Catalog Tree
                     Optional<TY_CatalogItem> itemSel = catgTreeAll.stream().filter(t -> t.getId().equals(catScan))
                             .findFirst();
@@ -158,11 +157,6 @@ public class CL_CatalogSrv implements IF_CatalogSrv
                 {
                     log.info("Category Hierarchy Array at index : " + i + " has category id : " + catTree[i]);
                 }
-                if (addBlank)
-                {
-                    // Refurbish Blank Category at Top for New Form - Session maintained
-                    catalogTree.getCategories().add(0, new TY_CatalogItem());
-                }
 
             }
         }
@@ -182,10 +176,9 @@ public class CL_CatalogSrv implements IF_CatalogSrv
             if (CollectionUtils.isNotEmpty(catgTree.getCategories()))
             {
                 // Remove blank Categories from Catalog Tree Used for UI Presentation
-                catgTree.getCategories().removeIf(x -> x.getId() == null);
-
+                //Instead of removing permanently, adding only non null category
                 Optional<TY_CatalogItem> currCatgDetailsO = catgTree.getCategories().stream()
-                        .filter(f -> f.getId().equals(catId)).findFirst();
+                        .filter(f -> f.getId() != null && f.getId().equals(catId)).findFirst();
                 if (currCatgDetailsO.isPresent())
                 {
                     // 1. Get Text from Catg Guid selected in form and Convert to Upper Case
@@ -237,8 +230,6 @@ public class CL_CatalogSrv implements IF_CatalogSrv
                     }
                 }
 
-                // Refurbish Blank Category at Top for New Form - Session maintained
-                catgTree.getCategories().add(0, new TY_CatalogItem());
             }
 
         }
@@ -265,10 +256,9 @@ public class CL_CatalogSrv implements IF_CatalogSrv
 
                     log.info("Scanning Category details for level 1 category ..  " + catId);
                     // Remove blank Categories from Catalog Tree Used for UI Presentation
-                    catgTree.getCategories().removeIf(x -> x.getId() == null);
-
+                    //Instead of removing permanently, adding only non null category
                     Optional<TY_CatalogItem> currCatgDetailsO = catgTree.getCategories().stream()
-                            .filter(f -> f.getId().equals(catId)).findFirst();
+                            .filter(f -> f.getId() != null && f.getId().equals(catId)).findFirst();
                     if (currCatgDetailsO.isPresent())
                     {
                         catgDetails = new TY_CatgDetails();
@@ -310,10 +300,9 @@ public class CL_CatalogSrv implements IF_CatalogSrv
                 {
                     log.info("Scanning Category details for level 2 category ..  " + catId);
                     // Remove blank Categories from Catalog Tree Used for UI Presentation
-                    catgTree.getCategorieslvl2().removeIf(x -> x.getId() == null);
-
+                    //Instead of removing permanently, adding only non null category
                     Optional<TY_CatalogItem> currCatgDetailsO = catgTree.getCategorieslvl2().stream()
-                            .filter(f -> f.getId().equals(catId)).findFirst();
+                            .filter(f -> f.getId() != null && f.getId().equals(catId)).findFirst();
                     if (currCatgDetailsO.isPresent())
                     {
                         catgDetails = new TY_CatgDetails();
@@ -338,9 +327,6 @@ public class CL_CatalogSrv implements IF_CatalogSrv
                         catgDetails.setRoot(isLvl1);
 
                     }
-
-                    // Refurbish Blank Category at Top for New Form - Session maintained
-                    catgTree.getCategories().add(0, new TY_CatalogItem());
                 }
             }
         }
@@ -562,8 +548,15 @@ public class CL_CatalogSrv implements IF_CatalogSrv
 
         if (CollectionUtils.isNotEmpty(caseCatgTree.getCategories()))
         {
-            caseCatgTree.getCategories().add(0, new TY_CatalogItem());
-            caseCatgTree.getCategorieslvl2().add(0, new TY_CatalogItem());
+            //Instead of blank adding --select--
+            TY_CatalogItem blankLvl1 = new TY_CatalogItem();
+            blankLvl1.setId("");
+            blankLvl1.setName("-- Select --");
+            caseCatgTree.getCategories().add(0, blankLvl1);
+            TY_CatalogItem blankLvl2 = new TY_CatalogItem();
+            blankLvl2.setId("");
+            blankLvl2.setName("-- Select --");
+            caseCatgTree.getCategorieslvl2().add(0, blankLvl2);
         }
         return caseCatgTree;
     }

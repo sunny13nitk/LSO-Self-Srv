@@ -63,7 +63,30 @@ public class EV_HDLR_CaseFormSubmit
                 }
         }
 
-        private void handleCaseSuccess(EV_CaseFormSubmit evCaseFormSubmit, Optional<TY_CatgCusItem> cusItemO,
+        private void handleCaseCreationError(EV_CaseFormSubmit evCaseFormSubmit, Exception e)
+        {
+                String msg;
+                msg = msgSrc.getMessage("ERR_CASE_POST", new Object[]
+                { e.getLocalizedMessage(), evCaseFormSubmit.getPayload().getSubmGuid() }, Locale.ENGLISH);
+
+                log.error(msg);
+                TY_Message logMsg = new TY_Message(evCaseFormSubmit.getPayload().getUserId(),
+                                Timestamp.from(Instant.now()), EnumStatus.Error, EnumMessageType.ERR_CASE_CREATE,
+                                evCaseFormSubmit.getPayload().getSubmGuid(), msg,
+                                evCaseFormSubmit.getPayload().getCaseForm().getCountry(),
+                                evCaseFormSubmit.getPayload().getCaseForm().getCatgText(),
+                                evCaseFormSubmit.getPayload().getCaseForm().getCatg2Text());
+
+                // Instantiate and Fire the Event
+                EV_LogMessage logMsgEvent = new EV_LogMessage((Object) evCaseFormSubmit.getPayload().getSubmGuid(),
+                                logMsg);
+                applicationEventPublisher.publishEvent(logMsgEvent);
+
+                // Should be handled Centrally via Aspect
+                throw new EX_ESMAPI(msg);
+        }
+
+        private void handleCaseSuccCreated(EV_CaseFormSubmit evCaseFormSubmit, Optional<TY_CatgCusItem> cusItemO,
                         String caseID)
         {
                 String msg = "Case ID : " + caseID + " created..";
@@ -76,7 +99,10 @@ public class EV_HDLR_CaseFormSubmit
 
                 TY_Message logMsg = new TY_Message(evCaseFormSubmit.getPayload().getUserId(),
                                 Timestamp.from(Instant.now()), EnumStatus.Success, EnumMessageType.SUCC_CASE_CREATE,
-                                evCaseFormSubmit.getPayload().getSubmGuid(), msg);
+                                evCaseFormSubmit.getPayload().getSubmGuid(), msg,
+                                evCaseFormSubmit.getPayload().getCaseForm().getCountry(),
+                                evCaseFormSubmit.getPayload().getCaseForm().getCatgText(),
+                                evCaseFormSubmit.getPayload().getCaseForm().getCatg2Text());
 
                 // Instantiate and Fire the Event
                 EV_LogMessage logMsgEvent = new EV_LogMessage((Object) evCaseFormSubmit.getPayload().getSubmGuid(),
@@ -92,7 +118,7 @@ public class EV_HDLR_CaseFormSubmit
 
                 log.error(msg);
                 TY_Message logMsg = new TY_Message(evCaseFormSubmit.getPayload().getUserId(),
-                                Timestamp.from(Instant.now()), EnumStatus.Error, EnumMessageType.ERR_CASE_CREATE,
+                                Timestamp.from(Instant.now()), EnumStatus.Error, EnumMessageType.ERR_CASE_CATG,
                                 evCaseFormSubmit.getPayload().getSubmGuid(), msg);
 
                 // Instantiate and Fire the Event
