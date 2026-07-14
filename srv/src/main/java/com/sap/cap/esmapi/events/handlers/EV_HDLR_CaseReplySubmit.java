@@ -245,7 +245,7 @@ public class EV_HDLR_CaseReplySubmit
     {
         String mdgAccount = event.getPayload().getMdgAccount();
 
-        // # Uncomment if (payload.isExternal())
+        if (payload.isExternal())
         {
             log.info(
                     "External User Case Reply Submission - Main Partner Override can only be applied in this scenario. Scanning for MDG Account in Session.");
