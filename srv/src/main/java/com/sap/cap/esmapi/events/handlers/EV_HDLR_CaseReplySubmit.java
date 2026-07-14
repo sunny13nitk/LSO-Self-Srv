@@ -79,6 +79,9 @@ public class EV_HDLR_CaseReplySubmit
                 // Case Reply Form Attached
                 if (evCaseReply.getPayload().getCaseReply() != null)
                 {
+                    log.info("Processing Case Reply Submission for Case GUID: "
+                            + evCaseReply.getPayload().getCaseReply().getCaseDetails().getCaseGuid());
+                    log.info("Is External  : " + evCaseReply.getPayload().getCaseReply().isExternal());
                     TY_DestinationProps desProps = evCaseReply.getPayload().getDesProps();
                     // Case GUID , Type and ETag Bound
                     if (StringUtils.hasText(evCaseReply.getPayload().getCaseReply().getCaseDetails().getCaseGuid())

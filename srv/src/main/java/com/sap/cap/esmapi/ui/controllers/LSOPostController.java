@@ -595,6 +595,7 @@ public class LSOPostController
 
                 // External/Internal User Pass to Asynch Thread as Session Scoped Service would
                 // not be accessible in Asynch thread
+                log.info("External User: " + userSessSrv.getUserDetails4mSession().isExternal());
                 caseEditFormAsync.getCaseReply().setExternal(userSessSrv.getUserDetails4mSession().isExternal());
                 // Access mdgAccount rom User Session and set in the caseEditFormAsync object to
                 // be used in the asynch thread
