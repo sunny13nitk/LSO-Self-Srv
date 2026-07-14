@@ -109,7 +109,7 @@ public class CL_ESS_UISrv implements IF_ESS_UISrv
     @Override
     public List<TY_CaseESS> getCases4User(Ty_UserAccountEmployee userDetails) throws IOException
     {
-        return srvCloudApiSrv.getCases4User(userDetails, userSessionSrv.getDestinationDetails4mUserSession());
+        return null;
     }
 
     @Override

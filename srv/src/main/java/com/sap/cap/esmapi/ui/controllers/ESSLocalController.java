@@ -99,8 +99,8 @@ public class ESSLocalController
 
                 // Set Cases to Null on each refresh
                 userDetails.setCases(null);
-                userDetails.setCases(srvCloudApiSrv.getCases4User(userAcc.getAccountId(),
-                        userSessionSrv.getDestinationDetails4mUserSession()));
+                // userDetails.setCases(srvCloudApiSrv.getCases4User(userAcc.getAccountId(),
+                // userSessionSrv.getDestinationDetails4mUserSession()));
                 if (userDetails != null && uiSrv != null && !CollectionUtils.isEmpty(userDetails.getCases()))
                 {
                     System.out.println("Number of cases post API call 4m Controller: " + userDetails.getCases().size());

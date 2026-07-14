@@ -230,7 +230,8 @@ public class CL_SplCatgCaseCreateSrv implements IF_SplCatgCaseCreateSrv
 
                 try
                 {
-                    caseID = srvCloudApiSrv.createCase4Employee(newCaseEntity4Employee, desProps);
+                    // caseID = srvCloudApiSrv.createCase4Employee(newCaseEntity4Employee,
+                    // desProps);
                     if (StringUtils.hasText(caseID))
                     {
                         log.info("Case created with ID : " + caseID);
@@ -376,7 +377,8 @@ public class CL_SplCatgCaseCreateSrv implements IF_SplCatgCaseCreateSrv
 
                 try
                 {
-                    caseID = srvCloudApiSrv.createCase4Customer(newCaseEntity4Customer, desProps);
+                    // caseID = srvCloudApiSrv.createCase4Customer(newCaseEntity4Customer,
+                    // desProps);
                     if (StringUtils.hasText(caseID))
                     {
                         log.info("Case created with ID : " + caseID);

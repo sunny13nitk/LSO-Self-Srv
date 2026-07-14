@@ -132,11 +132,24 @@ public class CL_CaseCreationService implements IF_CaseCreationService
     private void logContext(TY_CaseContext context)
     {
         log.info("========== Case Context ==========");
+
         log.info("Scenario      : {}", context.getCaseScenario());
-        log.info("Main Partner  : {}", context.getCaseScenario().getMainPartnerType());
-        log.info("Reporter      : {}", context.getCaseScenario().getReporterType());
-        log.info("Note Present  : {}", context.getDescription() != null);
-        log.info("Attachments   : {}", context.getAttachments().size());
+
+        if (context.getCaseScenario() != null)
+        {
+            log.info("Main Partner  : {}", context.getCaseScenario().getMainPartnerType());
+            log.info("Reporter      : {}", context.getCaseScenario().getReporterType());
+        }
+
+        log.info("Note Present  : {}",
+                StringUtils.hasText(context.getCaseEvent().getPayload().getCaseForm().getDescription()));
+
+        List<TY_AttachmentResponse> attachments = context.getCaseEvent().getPayload().getAttRespList();
+
+        log.info("Attachments   : {}", attachments == null ? 0 : attachments.size());
+
+        log.info("Destination   : {}", context.getDestinationProps().getBaseUrl());
+
         log.info("==================================");
     }
 }

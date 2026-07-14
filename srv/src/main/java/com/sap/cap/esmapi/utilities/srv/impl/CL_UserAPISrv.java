@@ -176,8 +176,7 @@ public class CL_UserAPISrv implements IF_UserAPISrv
 
     private List<TY_CaseESS> getCases4User() throws IOException
     {
-        return srvCloudApiSrv.getCases4User(userData.getAccountId(),
-                userSessionSrv.getDestinationDetails4mUserSession());
+        return null;
     }
 
 }
