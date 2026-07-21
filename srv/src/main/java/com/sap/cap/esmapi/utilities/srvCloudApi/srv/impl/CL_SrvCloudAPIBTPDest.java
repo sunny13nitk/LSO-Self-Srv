@@ -1676,6 +1676,11 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
 
                                         caseDetails = new TY_CaseDetails();
                                         caseDetails.setCaseGuid(caseId);
+                                        caseDetails.setCaseId(caseNode.path("displayId").asText(null));
+                                        caseDetails.setCaseType(caseNode.path("caseType").asText(null));
+                                        caseDetails.setOrigin(caseNode.path("origin").asText(null));
+                                        caseDetails.setStatus(caseNode.path("status").asText(null));
+
                                         caseDetails.setETag(eTag);
                                         caseDetails.setNotes(new ArrayList<>());
 
