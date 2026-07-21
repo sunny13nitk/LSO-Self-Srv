@@ -21,4 +21,5 @@ public class TY_Case_SrvCloud_Reply
     private List<TY_Attachment_CaseCreate> attachments;
     private TY_Account_CaseCreate account;
     private TY_Account_CaseCreate individualCustomer;
+    private TY_Employee_CaseCreate employee;
 }

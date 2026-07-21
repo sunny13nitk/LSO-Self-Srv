@@ -21,6 +21,9 @@ public class TY_CaseDetails
     private String description;
     private String eTag;
     private String catgLvl1;
+    private String employeeId;
+    private String accountId;
+    private String individualCustomerId;
 
     private List<TY_NotesDetails> notes;
 

@@ -1663,38 +1663,33 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
 
                                 if (jsonNode != null)
                                 {
+                                    JsonNode cases = jsonNode.path("value");
 
-                                    JsonNode rootNode = jsonNode.path("value");
-                                    if (rootNode != null)
+                                    if (cases.isArray() && !cases.isEmpty())
                                     {
+                                        JsonNode caseNode = cases.get(0);
+
+                                        JsonNode employeeNode = caseNode.path("employee");
+                                        JsonNode accountNode = caseNode.path("account");
+                                        JsonNode individualCustomerNode = caseNode.path("individualCustomer");
+                                        JsonNode categoryNode = caseNode.path("categoryLevel1");
+
                                         caseDetails = new TY_CaseDetails();
                                         caseDetails.setCaseGuid(caseId);
                                         caseDetails.setETag(eTag);
-                                        caseDetails.setNotes(new ArrayList<TY_NotesDetails>());
+                                        caseDetails.setNotes(new ArrayList<>());
 
-                                        JsonNode catEnt = rootNode.path("categoryLevel1");
-                                        if (catEnt != null)
+                                        caseDetails.setEmployeeId(employeeNode.path("id").asText(null));
+                                        caseDetails.setAccountId(accountNode.path("id").asText(null));
+                                        caseDetails.setIndividualCustomerId(
+                                                individualCustomerNode.path("id").asText(null));
+
+                                        String categoryId = categoryNode.path("id").asText(null);
+
+                                        if (StringUtils.hasText(categoryId))
                                         {
-                                            // log.info("AdminData Node Bound");
-
-                                            Iterator<String> fieldNamesCat = catEnt.fieldNames();
-                                            while (fieldNamesCat.hasNext())
-                                            {
-                                                String catFieldName = fieldNamesCat.next();
-                                                if (catFieldName.equals("id"))
-                                                {
-                                                    // log.info( "Created On : " +
-                                                    // admEnt.get(admFieldName).asText());
-                                                    String catglvl1 = catEnt.get(catFieldName).asText();
-                                                    if (StringUtils.hasText(catglvl1))
-                                                    {
-                                                        caseDetails.setCatgLvl1(catglvl1);
-                                                    }
-                                                }
-                                            }
-
+                                            caseDetails.setCatgLvl1(categoryId);
                                         }
-
                                     }
                                 }
 

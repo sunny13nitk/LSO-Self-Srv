@@ -33,6 +33,7 @@ import com.sap.cap.esmapi.utilities.pojos.TY_CaseDetails;
 import com.sap.cap.esmapi.utilities.pojos.TY_CasePatchInfo;
 import com.sap.cap.esmapi.utilities.pojos.TY_CaseReplyNote;
 import com.sap.cap.esmapi.utilities.pojos.TY_Case_SrvCloud_Reply;
+import com.sap.cap.esmapi.utilities.pojos.TY_Employee_CaseCreate;
 import com.sap.cap.esmapi.utilities.pojos.TY_Message;
 import com.sap.cap.esmapi.utilities.pojos.TY_NotesCreate;
 import com.sap.cap.esmapi.utilities.scrambling.CL_ScramblingUtils;
@@ -212,7 +213,7 @@ public class EV_HDLR_CaseReplySubmit
                                 if (caseReplyPayload != null)
                                 {
 
-                                    applyMainPartnerOverride(caseReplyPayload, evCaseReply);
+                                    populateMainPartner(caseReplyPayload, caseDetails, evCaseReply);
                                     // Invoke Srv cloud API to Patch/Update the Case
                                     if (srvCloudApiSrv.updateCasewithReply(
                                             new TY_CasePatchInfo(caseDetails.getCaseGuid(),
@@ -241,25 +242,81 @@ public class EV_HDLR_CaseReplySubmit
         }
     }
 
-    private void applyMainPartnerOverride(TY_Case_SrvCloud_Reply payload, EV_CaseReplySubmit event)
+    private void populateMainPartner(TY_Case_SrvCloud_Reply payload, TY_CaseDetails caseDetails,
+            EV_CaseReplySubmit event)
     {
+        if (caseDetails == null)
+        {
+            return;
+        }
+
+        /*
+         * ------------------------------------------------------- Step 1 Preserve the
+         * current Main Partner from Service Cloud
+         * -------------------------------------------------------
+         */
+
+        if (StringUtils.hasText(caseDetails.getAccountId()))
+        {
+            payload.setAccount(new TY_Account_CaseCreate(caseDetails.getAccountId()));
+
+            log.info("Existing Main Partner : Account [{}]", caseDetails.getAccountId());
+        }
+        else if (StringUtils.hasText(caseDetails.getIndividualCustomerId()))
+        {
+            payload.setIndividualCustomer(new TY_Account_CaseCreate(caseDetails.getIndividualCustomerId()));
+
+            log.info("Existing Main Partner : Individual Customer [{}]", caseDetails.getIndividualCustomerId());
+        }
+        else if (StringUtils.hasText(caseDetails.getEmployeeId()))
+        {
+            payload.setEmployee(new TY_Employee_CaseCreate(caseDetails.getEmployeeId()));
+
+            log.info("Existing Main Partner : Employee [{}]", caseDetails.getEmployeeId());
+        }
+
+        /*
+         * ------------------------------------------------------- Step 2 External user
+         * specific substitution -------------------------------------------------------
+         */
+
+        if (!payload.isExternal())
+        {
+            log.info("Internal user. Existing Main Partner preserved.");
+            return;
+        }
+
+        log.info("External user detected.");
+
         String mdgAccount = event.getPayload().getMdgAccount();
 
-        if (payload.isExternal())
+        if (!StringUtils.hasText(mdgAccount))
         {
-            log.info(
-                    "External User Case Reply Submission - Main Partner Override can only be applied in this scenario. Scanning for MDG Account in Session.");
+            log.info("No MDG Account found in session. Existing Main Partner preserved.");
+            return;
+        }
 
-            if (!StringUtils.hasText(mdgAccount))
-            {
-                log.debug("No MDG Account found in user session. Main partner will not be modified.");
-                return;
-            }
+        /*
+         * Only substitute when the case does NOT already have an Account.
+         */
 
-            log.info("MDG Account found in session. Updating case payload with Account [{}].", mdgAccount);
+        if (payload.getAccount() == null)
+        {
+            log.info("Applying Main Partner substitution. MDG Account [{}]", mdgAccount);
+
+            /*
+             * Replace IC with Account.
+             *
+             * Employee (if any) is intentionally preserved.
+             */
+
+            payload.setIndividualCustomer(new TY_Account_CaseCreate(""));
 
             payload.setAccount(new TY_Account_CaseCreate(mdgAccount));
-            payload.setIndividualCustomer(new TY_Account_CaseCreate(""));
+        }
+        else
+        {
+            log.info("Case already associated with an Account. No substitution required.");
         }
     }
 
