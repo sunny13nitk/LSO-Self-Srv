@@ -1663,18 +1663,17 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
 
                                 if (jsonNode != null)
                                 {
-                                    JsonNode cases = jsonNode.path("value");
+                                    JsonNode caseNode = jsonNode.path("value");
 
-                                    if (cases.isArray() && !cases.isEmpty())
+                                    if (!caseNode.isMissingNode() && caseNode.isObject())
                                     {
-                                        JsonNode caseNode = cases.get(0);
-
                                         JsonNode employeeNode = caseNode.path("employee");
                                         JsonNode accountNode = caseNode.path("account");
                                         JsonNode individualCustomerNode = caseNode.path("individualCustomer");
                                         JsonNode categoryNode = caseNode.path("categoryLevel1");
 
                                         caseDetails = new TY_CaseDetails();
+
                                         caseDetails.setCaseGuid(caseId);
                                         caseDetails.setCaseId(caseNode.path("displayId").asText(null));
                                         caseDetails.setCaseType(caseNode.path("caseType").asText(null));
@@ -1685,17 +1684,15 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                                         caseDetails.setNotes(new ArrayList<>());
 
                                         caseDetails.setEmployeeId(employeeNode.path("id").asText(null));
+
                                         caseDetails.setAccountId(accountNode.path("id").asText(null));
+
                                         caseDetails.setIndividualCustomerId(
                                                 individualCustomerNode.path("id").asText(null));
 
-                                        String categoryId = categoryNode.path("id").asText(null);
-
-                                        if (StringUtils.hasText(categoryId))
-                                        {
-                                            caseDetails.setCatgLvl1(categoryId);
-                                        }
+                                        caseDetails.setCatgLvl1(categoryNode.path("id").asText(null));
                                     }
+
                                 }
 
                             }
