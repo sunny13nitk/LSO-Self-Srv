@@ -1,0 +1,19 @@
+caseTypeEnum,catg1,catg2,rank
+Learning,Learning Advisory,Course and Delivery Information,1
+Learning,Learning Advisory,On Demand/3toRun,2
+Learning,Learning Advisory,Learning Hub Information,3
+Learning,Learning Advisory,Authorized Education & Training Partners,4
+Learning,Learning Advisory,People to Work,5
+Learning,Learning Advisory,Training Center Information,6
+Learning,Learning Advisory,Others,7
+Learning,Certification & Stay Certified,Stay Certified Advisory,1
+Learning,Certification & Stay Certified,Others,2
+Learning,Booking & Order,SAP Learning Class Support,1
+Learning,Booking & Order,SAP Learning Class: Partner Delivery Support,2
+Learning,Booking & Order,SAP Certification : Order & Activation Code,3
+Learning,Booking & Order,SAP Learning Hub: Activation Code,4
+Learning,Booking & Order,SAP Learning Hub: Partner Reseller Booking,5
+Learning,Booking & Order,Others,6
+Learning,Learning Virtual Class Support,Course Schedule Information,1
+Learning,Learning Virtual Class Support,Course Material,2
+Learning,Learning Virtual Class Support,Others,3
