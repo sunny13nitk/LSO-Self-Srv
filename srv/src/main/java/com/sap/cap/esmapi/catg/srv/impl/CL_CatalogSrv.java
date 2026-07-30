@@ -657,7 +657,9 @@ public class CL_CatalogSrv implements IF_CatalogSrv
 
         // Get Level 2 Rank entries for the current Case Type and Level 1 parent
         List<TY_Catg2RanksItem> currCatg2Ranks = catg2Ranks.getCatg2RankItems().stream()
-                .filter(c -> c.getCaseTypeEnum().equals(caseType) && StringUtils.hasText(c.getCatg1())
+                .filter(c -> c.getCaseTypeEnum() != null
+                        && c.getCaseTypeEnum().equals(caseType)
+                        && StringUtils.hasText(c.getCatg1())
                         && c.getCatg1().equals(catg1Name))
                 .collect(Collectors.toList());
 

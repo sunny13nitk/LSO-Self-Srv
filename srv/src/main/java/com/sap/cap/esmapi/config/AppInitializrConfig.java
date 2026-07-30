@@ -134,11 +134,9 @@ public class AppInitializrConfig
     @Bean
     public TY_Catg2Ranks loadCatg2Ranks4mConfig()
     {
-        TY_Catg2Ranks catg2RanksCus = null;
-
+        TY_Catg2Ranks catg2RanksCus = new TY_Catg2Ranks(new java.util.ArrayList<>());
         try
         {
-
             ClassPathResource classPathResource = new ClassPathResource(configCatg2Ranks);
             if (classPathResource != null)
             {
@@ -148,23 +146,24 @@ public class AppInitializrConfig
                     log.info("Resource Bound... ");
                     List<TY_Catg2RanksItem> configs = new CsvToBeanBuilder(reader).withSkipLines(1)
                             .withType(TY_Catg2RanksItem.class).build().parse();
-
                     if (!CollectionUtils.isEmpty(configs))
                     {
                         log.info("Entries in Config. Found for Case Level 2 Categories and Relative Ranks: "
                                 + configs.size());
                         catg2RanksCus = new TY_Catg2Ranks(configs);
                     }
+                    else
+                    {
+                        log.info("No entries found in config file: " + configCatg2Ranks);
+                    }
                 }
             }
-
         }
         catch (Exception e)
         {
             throw new EX_ESMAPI(msgSrc.getMessage("ERR_CASETYPE_CFG", new Object[]
-            { configPath, e.getLocalizedMessage() }, Locale.ENGLISH));
+                    { configCatg2Ranks, e.getLocalizedMessage() }, Locale.ENGLISH));
         }
-
         return catg2RanksCus;
     }
 

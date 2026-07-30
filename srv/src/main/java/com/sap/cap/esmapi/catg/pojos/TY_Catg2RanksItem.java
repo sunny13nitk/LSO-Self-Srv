@@ -22,6 +22,6 @@ public class TY_Catg2RanksItem
     @CsvBindByPosition(position = 2)
     private String catg2;
     @CsvBindByPosition(position = 3)
-    private int rank;
+    private Integer rank;
 
 }
