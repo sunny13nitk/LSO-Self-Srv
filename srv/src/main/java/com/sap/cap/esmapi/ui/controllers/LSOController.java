@@ -214,7 +214,8 @@ public class LSOController
         String viewCaseForm = caseFormViewLXSS;
 
         if ((StringUtils.hasText(userSessSrv.getUserDetails4mSession().getAccountId())
-                || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId()))
+                || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId())
+                || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getMdgAccount()))
                 && !CollectionUtils.isEmpty(catgCusSrv.getCustomizations()) && userInfo.isAuthenticated())
         {
 
@@ -299,7 +300,8 @@ public class LSOController
     {
 
         if ((StringUtils.hasText(userSessSrv.getUserDetails4mSession().getAccountId())
-                || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId()))
+                || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId())
+                || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getMdgAccount()))
                 && !CollectionUtils.isEmpty(catgCusSrv.getCustomizations())
                 && userSessSrv.getCurrentForm4Submission() != null)
         {
@@ -490,7 +492,8 @@ public class LSOController
         String viewName = null;
 
         if ((StringUtils.hasText(userSessSrv.getUserDetails4mSession().getAccountId())
-                || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId()))
+                || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId())
+                || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getMdgAccount()))
                 && !CollectionUtils.isEmpty(catgCusSrv.getCustomizations())
                 && userSessSrv.getCurrentForm4Submission() != null)
         {
@@ -1015,7 +1018,8 @@ public class LSOController
                 // additional fields
 
                 if ((StringUtils.hasText(userSessSrv.getUserDetails4mSession().getAccountId())
-                        || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId()))
+                        || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId())
+                        || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getMdgAccount()))
                         && !CollectionUtils.isEmpty(catgCusSrv.getCustomizations()))
                 {
 

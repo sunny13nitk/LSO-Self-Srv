@@ -285,7 +285,7 @@
 
       <!-- Form Row - Begin  -->
 
-      <div class="row flex-justify-center" th:if="${caseForm.getAccId() != null}">
+      <div class="row flex-justify-center" th:if="${caseForm.getAccId() != null or caseForm.getMdgAccount() != null}">
 
          <!--Error Messages Row - Starts -->
 
