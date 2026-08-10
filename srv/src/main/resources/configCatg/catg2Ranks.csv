@@ -6,14 +6,52 @@ Learning,Learning Advisory,Authorized Education & Training Partners,4
 Learning,Learning Advisory,People to Work,5
 Learning,Learning Advisory,Training Center Information,6
 Learning,Learning Advisory,Others,7
-Learning,Certification & Stay Certified,Stay Certified Advisory,1
-Learning,Certification & Stay Certified,Others,2
+Learning,Certification & Stay Certified ,Certification Advisory,1
+Learning,Certification & Stay Certified ,Stay Certified Advisory,2
+Learning,Certification & Stay Certified ,Certification/Badge Update,3
+Learning,Certification & Stay Certified ,Universal ID - Related Certification Issues,4
+Learning,Certification & Stay Certified ,Stay Certified/Badge - Expiry & Renewal,5
+Learning,Certification & Stay Certified ,Others,6
 Learning,Booking & Order,SAP Learning Class Support,1
-Learning,Booking & Order,SAP Learning Class: Partner Delivery Support,2
-Learning,Booking & Order,SAP Certification : Order & Activation Code,3
-Learning,Booking & Order,SAP Learning Hub: Activation Code,4
-Learning,Booking & Order,SAP Learning Hub: Partner Reseller Booking,5
+Learning,Booking & Order,SAP Learning Class Support: Partner Delivery,2
+Learning,Booking & Order,SAP Certification: Orders and Activation Codes,3
+Learning,Booking & Order,SAP Learning Hub: Activation Codes,4
+Learning,Booking & Order,SAP Learning Hub: Partner Reseller Bookings,5
 Learning,Booking & Order,Others,6
 Learning,Learning Virtual Class Support,Course Schedule Information,1
 Learning,Learning Virtual Class Support,Course Material,2
 Learning,Learning Virtual Class Support,Others,3
+Learning,Access & Universal ID,Registration & Login & Authentication,1
+Learning,Access & Universal ID,Universal ID,2
+Learning,Access & Universal ID,Access & Entitlement,3
+Learning,Access & Universal ID,Account & Profile Update,4
+Learning,Access & Universal ID,General Queries,5
+Learning,Learning Experience - Technical Issues,Content Issue,1
+Learning,Learning Experience - Technical Issues,Customer Configuration,2
+Learning,Learning Experience - Technical Issues,Functional/Performance Issues,3
+Learning,Learning Experience - Technical Issues,System Downtime,4
+Learning,Learning Experience - Technical Issues,General Queries,5
+Learning,SAP Learning Hub Admin Service,Learning Manager/Reporting Role,1
+Learning,SAP Learning Hub Admin Service,User & License Management,2
+Learning,Practice Systems,Course / Material,1
+Learning,Practice Systems,Exercise / Demo related,2
+Learning,Practice Systems,Login and Access to Practice Systems,3
+Learning,Practice Systems,Performance and other Technical Issues,4
+Learning,Practice Systems,"Prep, System Delivery and CATT",5
+Learning,Practice Systems,Server Deployment Issues,6
+Learning,Practice Systems,Trainer / Learner Readiness,7
+Learning,Practice Systems,Others,8
+Learning,Exam - System Based Assessment,Access & Enrollment,1
+Learning,Exam - System Based Assessment,Coaching feedback,2
+Learning,Exam - System Based Assessment,How-To & User Guidance Requests,3
+Learning,Exam - System Based Assessment,Retry & Attempt Management,4
+Learning,Exam - System Based Assessment,Score Review & Assessment Results,5
+Learning,Exam - System Based Assessment,Task/Exercise Issues,6
+Learning,Exam - System Based Assessment,Technical Issues & System Failures,7
+Learning,Exam - System Based Assessment,Others,8
+Learning,Exam - Scenario Based Assessment,How-To & User Guidance Requests,1
+Learning,Exam - Scenario Based Assessment,Exam Technical Issues & System Failures,2
+Learning,Exam - Scenario Based Assessment,Retry & Attempt Management,3
+Learning,Exam - Scenario Based Assessment,Score Review & Assessment Disputes,4
+Learning,Exam - Scenario Based Assessment,Coaching feedback,5
+Learning,Exam - Scenario Based Assessment,Others,6
