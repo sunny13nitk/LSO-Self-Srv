@@ -695,6 +695,9 @@ public class CL_CatalogSrv implements IF_CatalogSrv
         log.info("Level 2 Categories for Level 1 :" + catg1Name + " ranked/filtered from " + lvl2Catgs.size() + " to "
                 + catg2Sorted.size());
 
+        log.info("Final ranked L2 categories for L1 '{}':{}",
+                catg1Name,catg2Sorted.stream().map(TY_CatalogItem::getName).collect(Collectors.joining(", ")));
+
         return catg2Sorted;
     }
 
