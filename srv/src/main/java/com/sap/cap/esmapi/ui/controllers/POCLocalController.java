@@ -116,7 +116,8 @@ public class POCLocalController
             if (userSessSrv.getUserDetails4mSession() != null)
             {
                 if (StringUtils.hasText(userSessSrv.getUserDetails4mSession().getAccountId())
-                        || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId()))
+                        || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId())
+                        || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getMdgAccount()))
                 {
                     if (!CollectionUtils.isEmpty(catgCusSrv.getCustomizations()))
                     {
@@ -161,7 +162,8 @@ public class POCLocalController
         String viewCaseForm = caseFormView;
 
         if ((StringUtils.hasText(userSessSrv.getUserDetails4mSession().getAccountId())
-                || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId()))
+                || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId())
+                || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getMdgAccount()))
                 && !CollectionUtils.isEmpty(catgCusSrv.getCustomizations()))
         {
 
@@ -378,7 +380,8 @@ public class POCLocalController
     {
 
         if ((StringUtils.hasText(userSessSrv.getUserDetails4mSession().getAccountId())
-                || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId()))
+                || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId())
+                || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getMdgAccount()))
                 && !CollectionUtils.isEmpty(catgCusSrv.getCustomizations())
                 && userSessSrv.getCurrentForm4Submission() != null)
         {
@@ -494,7 +497,8 @@ public class POCLocalController
             // additional fields
 
             if ((StringUtils.hasText(userSessSrv.getUserDetails4mSession().getAccountId())
-                    || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId()))
+                    || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId())
+                    || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getMdgAccount()))
                     && !CollectionUtils.isEmpty(catgCusSrv.getCustomizations()))
             {
 
@@ -581,7 +585,8 @@ public class POCLocalController
             // additional fields
 
             if ((StringUtils.hasText(userSessSrv.getUserDetails4mSession().getAccountId())
-                    || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId()))
+                    || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId())
+                    || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getMdgAccount()))
                     && !CollectionUtils.isEmpty(catgCusSrv.getCustomizations()))
             {
 
@@ -1119,7 +1124,8 @@ public class POCLocalController
                 // additional fields
 
                 if ((StringUtils.hasText(userSessSrv.getUserDetails4mSession().getAccountId())
-                        || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId()))
+                        || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId())
+                        || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getMdgAccount()))
                         && !CollectionUtils.isEmpty(catgCusSrv.getCustomizations()))
                 {
 

@@ -44,7 +44,8 @@ public class CL_SplCatgMVSrv implements IF_SplCatgMVSrv
         ModelAndView modelVw = new ModelAndView("caseFormExamExtensions");
         // Prepare the model for Case form
         if ((StringUtils.hasText(userSessSrv.getUserDetails4mSession().getAccountId())
-                || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId()))
+                || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId())
+                || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getMdgAccount()))
                 && !CollectionUtils.isEmpty(catgCusSrv.getCustomizations()))
         {
             userSessSrv.setCaseFormB4Submission(null);
