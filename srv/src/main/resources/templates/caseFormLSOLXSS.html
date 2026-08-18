@@ -442,7 +442,7 @@
                      </label>
                      <select name="catgDesc2" id="dropDownCatg2" data-role="select" th:field="*{catg2Desc}"
                         data-cls-option="fg-grayMouse" data-cls-selected-item="bg-teal fg-white" addEmptyValue="true"
-                        data-cls-select="bg-transparent">
+                        data-cls-select="bg-transparent" onchange="getCatg2Sel(this)">
 
                         <option th:each="catg2 : ${catgslvl2}" th:value="${catg2.id}" th:selected="${catg2.id}"
                            th:text="${catg2.name}">
@@ -484,7 +484,7 @@
                      <!-- <small class="text-muted">Enter Issue Description in detail. </small> -->
                   </div>
 
-                  <div class="colspan-9 offset-1" style="margin-top: 5px; margin-bottom: 10px"
+                  <div id="countryDiv" class="colspan-9 offset-1" style="margin-top: 5px; margin-bottom: 10px"
                      th:if="${LSO_Country != null}">
                      <label style="color: #007db8;font-family: Arial, Helvetica, sans-serif;">Country </label>
                      <select name="country" id="dropDown1" data-role="select" th:field="*{country}"
@@ -505,7 +505,7 @@
                      </span>
                   </div>
 
-                  <div class="colspan-9 offset-1" style="margin-top: 5px; margin-bottom: 10px"
+                  <div id="languageDiv" class="colspan-9 offset-1" style="margin-top: 5px; margin-bottom: 10px"
                      th:if="${LSO_Language != null}">
                      <label style="color: #007db8;font-family: Arial, Helvetica, sans-serif;">Language </label>
                      <select name="language" id="dropDown2" data-role="select" th:field="*{language}"
@@ -826,6 +826,16 @@
          var catg2Text = formData.get('catg2Text');
          console.log("Category 2 - Text : " + catg2Text);
 
+         var selectedText = (selectObject.options[selectObject.selectedIndex])
+            ? selectObject.options[selectObject.selectedIndex].text.trim()
+            : '';
+         var restrictedCatg2 = ['Certification Advisory', 'Stay Certified Advisory'];
+         var hideFields = restrictedCatg2.indexOf(selectedText) !== -1;
+         var countryDiv = document.getElementById('countryDiv');
+         var languageDiv = document.getElementById('languageDiv');
+         if (countryDiv) { countryDiv.style.display = hideFields ? 'none' : ''; }
+         if (languageDiv) { languageDiv.style.display = hideFields ? 'none' : ''; }
+
          if (Boolean(value) && catg2Change)
          {
             console.log("Catg. 2 Bound..")
@@ -859,6 +869,10 @@
          }
       }
 
+      window.addEventListener('load', function() {
+         var catg2Sel = document.getElementById('dropDownCatg2');
+         if (catg2Sel) { getCatg2Sel(catg2Sel); }
+      });
 
    </script>
 
