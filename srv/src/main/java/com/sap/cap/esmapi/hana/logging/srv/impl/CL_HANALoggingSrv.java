@@ -79,12 +79,12 @@ public class CL_HANALoggingSrv implements IF_HANALoggingSrv
                 logEntity.put("objectid", logMsg.getObjectId()); // Object ID
 
                 String baseMsg = logMsg.getMessage();
-                if (EnumMessageType.SUCC_CASE_SUBM.equals(logMsg.getMsgType())
-                        || EnumMessageType.SUCC_CASE_CREATE.equals(logMsg.getMsgType()))
+                if (EnumMessageType.SUCC_CASE_SUBM.equals(logMsg.getMsgType()))
                 {
                     ObjectMapper objectMapper = new ObjectMapper();
                     ObjectNode meta = objectMapper.createObjectNode();
                     meta.put("country", logMsg.getCountry());
+                    meta.put("category1Id", logMsg.getCategory1Id());
                     meta.put("category1", logMsg.getCategory1());
                     meta.put("category2", logMsg.getCategory2());
                     baseMsg = baseMsg + "\n " + meta.toString();

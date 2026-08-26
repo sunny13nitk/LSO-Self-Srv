@@ -22,11 +22,12 @@ public class TY_Message
     private String message;
     private String country;
     private String category1;
+    private String category1Id;
     private String category2;
 
     public TY_Message(String userName, Timestamp timestamp, EnumStatus status, EnumMessageType msgType,
             String objectId, String message)
     {
-        this(userName, timestamp, status, msgType, objectId, message, null, null, null);
+        this(userName, timestamp, status, msgType, objectId, message, null, null, null, null);
     }
 }

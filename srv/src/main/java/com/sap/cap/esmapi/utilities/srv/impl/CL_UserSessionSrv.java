@@ -478,6 +478,7 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                                         caseFormAsyncSpl.getCaseFormAsync().getSubmGuid(), msg,
                                         caseFormAsyncSpl.getCaseFormAsync().getCaseForm().getCountry(),
                                         caseFormAsyncSpl.getCaseFormAsync().getCaseForm().getCatgText(),
+                                        caseFormAsyncSpl.getCaseFormAsync().getCaseForm().getCatgDesc(),
                                         caseFormAsyncSpl.getCaseFormAsync().getCaseForm().getCatg2Text());
                                 userSessInfo.getMessagesStack().add(logMsg);
                                 // Instantiate and Fire the Event : Syncronous processing
@@ -744,6 +745,7 @@ public class CL_UserSessionSrv implements IF_UserSessionSrv
                             EnumStatus.Success, EnumMessageType.SUCC_CASE_SUBM, caseFormAsync.getSubmGuid(), msg,
                             caseFormAsync.getCaseForm().getCountry(),
                             caseFormAsync.getCaseForm().getCatgText(),
+                            caseFormAsync.getCaseForm().getCatgDesc(),
                             caseFormAsync.getCaseForm().getCatg2Text());
                     userSessInfo.getMessagesStack().add(logMsg);
                     // Instantiate and Fire the Event : Syncronous processing
