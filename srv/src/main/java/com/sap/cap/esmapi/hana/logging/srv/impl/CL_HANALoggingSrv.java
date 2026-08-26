@@ -22,6 +22,7 @@ import org.springframework.util.StringUtils;
 import com.sap.cap.esmapi.exceptions.EX_ESMAPI;
 import com.sap.cap.esmapi.hana.logging.srv.intf.IF_HANALoggingSrv;
 import com.sap.cap.esmapi.utilities.constants.GC_Constants;
+import com.sap.cap.esmapi.utilities.enums.EnumMessageType;
 import com.sap.cap.esmapi.utilities.pojos.TY_Message;
 import com.sap.cds.Result;
 import com.sap.cds.ql.Insert;
@@ -78,12 +79,12 @@ public class CL_HANALoggingSrv implements IF_HANALoggingSrv
                 logEntity.put("objectid", logMsg.getObjectId()); // Object ID
 
                 String baseMsg = logMsg.getMessage();
-                if (StringUtils.hasText(logMsg.getCountry()) || StringUtils.hasText(logMsg.getCategory1())
-                        || StringUtils.hasText(logMsg.getCategory2()))
+                if (EnumMessageType.SUCC_CASE_SUBM.equals(logMsg.getMsgType()))
                 {
                     ObjectMapper objectMapper = new ObjectMapper();
                     ObjectNode meta = objectMapper.createObjectNode();
                     meta.put("country", logMsg.getCountry());
+                    meta.put("category1Id", logMsg.getCategory1Id());
                     meta.put("category1", logMsg.getCategory1());
                     meta.put("category2", logMsg.getCategory2());
                     baseMsg = baseMsg + "\n " + meta.toString();
