@@ -23,6 +23,7 @@ import com.sap.cap.esmapi.utilities.pojos.TY_Attachment_CaseCreate;
 import com.sap.cap.esmapi.utilities.pojos.TY_Description_CaseCreate;
 import com.sap.cap.esmapi.utilities.pojos.TY_NotesCreate;
 import com.sap.cap.esmapi.utilities.scrambling.CL_ScramblingUtils;
+import com.sap.cap.esmapi.utilities.scrambling.HtmlSanitizer;
 import com.sap.cap.esmapi.utilities.srvCloudApi.srv.intf.IF_SrvCloudAPI;
 
 import lombok.RequiredArgsConstructor;
@@ -98,15 +99,21 @@ public class CL_CaseCreationService implements IF_CaseCreationService
             return;
         }
 
+        // Text Sanitization and Scrambling
+        // We don't log Original description as it could contain sensitive information.
+        // We log only scrambled and sanitized description.
         String scrambledTxt = CL_ScramblingUtils.scrambleText(form.getDescription());
+        log.info("Scrambled Description: {}", scrambledTxt);
+        String sanitizedTxt = HtmlSanitizer.sanitizeCaseHtml(scrambledTxt);
+        log.info("Sanitized Description: {}", sanitizedTxt);
 
-        if (!StringUtils.hasText(scrambledTxt))
+        if (!StringUtils.hasText(sanitizedTxt))
         {
             return;
         }
 
         String noteId = srvCloudApi.createNotes(
-                new TY_NotesCreate(form.isExternal(), scrambledTxt, GC_Constants.gc_NoteTypeDescription),
+                new TY_NotesCreate(form.isExternal(), sanitizedTxt, GC_Constants.gc_NoteTypeDescription),
                 context.getDestinationProps());
 
         context.setDescription(new TY_Description_CaseCreate(noteId));

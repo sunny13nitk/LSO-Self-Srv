@@ -2,12 +2,12 @@ package com.sap.cap.esmapi.utilities.scrambling;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.logging.Logger;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 public class CL_ScramblingUtils
 {
+
+    private static final Logger log = Logger.getLogger(CL_ScramblingUtils.class.getName());
 
     private static final String ccPatternDash = "(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|"
             + "6(?:011|5[0-9][0-9])[0-9]{12}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|"

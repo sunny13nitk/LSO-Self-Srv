@@ -37,6 +37,7 @@ import com.sap.cap.esmapi.utilities.pojos.TY_Employee_CaseCreate;
 import com.sap.cap.esmapi.utilities.pojos.TY_Message;
 import com.sap.cap.esmapi.utilities.pojos.TY_NotesCreate;
 import com.sap.cap.esmapi.utilities.scrambling.CL_ScramblingUtils;
+import com.sap.cap.esmapi.utilities.scrambling.HtmlSanitizer;
 import com.sap.cap.esmapi.utilities.srvCloudApi.destination.pojos.TY_DestinationProps;
 import com.sap.cap.esmapi.utilities.srvCloudApi.srv.intf.IF_SrvCloudAPI;
 
@@ -147,12 +148,15 @@ public class EV_HDLR_CaseReplySubmit
                                                     .scrambleText(evCaseReply.getPayload().getCaseReply().getReply());
                                             if (StringUtils.hasText(scrambledTxt))
                                             {
+                                                // Also perform HTML Sanitization on the Scrambled Text before creating
+                                                // the Note in Service Cloud
+                                                String sanitizedTxt = HtmlSanitizer.sanitizeCaseHtml(scrambledTxt);
                                                 // Create Note and Get Guid back
                                                 String noteId = srvCloudApiSrv.createNotes(new TY_NotesCreate(false,
-                                                        scrambledTxt, cfgO.get().getReplyNoteType()), desProps);
+                                                        sanitizedTxt, cfgO.get().getReplyNoteType()), desProps);
                                                 if (StringUtils.hasText(noteId))
                                                 {
-                                                    caseReplyPayload.getNotes().add(new TY_CaseReplyNote(scrambledTxt,
+                                                    caseReplyPayload.getNotes().add(new TY_CaseReplyNote(sanitizedTxt,
                                                             null, noteId, cfgO.get().getReplyNoteType()));
                                                 }
                                             }
@@ -169,12 +173,15 @@ public class EV_HDLR_CaseReplySubmit
                                                     .scrambleText(evCaseReply.getPayload().getCaseReply().getReply());
                                             if (StringUtils.hasText(scrambledTxt))
                                             {
+                                                // Also perform HTML Sanitization on the Scrambled Text before creating
+                                                // the Note in Service Cloud
+                                                String sanitizedTxt = HtmlSanitizer.sanitizeCaseHtml(scrambledTxt);
                                                 String noteId = srvCloudApiSrv.createNotes(
-                                                        new TY_NotesCreate(false, scrambledTxt, null), desProps);
+                                                        new TY_NotesCreate(false, sanitizedTxt, null), desProps);
                                                 if (StringUtils.hasText(noteId))
                                                 {
                                                     caseReplyPayload.getNotes().add(
-                                                            new TY_CaseReplyNote(scrambledTxt, null, noteId, null));
+                                                            new TY_CaseReplyNote(sanitizedTxt, null, noteId, null));
                                                 }
                                             }
 
