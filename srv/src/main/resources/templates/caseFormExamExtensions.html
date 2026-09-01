@@ -218,7 +218,7 @@
    <!-- Metro 4 -->
    <link rel="stylesheet" href="https://cdn.metroui.org.ua/v4.3.2/css/metro-all.min.css">
 
-   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 </head>
 
 <body>
@@ -413,12 +413,13 @@
                   </div>
 
                   <div class="colspan-2 offset-1" style="margin-top: 15px; margin-bottom: 10px;">
-                     <label style="color: #007db8;font-family: Arial, Helvetica, sans-serif;">Certification Title </label>
+                     <label style="color: #007db8;font-family: Arial, Helvetica, sans-serif;">Certification Title
+                     </label>
                      <input class="alert metro-input" type="text" data-role="input" title="" th:field="*{appId}">
-                     
+
                   </div>
 
-                  
+
 
                   <div class="colspan-9 offset-1" data-role="panel" data-cls-title="bg-transparent fg-darkCyan"
                      style="color: #007db8;font-family: Arial, Helvetica, sans-serif; padding: 10px"
@@ -429,7 +430,7 @@
                               data-caption-position="left" data-cls-caption="fg-darkCyan" data-cls-content="cyan"
                               data-caption="Additional time">
                         </div>
-                       
+
                   </div>
 
 
@@ -567,11 +568,11 @@
    </script>
 
 
-   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
    <script th:inline="javascript">
 
 
-     
+
       function getCatgSel(selectObject)
       {
          var value = selectObject.value;
@@ -588,7 +589,7 @@
             console.log("Category - Changed " + catgChange);
             console.log("Category - Text : " + catgText);
 
-            
+
             $.ajax({
                type: "POST",
                url: "/post/selCatg",
