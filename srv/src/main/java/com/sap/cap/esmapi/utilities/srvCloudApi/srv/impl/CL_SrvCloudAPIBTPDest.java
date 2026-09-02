@@ -1947,11 +1947,11 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
 
             ResponseEntity<String> response = srvCloudWebClient.post().uri(casePOSTURL)
                     .header(HttpHeaders.AUTHORIZATION, desProps.getAuthToken()).contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(payload).retrieve().toEntity(String.class).block();
+                    .bodyValue(payload).exchangeToMono(res -> res.toEntity(String.class)).block();
 
             if (response == null)
             {
-                throw new EX_ESMAPI(msgSrc.getMessage("ERR_NOTES_POST", new Object[]
+                throw new EX_ESMAPI(msgSrc.getMessage("ERR_CASE_POST_SRV", new Object[]
                 { "No response received" }, Locale.ENGLISH));
             }
 
@@ -1959,9 +1959,25 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
             {
                 log.error("Case Creation Failed. Status : {}, Response : {}", response.getStatusCode().value(),
                         response.getBody());
-
-                throw new EX_ESMAPI(msgSrc.getMessage("ERR_NOTES_POST", new Object[]
-                { response.getBody() }, Locale.ENGLISH));
+                String errorMsg = response.getBody();
+                try
+                {
+                    JsonNode errNode = objectMapper.readTree(response.getBody());
+                    JsonNode details = errNode.path("error").path("details");
+                    if (details.isArray() && details.size() > 0 && details.get(0).hasNonNull("message"))
+                    {
+                        errorMsg = details.get(0).path("message").asText();
+                    }
+                    else if (errNode.path("error").hasNonNull("message"))
+                    {
+                        errorMsg = errNode.path("error").path("message").asText();
+                    }
+                }
+                catch (Exception ignored)
+                {
+                }
+                throw new EX_ESMAPI(msgSrc.getMessage("ERR_CASE_POST_SRV", new Object[]
+                { response.getStatusCode().value() + " - " + errorMsg }, Locale.ENGLISH));
             }
 
             JsonNode responseNode = objectMapper.readTree(response.getBody());
@@ -1974,7 +1990,7 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
         }
         catch (JsonProcessingException e)
         {
-            throw new EX_ESMAPI(msgSrc.getMessage("ERR_NEW_NOTES_JSON", new Object[]
+            throw new EX_ESMAPI(msgSrc.getMessage("ERR_CASE_POST_SRV", new Object[]
             { e.getLocalizedMessage() }, Locale.ENGLISH));
         }
         catch (EX_ESMAPI e)
@@ -1983,7 +1999,7 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
         }
         catch (Exception e)
         {
-            throw new EX_ESMAPI(msgSrc.getMessage("ERR_NOTES_POST", new Object[]
+            throw new EX_ESMAPI(msgSrc.getMessage("ERR_CASE_POST_SRV", new Object[]
             { e.getLocalizedMessage() }, Locale.ENGLISH));
         }
     }
