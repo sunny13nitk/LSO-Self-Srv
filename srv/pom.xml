@@ -14,7 +14,9 @@
 
 	<properties>
 		<node.url>https://int.repositories.cloud.sap/artifactory/proxy-3rd-party-nodejs-dist</node.url>
-	</properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
 
     <!-- ACTUAL DEPENDENCIES -->
     <dependencies>

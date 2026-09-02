@@ -18,6 +18,8 @@ import org.springframework.util.StringUtils;
 
 import com.sap.cap.esmapi.catg.pojos.TY_CatalogItem;
 import com.sap.cap.esmapi.catg.pojos.TY_CatalogTree;
+import com.sap.cap.esmapi.catg.pojos.TY_Catg2Ranks;
+import com.sap.cap.esmapi.catg.pojos.TY_Catg2RanksItem;
 import com.sap.cap.esmapi.catg.pojos.TY_Catg2Templates;
 import com.sap.cap.esmapi.catg.pojos.TY_Catg2TemplatesCus;
 import com.sap.cap.esmapi.catg.pojos.TY_CatgCus;
@@ -51,6 +53,9 @@ public class CL_CatalogSrv implements IF_CatalogSrv
 
     @Autowired
     private TY_CatgRanks catgRanks;
+
+    @Autowired
+    private TY_Catg2Ranks catg2Ranks;
 
     @Autowired
     private TY_CatgTemplatesCus catgTmplCus;
@@ -518,6 +523,18 @@ public class CL_CatalogSrv implements IF_CatalogSrv
                                         log.info("Loading Level 2 Categories for Category :" + lvl1Catg.getName()
                                                 + " and Case Type :" + caseType.toString() + " with Count :"
                                                 + catgLvl2.size());
+
+                                        // Level 2 Categories Rank + Filter Enabled - reuse the
+                                        // same catgRankEnabled flag as Level 1. For a Level 1 that
+                                        // has entries in catg2Ranks.csv, only the listed Level 2
+                                        // categories are retained, in rank order (whitelist);
+                                        // Level 1s without entries keep all children in default
+                                        // order.
+                                        if (caseCFgO.get().getCatgRankEnabled())
+                                        {
+                                            catgLvl2 = prepareRankedCatg2List(catgLvl2, lvl1Catg.getName(), caseType);
+                                        }
+
                                         caseCatgTree.getCategorieslvl2().addAll(catgLvl2);
                                     }
                                 }
@@ -613,6 +630,72 @@ public class CL_CatalogSrv implements IF_CatalogSrv
         }
 
         return catgsSorted;
+    }
+
+    /**
+     * Rank and filter (whitelist) the Level 2 categories for a given Level 1 parent.
+     *
+     * Unlike {@link #prepareRankedCatgTree} (which keeps unranked Level 1 categories at
+     * the tail), this applies whitelist semantics for Level 2:
+     * <ul>
+     * <li>If the parent Level 1 has NO entries in catg2Ranks.csv, the list is returned
+     * unchanged - all Level 2 children remain visible in their default order.</li>
+     * <li>If the parent Level 1 HAS entries, only the listed Level 2 categories are
+     * retained, ordered by rank. Any Level 2 category not listed is dropped (hidden from
+     * the dropdown).</li>
+     * </ul>
+     * Matching is by category name, scoped to the (caseType, catg1) pair.
+     */
+    private List<TY_CatalogItem> prepareRankedCatg2List(List<TY_CatalogItem> lvl2Catgs, String catg1Name,
+            EnumCaseTypes caseType)
+    {
+        if (catg2Ranks == null || CollectionUtils.isEmpty(catg2Ranks.getCatg2RankItems())
+                || !StringUtils.hasText(catg1Name))
+        {
+            return lvl2Catgs;
+        }
+
+        // Get Level 2 Rank entries for the current Case Type and Level 1 parent
+        List<TY_Catg2RanksItem> currCatg2Ranks = catg2Ranks.getCatg2RankItems().stream()
+                .filter(c -> c.getCaseTypeEnum() != null
+                        && c.getCaseTypeEnum().equals(caseType)
+                        && StringUtils.hasText(c.getCatg1())
+                        && c.getCatg1().equals(catg1Name))
+                .collect(Collectors.toList());
+
+        // No ranking configured for this Level 1 - keep all children as-is (default order)
+        if (CollectionUtils.isEmpty(currCatg2Ranks))
+        {
+            return lvl2Catgs;
+        }
+
+        // Sort by Rank
+        currCatg2Ranks.sort(Comparator.comparing(TY_Catg2RanksItem::getRank));
+
+        // Whitelist: build the new list only from the ranked (listed) Level 2 categories.
+        // Unlisted Level 2 categories are intentionally NOT appended - they are hidden.
+        List<TY_CatalogItem> catg2Sorted = new ArrayList<TY_CatalogItem>();
+        for (TY_Catg2RanksItem catg2Rank : currCatg2Ranks)
+        {
+            Optional<TY_CatalogItem> catgItemO = lvl2Catgs.stream()
+                    .filter(c -> StringUtils.hasText(c.getName()) && c.getName().equals(catg2Rank.getCatg2()))
+                    .findFirst();
+            if (catgItemO.isPresent())
+            {
+                catg2Sorted.add(catgItemO.get());
+            }
+            else
+            {
+                log.warn("Level 2 Category configured in catg2Ranks.csv not found in Catalog Tree - Level 1 : "
+                        + catg1Name + " , Level 2 : " + catg2Rank.getCatg2()
+                        + " . It will not appear in the dropdown.");
+            }
+        }
+
+        log.info("Level 2 Categories for Level 1 :" + catg1Name + " ranked/filtered from " + lvl2Catgs.size() + " to "
+                + catg2Sorted.size());
+
+        return catg2Sorted;
     }
 
 }

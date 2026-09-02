@@ -285,7 +285,7 @@
 
       <!-- Form Row - Begin  -->
 
-      <div class="row flex-justify-center" th:if="${caseForm.getAccId() != null}">
+      <div class="row flex-justify-center" th:if="${caseForm.getAccId() != null or caseForm.getMdgAccount() != null}">
 
          <!--Error Messages Row - Starts -->
 
@@ -344,85 +344,79 @@
                            data-role="popover" data-popover-position="right" data-popover-hide=1000000
                            data-hide-on-leave=true data-popover-text="<b> Categories Information </b>
 
-                           <p>
-                              <b>Booking & Order: </b> 
-                              Business support for learners regarding Booking/Order requests, consequent Billing activities, Activation Code redemption
-                              & Preferred Card, etc
 
+                           <p>
+                              <b>Learning Advisory: </b>
+                              Business support for learners regarding information about learning portal and learning portfolio, Learning
+                              path, on-demand public courses/3 to Run,learning method, course schedule, training delivery & training center
                            </p>
 
                            <p>
-                              <b>Learning Advisory: </b> 
-                              Business support for learners regarding information about learning portal and learning portfolio, Learning
-                              path, on-demand public courses/3 to Run, learning method, certifications, course schedule, training delivery & training center
+                              <b>Booking & Order: </b>
+                              Business support for learners regarding Booking/Order requests, consequent Billing activities, Activation Code redemption & Preferred Card, etc
+                           </p>
 
-                           </p>   
-                                  
                            <p>
-                              <b>Learning Virtual Class Support: </b> 
+                              <b>Certification & Stay Certified: </b>
+                              Support for learners regarding SAP certifications, including advice, certification or badge expiry and renewals and Universal ID questions
+                           </p>
+
+                           <p>
+                              <b> Exam - Scenario Based Assessment: </b>
+                               Technical support for learners who are taking the scenario based assessments, regarding system failure, result concerns, how-to’s, etc
+                           </p>
+
+                           <p>
+                              <b> Exam - System Based Assessment: </b>
+                               Technical support for learners who are taking the system based assessments, regarding system failure, result concerns, how-to’s, etc
+                           </p>
+
+                           <p>
+                              <b>Access & Universal ID: </b>
+                              Technical support for learners for login to SAP Learning, certification login issues, subscription access and Universal ID queries
+                           </p>
+
+                           <p>
+                              <b>Learning Experience – Technical Issues: </b>
+                              Technical support for learners utilising the SAP Learning platform, including content issues, configuration concerns, system failure or downtime and general queries.
+                           </p>
+
+                           <p>
+                              <b>Learning Virtual Class Support: </b>
                               Support for SAP Learning Class Virtual delivery for the registered learners (e-material, virtual room link)
                            </p>
 
-                            <p>
-                              <b>Training Reseller Partner Topics: </b> 
-                              Support for SAP Education Resellers regarding onboarding, high level training, booking/order requests, activation code redemption, Manage My Partnership, account setup & contract management, etc.
-                           </p>
-                           
                            <p>
-                              <b>Virtual Event Services: </b> 
-                             Provides logistics and support for broader events, virtual trainings or workshops published on SAP Learning Hub and
-                             learning.sap.com to support any enablement activities
-                           </p>
-
-                           <p>
-                              <b>Learning Experience - Technical Issues: </b> 
-                             Technical support for learners regarding registration, login & access, content, and functionality on the SAP Learning
-                             platform, license management tool or the learning dashboard
-
-                           </p>
-
-                            <p>
-                              <b>Training System Delivery: </b> 
-                             This is intended for our SAP internal colleagues who require additional support for training system landscapes.
-                           </p>
-
-                           <p>
-                              <b>Demo & Interactive Learning: </b> 
-                             Technical support for learner encountering issues with the interactive learning component available as part of a
-                             learning journey
-                           </p>
-
-                           <p>
-                             <b>Scenario based assessment: </b> 
-                             Technical support for learners who are taking the scenario based assessments, regarding system failure, result
-                             concerns, how-to’s, etc
-                           </p>
-
-                           <p>
-                              <b>System based assessment: </b> 
-                             Technical support for learners who are taking the system based assessments, regarding system failure, result
-                             concerns, how-to’s, etc
+                              <b>Practice Systems: </b>
+                              Help instructors and learners regarding access and login, system performance, how-to questions, user guides, exercises &demos, etc..
                            </p>
 
                            <p>
                               <b>SAP Learning Hub Admin Service: </b>
-                              Technical support for SAP Learning Hub license admins requiring additional administrators, user upload 
-                              queries and general support for the license management or learning analytics tools
+                               Technical support for SAP Learning Hub license admins requiring additional administrators, user upload queries and general support for the license management or learning analytics tools
                            </p>
 
                            <p>
-                              <b>Certification: </b>
-                              Support for learners regarding SAP certifications, including advice, certification or badge expiry
-                               and renewals and Universal ID questions
+                              <b>Practice System Delivery: </b>
+                              Additional technical support for training system landscapes
                            </p>
 
                            <p>
-                              <b>Login, Access &amp; Universal ID: </b>
-                              Technical support for learners for login, subscription access and Universal ID queries
+                              <b>Training Reseller Partner Topics: </b>
+                              Support for SAP Education resellers regarding onboarding, high level training, booking/order requests,activation code redemption, Manage My Partnership, account setup & contract management, etc
                            </p>
-                          
 
-                           
+                           <p>
+                              <b>Live Sessions: </b>
+                               Provides logistics and support for broader events, virtual trainings or workshops published on SAP Learning Hub andlearning.sap.com to support any enablement activities
+                           </p>
+
+                           <p>
+                              <b>Demo or Interactive Learning: </b>
+                              Technical support for learner encountering issues with the interactive learning component available as part of a learning journey
+                           </p>
+
+
 
                            
 

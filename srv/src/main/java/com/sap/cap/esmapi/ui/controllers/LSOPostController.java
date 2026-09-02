@@ -434,7 +434,8 @@ public class LSOPostController
             // additional fields
 
             if ((StringUtils.hasText(userSessSrv.getUserDetails4mSession().getAccountId())
-                    || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId()))
+                    || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId())
+                    || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getMdgAccount()))
                     && !CollectionUtils.isEmpty(catgCusSrv.getCustomizations()))
             {
 
@@ -683,7 +684,8 @@ public class LSOPostController
             // additional fields
 
             if ((StringUtils.hasText(userSessSrv.getUserDetails4mSession().getAccountId())
-                    || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId()))
+                    || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId())
+                    || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getMdgAccount()))
                     && !CollectionUtils.isEmpty(catgCusSrv.getCustomizations()))
             {
 
@@ -1008,7 +1010,8 @@ public class LSOPostController
             // additional fields
 
             if ((StringUtils.hasText(userSessSrv.getUserDetails4mSession().getAccountId())
-                    || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId()))
+                    || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getEmployeeId())
+                    || StringUtils.hasText(userSessSrv.getUserDetails4mSession().getMdgAccount()))
                     && !CollectionUtils.isEmpty(catgCusSrv.getCustomizations()))
             {
                 // check for templates based on chosen categories in Form
