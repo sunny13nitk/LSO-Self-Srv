@@ -10,7 +10,6 @@ import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -20,23 +19,8 @@ import java.util.Map.Entry;
 import java.util.Optional;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.http.Header;
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
-import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPatch;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
@@ -128,8 +112,6 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
             {
 
                 JsonNode jsonNode = null;
-                HttpResponse response = null;
-                CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 
                 if (StringUtils.hasText(userEmail) && StringUtils.hasText(desProps.getAuthToken()))
                 {
@@ -137,104 +119,81 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                     if (StringUtils.hasText(dS.getAccByEmailPathString()))
                     {
 
-                        try
-                        {
-                            String urlLink = StringsUtility.replaceURLwithParams(dS.getAccByEmailPathString(),
-                                    new String[]
-                                    { userEmail, userEmail }, GC_Constants.gc_UrlReplParam);
+                        String urlLink = StringsUtility.replaceURLwithParams(dS.getAccByEmailPathString(),
+                                new String[]
+                                        {userEmail, userEmail}, GC_Constants.gc_UrlReplParam);
 
-                            if (StringUtils.hasText(urlLink))
-                            {
-
-                                try
-                                {
-                                    urlLink = CL_URLUtility.getUrl4DestinationAPI(urlLink, desProps.getBaseUrl());
-                                    URL url = new URL(urlLink);
-                                    URI uri = new URI(url.getProtocol(), url.getUserInfo(), IDN.toASCII(url.getHost()),
-                                            url.getPort(), url.getPath(), url.getQuery(), url.getRef());
-                                    String correctEncodedURL = uri.toASCIIString();
-
-                                    HttpGet httpGet = new HttpGet(correctEncodedURL);
-                                    httpGet.setHeader(HttpHeaders.AUTHORIZATION, desProps.getAuthToken());
-                                    httpGet.addHeader("accept", "application/json");
-                                    // Fire the Url
-                                    response = httpClient.execute(httpGet);
-
-                                    // verify the valid error code first
-                                    int statusCode = response.getStatusLine().getStatusCode();
-                                    if (statusCode != HttpStatus.SC_OK)
-                                    {
-                                        throw new RuntimeException("Failed with HTTP error code : " + statusCode);
-                                    }
-
-                                    // Try and Get Entity from Response
-                                    org.apache.http.HttpEntity entity = response.getEntity();
-                                    String apiOutput = EntityUtils.toString(entity);
-
-                                    // Conerting to JSON
-                                    ObjectMapper mapper = new ObjectMapper();
-                                    jsonNode = mapper.readTree(apiOutput);
-                                    if (jsonNode != null)
-                                    {
-                                        Iterator<Map.Entry<String, JsonNode>> payloadItr = jsonNode.fields();
-                                        while (payloadItr.hasNext())
-                                        {
-                                            Map.Entry<String, JsonNode> payloadEnt = payloadItr.next();
-                                            String payloadFieldName = payloadEnt.getKey();
-                                            if (payloadFieldName.equals("value"))
-                                            {
-                                                Iterator<JsonNode> accItr = payloadEnt.getValue().elements();
-                                                while (accItr.hasNext())
-                                                {
-                                                    JsonNode accEnt = accItr.next();
-                                                    if (accEnt != null)
-                                                    {
-
-                                                        Iterator<String> fieldNames = accEnt.fieldNames();
-                                                        while (fieldNames.hasNext())
-                                                        {
-                                                            String accFieldName = fieldNames.next();
-                                                            if (accFieldName.equals("id"))
-                                                            {
-                                                                log.info("Account Id Added : "
-                                                                        + accEnt.get(accFieldName).asText());
-                                                                accountID = accEnt.get(accFieldName).asText();
-                                                            }
-
-                                                        }
-
-                                                    }
-                                                }
-
-                                            }
-
-                                        }
-                                    }
-
-                                }
-
-                                catch (Exception e)
-                                {
-                                    if (e != null)
-                                    {
-                                        log.error(e.getLocalizedMessage());
-                                    }
-                                }
-
-                            }
-                        }
-
-                        finally
+                        if (StringUtils.hasText(urlLink))
                         {
 
                             try
                             {
-                                httpClient.close();
-                            }
-                            catch (IOException e)
-                            {
+                                urlLink = CL_URLUtility.getUrl4DestinationAPI(urlLink, desProps.getBaseUrl());
+                                URL url = new URL(urlLink);
+                                URI uri = new URI(url.getProtocol(), url.getUserInfo(), IDN.toASCII(url.getHost()),
+                                        url.getPort(), url.getPath(), url.getQuery(), url.getRef());
+                                // Fire the Url
+                                ResponseEntity<String> wcResponse = srvCloudWebClient.get()
+                                        .uri(uri)
+                                        .header(HttpHeaders.AUTHORIZATION, desProps.getAuthToken())
+                                        .header("accept", "application/json")
+                                        .exchangeToMono(r -> r.toEntity(String.class)).block();
 
-                                log.error(e.getLocalizedMessage());
+                                // verify the valid error code first
+                                int statusCode = wcResponse != null ? wcResponse.getStatusCode().value() : 0;
+                                if (statusCode != HttpStatus.SC_OK)
+                                {
+                                    throw new RuntimeException("Failed with HTTP error code : " + statusCode);
+                                }
+
+                                String apiOutput = wcResponse.getBody();
+
+                                // Conerting to JSON
+                                ObjectMapper mapper = new ObjectMapper();
+                                jsonNode = mapper.readTree(apiOutput);
+                                if (jsonNode != null)
+                                {
+                                    Iterator<Map.Entry<String, JsonNode>> payloadItr = jsonNode.fields();
+                                    while (payloadItr.hasNext())
+                                    {
+                                        Map.Entry<String, JsonNode> payloadEnt = payloadItr.next();
+                                        String payloadFieldName = payloadEnt.getKey();
+                                        if (payloadFieldName.equals("value"))
+                                        {
+                                            Iterator<JsonNode> accItr = payloadEnt.getValue().elements();
+                                            while (accItr.hasNext())
+                                            {
+                                                JsonNode accEnt = accItr.next();
+                                                if (accEnt != null)
+                                                {
+
+                                                    Iterator<String> fieldNames = accEnt.fieldNames();
+                                                    while (fieldNames.hasNext())
+                                                    {
+                                                        String accFieldName = fieldNames.next();
+                                                        if (accFieldName.equals("id"))
+                                                        {
+                                                            log.info("Account Id Added : "
+                                                                    + accEnt.get(accFieldName).asText());
+                                                            accountID = accEnt.get(accFieldName).asText();
+                                                        }
+
+                                                    }
+
+                                                }
+                                            }
+
+                                        }
+
+                                    }
+                                }
+
+                            }
+
+                            catch (Exception e)
+                            {
+                                throw new EX_ESMAPI(msgSrc.getMessage("ERR_ACC_ID_USER_EMAIL", new Object[]
+                                        { e.getMessage() }, Locale.ENGLISH));
                             }
 
                         }
@@ -262,8 +221,7 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
             {
 
                 JsonNode jsonNode = null;
-                HttpResponse response = null;
-                CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+
 
                 if (StringUtils.hasText(userEmail) && StringUtils.hasText(desProps.getAuthToken()))
                 {
@@ -271,102 +229,80 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                     if (StringUtils.hasText(dS.getEmpByIdPathString()))
                     {
 
-                        try
-                        {
-                            String urlLink = dS.getEmpByIdPathString() + userEmail;
+                        String urlLink = dS.getEmpByIdPathString() + userEmail;
 
-                            if (StringUtils.hasText(urlLink))
-                            {
-
-                                try
-                                {
-                                    urlLink = CL_URLUtility.getUrl4DestinationAPI(urlLink, desProps.getBaseUrl());
-                                    URL url = new URL(urlLink);
-                                    URI uri = new URI(url.getProtocol(), url.getUserInfo(), IDN.toASCII(url.getHost()),
-                                            url.getPort(), url.getPath(), url.getQuery(), url.getRef());
-                                    String correctEncodedURL = uri.toASCIIString();
-
-                                    HttpGet httpGet = new HttpGet(correctEncodedURL);
-                                    httpGet.setHeader(HttpHeaders.AUTHORIZATION, desProps.getAuthToken());
-                                    httpGet.addHeader("accept", "application/json");
-                                    // Fire the Url
-                                    response = httpClient.execute(httpGet);
-
-                                    // verify the valid error code first
-                                    int statusCode = response.getStatusLine().getStatusCode();
-                                    if (statusCode != HttpStatus.SC_OK)
-                                    {
-                                        throw new RuntimeException("Failed with HTTP error code : " + statusCode);
-                                    }
-
-                                    // Try and Get Entity from Response
-                                    org.apache.http.HttpEntity entity = response.getEntity();
-                                    String apiOutput = EntityUtils.toString(entity);
-
-                                    // Conerting to JSON
-                                    ObjectMapper mapper = new ObjectMapper();
-                                    jsonNode = mapper.readTree(apiOutput);
-                                    if (jsonNode != null)
-                                    {
-                                        Iterator<Map.Entry<String, JsonNode>> payloadItr = jsonNode.fields();
-                                        while (payloadItr.hasNext())
-                                        {
-                                            Map.Entry<String, JsonNode> payloadEnt = payloadItr.next();
-                                            String payloadFieldName = payloadEnt.getKey();
-                                            if (payloadFieldName.equals("value"))
-                                            {
-                                                Iterator<JsonNode> accItr = payloadEnt.getValue().elements();
-                                                while (accItr.hasNext())
-                                                {
-                                                    JsonNode accEnt = accItr.next();
-                                                    if (accEnt != null)
-                                                    {
-
-                                                        Iterator<String> fieldNames = accEnt.fieldNames();
-                                                        while (fieldNames.hasNext())
-                                                        {
-                                                            String accFieldName = fieldNames.next();
-                                                            if (accFieldName.equals("id"))
-                                                            {
-                                                                log.info("Employee Id Added : "
-                                                                        + accEnt.get(accFieldName).asText());
-                                                                employeeID = accEnt.get(accFieldName).asText();
-                                                            }
-
-                                                        }
-
-                                                    }
-                                                }
-
-                                            }
-
-                                        }
-                                    }
-
-                                }
-
-                                catch (Exception e)
-                                {
-                                    if (e != null)
-                                    {
-                                        log.error(e.getLocalizedMessage());
-                                    }
-                                }
-
-                            }
-                        }
-
-                        finally
+                        if (StringUtils.hasText(urlLink))
                         {
 
                             try
                             {
-                                httpClient.close();
-                            }
-                            catch (IOException e)
-                            {
+                                urlLink = CL_URLUtility.getUrl4DestinationAPI(urlLink, desProps.getBaseUrl());
+                                URL url = new URL(urlLink);
+                                URI uri = new URI(url.getProtocol(), url.getUserInfo(), IDN.toASCII(url.getHost()),
+                                        url.getPort(), url.getPath(), url.getQuery(), url.getRef());
+                                 // Fire the Url
+                                ResponseEntity<String> wcResponse = srvCloudWebClient.get()
+                                        .uri(uri)
+                                        .header(HttpHeaders.AUTHORIZATION, desProps.getAuthToken())
+                                        .header("accept", "application/json")
+                                        .exchangeToMono(r -> r.toEntity(String.class)).block();
 
-                                log.error(e.getLocalizedMessage());
+                                // verify the valid error code first
+                                int statusCode = wcResponse != null ? wcResponse.getStatusCode().value() : 0;
+                                if (statusCode != HttpStatus.SC_OK)
+                                {
+                                    throw new RuntimeException("Failed with HTTP error code : " + statusCode);
+                                }
+
+                                // Try and Get Entity from Response
+                                String apiOutput = wcResponse.getBody();
+
+                                // Conerting to JSON
+                                ObjectMapper mapper = new ObjectMapper();
+                                jsonNode = mapper.readTree(apiOutput);
+                                if (jsonNode != null)
+                                {
+                                    Iterator<Map.Entry<String, JsonNode>> payloadItr = jsonNode.fields();
+                                    while (payloadItr.hasNext())
+                                    {
+                                        Map.Entry<String, JsonNode> payloadEnt = payloadItr.next();
+                                        String payloadFieldName = payloadEnt.getKey();
+                                        if (payloadFieldName.equals("value"))
+                                        {
+                                            Iterator<JsonNode> accItr = payloadEnt.getValue().elements();
+                                            while (accItr.hasNext())
+                                            {
+                                                JsonNode accEnt = accItr.next();
+                                                if (accEnt != null)
+                                                {
+
+                                                    Iterator<String> fieldNames = accEnt.fieldNames();
+                                                    while (fieldNames.hasNext())
+                                                    {
+                                                        String accFieldName = fieldNames.next();
+                                                        if (accFieldName.equals("id"))
+                                                        {
+                                                            log.info("Employee Id Added : "
+                                                                    + accEnt.get(accFieldName).asText());
+                                                            employeeID = accEnt.get(accFieldName).asText();
+                                                        }
+
+                                                    }
+
+                                                }
+                                            }
+
+                                        }
+
+                                    }
+                                }
+
+                            }
+
+                            catch (Exception e)
+                            {
+                                throw new EX_ESMAPI(msgSrc.getMessage("ERR_EMP_ID_USER_EMAIL", new Object[]
+                                        {  e.getMessage() }, Locale.ENGLISH));//
                             }
 
                         }
@@ -415,15 +351,13 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                         if (newAccount != null)
                         {
 
-                            HttpClient httpclient = HttpClients.createDefault();
+
                             String accPOSTURL = CL_URLUtility.getUrl4DestinationAPI(dS.getCustomerUrlPathString(),
                                     desProps.getBaseUrl());
                             if (StringUtils.hasText(accPOSTURL))
                             {
 
-                                HttpPost httpPost = new HttpPost(accPOSTURL);
-                                httpPost.setHeader(HttpHeaders.AUTHORIZATION, desProps.getAuthToken());
-                                httpPost.addHeader("Content-Type", "application/json");
+
 
                                 ObjectMapper objMapper = new ObjectMapper();
                                 try
@@ -431,24 +365,25 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                                     String requestBody = objMapper.writeValueAsString(newAccount);
                                     log.info(requestBody);
 
-                                    StringEntity entity = new StringEntity(requestBody, ContentType.APPLICATION_JSON);
-                                    httpPost.setEntity(entity);
-
                                     // POST Account in Service Cloud
                                     try
                                     {
                                         // Fire the Url
-                                        HttpResponse response = httpclient.execute(httpPost);
+                                        ResponseEntity<String> wcResponse = srvCloudWebClient
+                                                .post().uri(accPOSTURL)
+                                                .header(HttpHeaders.AUTHORIZATION, desProps.getAuthToken())
+                                                .header("Content-Type", "application/json")
+                                                .bodyValue(requestBody)
+                                                .exchangeToMono(r -> r.toEntity(String.class)).block();
                                         // verify the valid error code first
-                                        int statusCode = response.getStatusLine().getStatusCode();
+                                        int statusCode = wcResponse != null ? wcResponse.getStatusCode().value() : 0;
                                         if (statusCode != HttpStatus.SC_CREATED)
                                         {
                                             throw new RuntimeException("Failed with HTTP error code : " + statusCode);
                                         }
 
                                         // Try and Get Entity from Response
-                                        HttpEntity entityResp = response.getEntity();
-                                        String apiOutput = EntityUtils.toString(entityResp);
+                                        String apiOutput = wcResponse.getBody();
 
                                         // Conerting to JSON
                                         ObjectMapper mapper = new ObjectMapper();
@@ -508,16 +443,16 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                                         }
 
                                     }
-                                    catch (IOException e)
+                                    catch (Exception e)
                                     {
                                         throw new EX_ESMAPI(msgSrc.getMessage("ERR_ACC_POST", new Object[]
-                                        { e.getLocalizedMessage() }, Locale.ENGLISH));
+                                                { e.getLocalizedMessage() }, Locale.ENGLISH));
                                     }
                                 }
                                 catch (JsonProcessingException e)
                                 {
                                     throw new EX_ESMAPI(msgSrc.getMessage("ERR_NEW_AC_JSON", new Object[]
-                                    { e.getLocalizedMessage() }, Locale.ENGLISH));
+                                            { e.getLocalizedMessage() }, Locale.ENGLISH));
                                 }
 
                             }
@@ -548,8 +483,8 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                 {
                     String url = null;
                     JsonNode jsonNode = null;
-                    HttpResponse response = null;
-                    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+                    // HttpResponse response = null; // migrated to WebClient
+                    // CloseableHttpClient httpClient = HttpClientBuilder.create().build(); // migrated to WebClient
 
                     try
                     {
@@ -560,22 +495,22 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                             url = CL_URLUtility.getUrl4DestinationAPI(dS.getCaseTemplateUrlPathString(),
                                     desProps.getBaseUrl()) + caseType;
 
-                            HttpGet httpGet = new HttpGet(url);
-                            httpGet.setHeader(HttpHeaders.AUTHORIZATION, desProps.getAuthToken());
-                            httpGet.addHeader("accept", "application/json");
-
                             // Fire the Url
-                            response = httpClient.execute(httpGet);
+                            ResponseEntity<String> wcResponse = srvCloudWebClient.get()
+                                    .uri(url)
+                                    .header(HttpHeaders.AUTHORIZATION, desProps.getAuthToken())
+                                    .header("accept", "application/json")
+                                    .exchangeToMono(r -> r.toEntity(String.class)).block();
 
                             // verify the valid error code first
-                            int statusCode = response.getStatusLine().getStatusCode();
+                            int statusCode = wcResponse != null ? wcResponse.getStatusCode().value() : 0;
                             if (statusCode != HttpStatus.SC_OK)
                             {
 
                                 if (statusCode == HttpStatus.SC_NOT_FOUND)
                                 {
                                     throw new EX_ESMAPI(msgSrc.getMessage("ERR_CASE_TYPE_NOCFG", new Object[]
-                                    { caseType }, Locale.ENGLISH));
+                                            { caseType }, Locale.ENGLISH));
                                 }
                                 else
                                 {
@@ -585,8 +520,7 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                             }
 
                             // Try and Get Entity from Response
-                            HttpEntity entity = response.getEntity();
-                            String apiOutput = EntityUtils.toString(entity);
+                            String apiOutput = wcResponse.getBody();
                             // Lets see what we got from API
                             // log.info(apiOutput);
 
@@ -731,13 +665,9 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
 
                     catch (Exception e)
                     {
-                        throw new EX_ESMAPI(msgSrc.getMessage("ERR_CATG_LOAD_CASETYP", new Object[]
-                        { caseType, e.getMessage() }, Locale.ENGLISH));
+                        throw new EX_ESMAPI(msgSrc.getMessage("ERR_CATG_LOAD_CASETYPE", new Object[]
+                                { caseType, e.getMessage() }, Locale.ENGLISH));
 
-                    }
-                    finally
-                    {
-                        httpClient.close();
                     }
 
                 }
@@ -762,8 +692,7 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                 if (StringUtils.hasText(desProps.getAuthToken()))
                 {
                     JsonNode jsonNode = null;
-                    HttpResponse response = null;
-                    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+
                     String urlLink = null;
 
                     try
@@ -773,32 +702,31 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                             log.info("Url and Credentials Found!!");
 
                             urlLink = StringsUtility.replaceURLwithParams(dS.getCatgTreeUrlPathString(), new String[]
-                            { catalogID }, GC_Constants.gc_UrlReplParam);
+                                    { catalogID }, GC_Constants.gc_UrlReplParam);
 
                             urlLink = CL_URLUtility.getUrl4DestinationAPI(urlLink, desProps.getBaseUrl());
                             // Query URL Encoding to avoid Illegal character error in Query
                             URL url = new URL(urlLink);
                             URI uri = new URI(url.getProtocol(), url.getUserInfo(), IDN.toASCII(url.getHost()),
                                     url.getPort(), url.getPath(), url.getQuery(), url.getRef());
-                            String correctEncodedURL = uri.toASCIIString();
 
-                            HttpGet httpGet = new HttpGet(correctEncodedURL);
-
-                            httpGet.setHeader(HttpHeaders.AUTHORIZATION, desProps.getAuthToken());
-                            httpGet.addHeader("accept", "application/json");
 
                             // Fire the Url
-                            response = httpClient.execute(httpGet);
+                            ResponseEntity<String> wcResponse = srvCloudWebClient.get()
+                                    .uri(uri)
+                                    .header(HttpHeaders.AUTHORIZATION, desProps.getAuthToken())
+                                    .header("accept", "application/json")
+                                    .exchangeToMono(r -> r.toEntity(String.class)).block();
 
                             // verify the valid error code first
-                            int statusCode = response.getStatusLine().getStatusCode();
+                            int statusCode = wcResponse != null ? wcResponse.getStatusCode().value() : 0;
                             if (statusCode != HttpStatus.SC_OK)
                             {
 
                                 if (statusCode == HttpStatus.SC_NOT_FOUND)
                                 {
                                     throw new EX_ESMAPI(msgSrc.getMessage("ERR_CATALOG_READ", new Object[]
-                                    { catalogID }, Locale.ENGLISH));
+                                            { catalogID }, Locale.ENGLISH));
                                 }
                                 else
                                 {
@@ -808,8 +736,7 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                             }
 
                             // Try and Get Entity from Response
-                            HttpEntity entity = response.getEntity();
-                            String apiOutput = EntityUtils.toString(entity);
+                            String apiOutput = wcResponse.getBody();
                             // Lets see what we got from API
                             // log.info(apiOutput);
 
@@ -919,12 +846,8 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                     catch (Exception e)
                     {
                         throw new EX_ESMAPI(msgSrc.getMessage("ERR_CATALOG_READ", new Object[]
-                        { catalogID, e.getMessage() }, Locale.ENGLISH));
+                                { catalogID, e.getMessage() }, Locale.ENGLISH));
 
-                    }
-                    finally
-                    {
-                        httpClient.close();
                     }
 
                 }
@@ -949,15 +872,13 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
 
                     if (StringUtils.hasText(notes.getHtmlContent()))
                     {
-                        HttpClient httpclient = HttpClients.createDefault();
+                        // HttpClient httpclient = HttpClients.createDefault(); // migrated to WebClient
                         String notesPOSTURL = CL_URLUtility.getUrl4DestinationAPI(dS.getNotesUrlPathString(),
                                 desProps.getBaseUrl());
                         if (StringUtils.hasText(notesPOSTURL))
                         {
 
-                            HttpPost httpPost = new HttpPost(notesPOSTURL);
-                            httpPost.setHeader(HttpHeaders.AUTHORIZATION, desProps.getAuthToken());
-                            httpPost.addHeader("Content-Type", "application/json");
+
 
                             ObjectMapper objMapper = new ObjectMapper();
                             try
@@ -965,24 +886,25 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                                 String requestBody = objMapper.writeValueAsString(notes);
                                 log.info(requestBody);
 
-                                StringEntity entity = new StringEntity(requestBody, ContentType.APPLICATION_JSON);
-                                httpPost.setEntity(entity);
-
                                 // POST Notes in Service Cloud
                                 try
                                 {
                                     // Fire the Url
-                                    HttpResponse response = httpclient.execute(httpPost);
+                                    ResponseEntity<String> wcResponse = srvCloudWebClient
+                                            .post().uri(notesPOSTURL)
+                                            .header(HttpHeaders.AUTHORIZATION, desProps.getAuthToken())
+                                            .header("Content-Type", "application/json")
+                                            .bodyValue(requestBody)
+                                            .exchangeToMono(r -> r.toEntity(String.class)).block();
                                     // verify the valid error code first
-                                    int statusCode = response.getStatusLine().getStatusCode();
+                                    int statusCode = wcResponse != null ? wcResponse.getStatusCode().value() : 0;
                                     if (statusCode != HttpStatus.SC_CREATED)
                                     {
                                         throw new RuntimeException("Failed with HTTP error code : " + statusCode);
                                     }
 
                                     // Try and Get Entity from Response
-                                    HttpEntity entityResp = response.getEntity();
-                                    String apiOutput = EntityUtils.toString(entityResp);
+                                    String apiOutput = wcResponse.getBody();
 
                                     // Conerting to JSON
                                     ObjectMapper mapper = new ObjectMapper();
@@ -1041,16 +963,16 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                                     }
 
                                 }
-                                catch (IOException e)
+                                catch (Exception e)
                                 {
                                     throw new EX_ESMAPI(msgSrc.getMessage("ERR_NOTES_POST", new Object[]
-                                    { e.getLocalizedMessage() }, Locale.ENGLISH));
+                                            { e.getLocalizedMessage() }, Locale.ENGLISH));
                                 }
                             }
                             catch (JsonProcessingException e)
                             {
                                 throw new EX_ESMAPI(msgSrc.getMessage("ERR_NEW_NOTES_JSON", new Object[]
-                                { e.getLocalizedMessage() }, Locale.ENGLISH));
+                                        { e.getLocalizedMessage() }, Locale.ENGLISH));
                             }
 
                         }
@@ -1086,15 +1008,13 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                         if (StringUtils.hasText(attachment.getFileName())
                                 && StringUtils.hasText(dS.getDocSrvUrlPathString()))
                         {
-                            HttpClient httpclient = HttpClients.createDefault();
+                            // HttpClient httpclient = HttpClients.createDefault(); // migrated to WebClient
                             String docPOSTURL = CL_URLUtility.getUrl4DestinationAPI(dS.getDocSrvUrlPathString(),
                                     desProps.getBaseUrl());
 
                             // Call Attachment POST to generate the Document Store Url
 
-                            HttpPost httpPost = new HttpPost(docPOSTURL);
-                            httpPost.setHeader(HttpHeaders.AUTHORIZATION, desProps.getAuthToken());
-                            httpPost.addHeader("Content-Type", "application/json");
+                            // HttpPost httpPost = new HttpPost(docPOSTURL); // migrated to WebClient
 
                             ObjectMapper objMapper = new ObjectMapper();
                             String requestBody;
@@ -1105,25 +1025,27 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
 
                                 if (requestBody != null)
                                 {
-                                    StringEntity entity = new StringEntity(requestBody, ContentType.APPLICATION_JSON);
-                                    httpPost.setEntity(entity);
                                     // POST Notes in Service Cloud
                                     try
                                     {
                                         // Fire the Url
-                                        HttpResponse response = httpclient.execute(httpPost);
+                                        ResponseEntity<String> wcResponse = srvCloudWebClient
+                                                .post().uri(docPOSTURL)
+                                                .header(HttpHeaders.AUTHORIZATION, desProps.getAuthToken())
+                                                .header("Content-Type", "application/json")
+                                                .bodyValue(requestBody)
+                                                .exchangeToMono(r -> r.toEntity(String.class)).block();
 
                                         // verify the valid error code first
-                                        int statusCode = response.getStatusLine().getStatusCode();
+                                        int statusCode = wcResponse != null ? wcResponse.getStatusCode().value() : 0;
                                         if (statusCode != HttpStatus.SC_CREATED && statusCode != HttpStatus.SC_OK)
                                         {
                                             throw new RuntimeException("Failed with HTTP error code : " + statusCode
-                                                    + " Message - " + response.getStatusLine().toString());
+                                                    + " Message - " + (wcResponse != null ? wcResponse.getStatusCode() : "null"));
                                         }
 
                                         // Try and Get Entity from Response
-                                        HttpEntity entityResp = response.getEntity();
-                                        String apiOutput = EntityUtils.toString(entityResp);
+                                        String apiOutput = wcResponse.getBody();
 
                                         // Conerting to JSON
                                         ObjectMapper mapper = new ObjectMapper();
@@ -1201,10 +1123,10 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                                         }
 
                                     }
-                                    catch (IOException e)
+                                    catch (Exception e)
                                     {
                                         throw new EX_ESMAPI(msgSrc.getMessage("ERR_DOCS_POST", new Object[]
-                                        { e.getLocalizedMessage() }, Locale.ENGLISH));
+                                                { e.getLocalizedMessage() }, Locale.ENGLISH));
                                     }
 
                                 }
@@ -1212,7 +1134,7 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                             catch (JsonProcessingException e)
                             {
                                 throw new EX_ESMAPI(msgSrc.getMessage("ERR_NEW_DOCS_JSON", new Object[]
-                                { e.getLocalizedMessage(), attachment.toString() }, Locale.ENGLISH));
+                                        { e.getLocalizedMessage(), attachment.toString() }, Locale.ENGLISH));
                             }
 
                         }
@@ -1234,29 +1156,25 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
         boolean isPersisted = false;
         if (StringUtils.hasText(url))
         {
-            HttpClient httpclient = HttpClients.createDefault();
-            HttpPut httpPut = new HttpPut(url);
-            if (httpPut != null)
-            {
-                ByteArrayEntity requestEntity = new ByteArrayEntity(file.getBytes());
-                if (requestEntity != null)
-                {
-                    httpPut.setEntity(requestEntity);
 
+            {
+                byte[] fileBytes = file.getBytes();
+                {
                     // Fire the Url
-                    HttpResponse response = httpclient.execute(httpPut);
+                    ResponseEntity<String> wcResponse = srvCloudWebClient.put().uri(URI.create(url))
+                            .bodyValue(fileBytes)
+                            .exchangeToMono(r -> r.toEntity(String.class)).block();
                     // verify the valid error code first
-                    int statusCode = response.getStatusLine().getStatusCode();
+                    int statusCode = wcResponse != null ? wcResponse.getStatusCode().value() : 0;
                     if (statusCode == HttpStatus.SC_OK)
                     {
                         isPersisted = true;
                     }
                     else
                     {
-                        HttpEntity entityResp = response.getEntity();
-                        String apiOutput = EntityUtils.toString(entityResp);
+                        String apiOutput = wcResponse != null ? wcResponse.getBody() : "null";
                         log.error(apiOutput);
-                        throw new EX_ESMAPI("Error peristing Attachment for filename : " + file.getOriginalFilename()
+                        throw new EX_ESMAPI("Error multipart peristing Attachment for filename : " + file.getOriginalFilename()
                                 + "HTTPSTATUS Code" + statusCode + "Details :" + apiOutput);
                     }
 
@@ -1275,27 +1193,22 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
         boolean isPersisted = false;
         if (StringUtils.hasText(url))
         {
-            HttpClient httpclient = HttpClients.createDefault();
-            HttpPut httpPut = new HttpPut(url);
-            if (httpPut != null)
-            {
-                ByteArrayEntity requestEntity = new ByteArrayEntity(blob);
-                if (requestEntity != null)
-                {
-                    httpPut.setEntity(requestEntity);
 
+            {
+                {
                     // Fire the Url
-                    HttpResponse response = httpclient.execute(httpPut);
+                    ResponseEntity<String> wcResponse = srvCloudWebClient.put().uri(URI.create(url))
+                            .bodyValue(blob)
+                            .exchangeToMono(r -> r.toEntity(String.class)).block();
                     // verify the valid error code first
-                    int statusCode = response.getStatusLine().getStatusCode();
+                    int statusCode = wcResponse != null ? wcResponse.getStatusCode().value() : 0;
                     if (statusCode == HttpStatus.SC_OK)
                     {
                         isPersisted = true;
                     }
                     else
                     {
-                        HttpEntity entityResp = response.getEntity();
-                        String apiOutput = EntityUtils.toString(entityResp);
+                        String apiOutput = wcResponse != null ? wcResponse.getBody() : "null";
                         log.error(apiOutput);
                         throw new EX_ESMAPI("Error peristing Attachment for filename : " + fileName + "HTTPSTATUS Code"
                                 + statusCode + "Details :" + apiOutput);
@@ -1324,8 +1237,8 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                 {
 
                     JsonNode jsonNode = null;
-                    HttpResponse response = null;
-                    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+                    // HttpResponse response = null; // migrated to WebClient
+                    // CloseableHttpClient httpClient = HttpClientBuilder.create().build(); // migrated to WebClient
 
                     // Only Internal User(s) Allowed Login can Execute Employee Search
                     if (StringUtils.hasText(userId) && StringUtils.hasText(dS.getEmpByIdPathString())
@@ -1336,107 +1249,86 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                         if (StringUtils.hasText(dS.getEmpByIdPathString()))
                         {
 
-                            try
-                            {
-                                String urlLink = CL_URLUtility.getUrl4DestinationAPI(dS.getEmpByIdPathString(),
-                                        desProps.getBaseUrl()) + userId;
+                            String urlLink = CL_URLUtility.getUrl4DestinationAPI(dS.getEmpByIdPathString(),
+                                    desProps.getBaseUrl()) + userId;
 
-                                if (StringUtils.hasText(urlLink))
-                                {
-
-                                    try
-                                    {
-
-                                        URL url = new URL(urlLink);
-                                        URI uri = new URI(url.getProtocol(), url.getUserInfo(),
-                                                IDN.toASCII(url.getHost()), url.getPort(), url.getPath(),
-                                                url.getQuery(), url.getRef());
-                                        String correctEncodedURL = uri.toASCIIString();
-
-                                        log.info(" Employee Scan with url : " + correctEncodedURL);
-
-                                        HttpGet httpGet = new HttpGet(correctEncodedURL);
-                                        httpGet.setHeader(HttpHeaders.AUTHORIZATION, desProps.getAuthToken());
-                                        httpGet.addHeader("accept", "application/json");
-                                        // Fire the Url
-                                        response = httpClient.execute(httpGet);
-
-                                        // verify the valid error code first
-                                        int statusCode = response.getStatusLine().getStatusCode();
-                                        if (statusCode != HttpStatus.SC_OK)
-                                        {
-
-                                            throw new RuntimeException("Failed with HTTP error code : " + statusCode);
-                                        }
-
-                                        // Try and Get Entity from Response
-                                        org.apache.http.HttpEntity entity = response.getEntity();
-                                        String apiOutput = EntityUtils.toString(entity);
-
-                                        // Conerting to JSON
-                                        ObjectMapper mapper = new ObjectMapper();
-                                        jsonNode = mapper.readTree(apiOutput);
-                                        if (jsonNode != null)
-                                        {
-                                            Iterator<Map.Entry<String, JsonNode>> payloadItr = jsonNode.fields();
-                                            while (payloadItr.hasNext())
-                                            {
-                                                Map.Entry<String, JsonNode> payloadEnt = payloadItr.next();
-                                                String payloadFieldName = payloadEnt.getKey();
-                                                if (payloadFieldName.equals("value"))
-                                                {
-                                                    Iterator<JsonNode> accItr = payloadEnt.getValue().elements();
-                                                    while (accItr.hasNext())
-                                                    {
-                                                        JsonNode accEnt = accItr.next();
-                                                        if (accEnt != null)
-                                                        {
-
-                                                            Iterator<String> fieldNames = accEnt.fieldNames();
-                                                            while (fieldNames.hasNext())
-                                                            {
-                                                                String accFieldName = fieldNames.next();
-                                                                if (accFieldName.equals("id"))
-                                                                {
-                                                                    log.info("Employee Id Added : "
-                                                                            + accEnt.get(accFieldName).asText());
-                                                                    empID = accEnt.get(accFieldName).asText();
-                                                                }
-
-                                                            }
-
-                                                        }
-                                                    }
-
-                                                }
-
-                                            }
-                                        }
-
-                                    }
-
-                                    catch (Exception e)
-                                    {
-                                        if (e != null)
-                                        {
-                                            log.error(e.getLocalizedMessage());
-                                        }
-                                    }
-
-                                }
-                            }
-
-                            finally
+                            if (StringUtils.hasText(urlLink))
                             {
 
                                 try
                                 {
-                                    httpClient.close();
-                                }
-                                catch (IOException e)
-                                {
 
-                                    log.error(e.getLocalizedMessage());
+                                    URL url = new URL(urlLink);
+                                    URI uri = new URI(url.getProtocol(), url.getUserInfo(),
+                                            IDN.toASCII(url.getHost()), url.getPort(), url.getPath(),
+                                            url.getQuery(), url.getRef());
+
+                                    log.info(" Employee Scan with url : " + uri);
+
+                                    // Fire the Url
+                                    ResponseEntity<String> wcResponse = srvCloudWebClient
+                                            .get().uri(uri)
+                                            .header(HttpHeaders.AUTHORIZATION, desProps.getAuthToken())
+                                            .header("accept", "application/json")
+                                            .exchangeToMono(r -> r.toEntity(String.class)).block();
+
+                                    // verify the valid error code first
+                                    int statusCode = wcResponse != null ? wcResponse.getStatusCode().value() : 0;
+                                    if (statusCode != HttpStatus.SC_OK)
+                                    {
+
+                                        throw new RuntimeException("Failed with HTTP error code : " + statusCode);
+                                    }
+
+                                    // Try and Get Entity from Response
+                                    String apiOutput = wcResponse.getBody();
+
+                                    // Conerting to JSON
+                                    ObjectMapper mapper = new ObjectMapper();
+                                    jsonNode = mapper.readTree(apiOutput);
+                                    if (jsonNode != null)
+                                    {
+                                        Iterator<Map.Entry<String, JsonNode>> payloadItr = jsonNode.fields();
+                                        while (payloadItr.hasNext())
+                                        {
+                                            Map.Entry<String, JsonNode> payloadEnt = payloadItr.next();
+                                            String payloadFieldName = payloadEnt.getKey();
+                                            if (payloadFieldName.equals("value"))
+                                            {
+                                                Iterator<JsonNode> accItr = payloadEnt.getValue().elements();
+                                                while (accItr.hasNext())
+                                                {
+                                                    JsonNode accEnt = accItr.next();
+                                                    if (accEnt != null)
+                                                    {
+
+                                                        Iterator<String> fieldNames = accEnt.fieldNames();
+                                                        while (fieldNames.hasNext())
+                                                        {
+                                                            String accFieldName = fieldNames.next();
+                                                            if (accFieldName.equals("id"))
+                                                            {
+                                                                log.info("Employee Id Added : "
+                                                                        + accEnt.get(accFieldName).asText());
+                                                                empID = accEnt.get(accFieldName).asText();
+                                                            }
+
+                                                        }
+
+                                                    }
+                                                }
+
+                                            }
+
+                                        }
+                                    }
+
+                                }
+
+                                catch (Exception e)
+                                {
+                                    throw new EX_ESMAPI(msgSrc.getMessage("ERR_EMP_ID_BY_USER_ID_GET", new Object[]
+                                            {  e.getMessage() }, Locale.ENGLISH));
                                 }
 
                             }
@@ -1468,8 +1360,8 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                 if (StringUtils.hasText(desProps.getAuthToken()))
                 {
                     JsonNode jsonNode = null;
-                    HttpResponse response = null;
-                    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+                    // HttpResponse response = null; // migrated to WebClient
+                    // CloseableHttpClient httpClient = HttpClientBuilder.create().build(); // migrated to WebClient
                     String urlLink = null;
                     try
                     {
@@ -1481,30 +1373,29 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                             urlLink = CL_URLUtility.getUrl4DestinationAPI(dS.getVhlpUrlPathString(),
                                     desProps.getBaseUrl()) + fieldName;
 
-                            HttpGet httpGet = new HttpGet(urlLink);
-
-                            httpGet.setHeader(HttpHeaders.AUTHORIZATION, desProps.getAuthToken());
-                            httpGet.addHeader("accept", "application/json");
-
                             // Fire the Url
-                            response = httpClient.execute(httpGet);
+                            ResponseEntity<String> wcResponse = srvCloudWebClient.get()
+                                    .uri(urlLink)
+                                    .header(HttpHeaders.AUTHORIZATION, desProps.getAuthToken())
+                                    .header("accept", "application/json")
+                                    .exchangeToMono(r -> r.toEntity(String.class)).block();
 
                             // verify the valid error code first
-                            int statusCode = response.getStatusLine().getStatusCode();
+                            int statusCode = wcResponse != null ? wcResponse.getStatusCode().value() : 0;
                             if (statusCode != HttpStatus.SC_OK)
                             {
 
                                 if (statusCode == HttpStatus.SC_NOT_FOUND)
                                 {
                                     String msg = msgSrc.getMessage("ERR_VHLP_FLD_SRVCLOUD_NOTFOUND", new Object[]
-                                    { fieldName }, Locale.ENGLISH);
+                                            { fieldName }, Locale.ENGLISH);
                                     log.error(msg);
                                     throw new EX_ESMAPI(msg);
                                 }
                                 else
                                 {
                                     String msg = msgSrc.getMessage("ERR_VHLP_FLD_SRVCLOUD_GEN", new Object[]
-                                    { fieldName, statusCode }, Locale.ENGLISH);
+                                            { fieldName, statusCode }, Locale.ENGLISH);
                                     log.error(msg);
                                     throw new EX_ESMAPI(msg);
 
@@ -1513,8 +1404,7 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                             }
 
                             // Try and Get Entity from Response
-                            HttpEntity entity = response.getEntity();
-                            String apiOutput = EntityUtils.toString(entity);
+                            String apiOutput = wcResponse.getBody();
                             // Lets see what we got from API
                             // log.info(apiOutput);
 
@@ -1575,16 +1465,10 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                     catch (Exception e)
                     {
                         throw new EX_ESMAPI(msgSrc.getMessage("ERR_VHLP_FLD_SRVCLOUD_NOTFOUND", new Object[]
-                        { fieldName, e.getMessage() }, Locale.ENGLISH));
+                                { fieldName, e.getMessage() }, Locale.ENGLISH));
 
                     }
-                    finally
-                    {
-                        httpClient.close();
-                    }
-
                 }
-
             }
         }
 
@@ -1606,8 +1490,7 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                     if (StringUtils.hasText(caseId))
                     {
                         JsonNode jsonNode = null;
-                        HttpResponse response = null;
-                        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+
                         String urlLink = null;
                         try
                         {
@@ -1619,43 +1502,30 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                                 urlLink = CL_URLUtility.getUrl4DestinationAPI(dS.getCaseDetailsUrlPathString(),
                                         desProps.getBaseUrl()) + caseId;
 
-                                HttpGet httpGet = new HttpGet(urlLink);
-
-                                httpGet.setHeader(HttpHeaders.AUTHORIZATION, desProps.getAuthToken());
-                                httpGet.addHeader("accept", "application/json");
-
                                 // Fire the Url
-                                response = httpClient.execute(httpGet);
+                                ResponseEntity<String> wcResponse = srvCloudWebClient.get()
+                                        .uri(urlLink)
+                                        .header(HttpHeaders.AUTHORIZATION, desProps.getAuthToken())
+                                        .header("accept", "application/json")
+                                        .exchangeToMono(r -> r.toEntity(String.class)).block();
 
                                 // verify the valid error code first
-                                int statusCode = response.getStatusLine().getStatusCode();
+                                int statusCode = wcResponse != null ? wcResponse.getStatusCode().value() : 0;
                                 if (statusCode != HttpStatus.SC_OK)
                                 {
                                     String msg = msgSrc.getMessage("ERR_CASE_DET_FETCH", new Object[]
-                                    { caseId }, Locale.ENGLISH);
+                                            { caseId }, Locale.ENGLISH);
                                     log.error(msg);
                                     throw new EX_ESMAPI(msg);
                                 }
 
                                 // Try and Get Entity from Response
-                                HttpEntity entity = response.getEntity();
-                                String apiOutput = EntityUtils.toString(entity);
+                                String apiOutput = wcResponse.getBody();
                                 // Lets see what we got from API
                                 // log.info(apiOutput);
 
-                                // Get Response Header(s) from API REsponse
-                                Header[] headers = response.getAllHeaders();
-                                String eTag = null;
-                                if (headers.length > 0)
-                                {
-                                    // Get the Etag
-                                    Optional<Header> etagO = Arrays.asList(headers).stream()
-                                            .filter(e -> e.getName().equals(GC_Constants.gc_ETag)).findFirst();
-                                    if (etagO.isPresent())
-                                    {
-                                        eTag = etagO.get().getValue();
-                                    }
-                                }
+                                // Get Response Header(s) from API Response
+                                String eTag = wcResponse.getHeaders().getFirst(GC_Constants.gc_ETag);
 
                                 // Conerting to JSON
                                 ObjectMapper mapper = new ObjectMapper();
@@ -1700,13 +1570,10 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                         catch (Exception e)
                         {
                             throw new EX_ESMAPI(msgSrc.getMessage("ERR_CASE_DET_FETCH", new Object[]
-                            { caseId, e.getMessage() }, Locale.ENGLISH));
+                                    { caseId, e.getMessage() }, Locale.ENGLISH));
 
                         }
-                        finally
-                        {
-                            httpClient.close();
-                        }
+
 
                     }
 
@@ -1735,8 +1602,7 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                     {
 
                         JsonNode jsonNode = null;
-                        HttpResponse response = null;
-                        CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+
                         String urlLink = null;
                         try
                         {
@@ -1746,27 +1612,25 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                             urlLink = CL_URLUtility.getUrl4DestinationAPI(dS.getStatusSchemaUrlPathString(),
                                     desProps.getBaseUrl()) + StatusSchema;
 
-                            HttpGet httpGet = new HttpGet(urlLink);
-
-                            httpGet.setHeader(HttpHeaders.AUTHORIZATION, desProps.getAuthToken());
-                            httpGet.addHeader("accept", "application/json");
-
                             // Fire the Url
-                            response = httpClient.execute(httpGet);
+                            ResponseEntity<String> wcResponse = srvCloudWebClient.get()
+                                    .uri(urlLink)
+                                    .header(HttpHeaders.AUTHORIZATION, desProps.getAuthToken())
+                                    .header("accept", "application/json")
+                                    .exchangeToMono(r -> r.toEntity(String.class)).block();
 
                             // verify the valid error code first
-                            int statusCode = response.getStatusLine().getStatusCode();
+                            int statusCode = wcResponse != null ? wcResponse.getStatusCode().value() : 0;
                             if (statusCode != HttpStatus.SC_OK)
                             {
                                 String msg = msgSrc.getMessage("ERR_INVALID_SCHEMA", new Object[]
-                                { StatusSchema }, Locale.ENGLISH);
+                                        { StatusSchema }, Locale.ENGLISH);
                                 log.error(msg);
                                 throw new EX_ESMAPI(msg);
                             }
 
                             // Try and Get Entity from Response
-                            HttpEntity entity = response.getEntity();
-                            String apiOutput = EntityUtils.toString(entity);
+                            String apiOutput = wcResponse.getBody();
                             // Lets see what we got from API
                             // log.info(apiOutput);
 
@@ -1819,13 +1683,10 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                         catch (Exception e)
                         {
                             throw new EX_ESMAPI(msgSrc.getMessage("ERR_INVALID_SCHEMA", new Object[]
-                            { StatusSchema, e.getMessage() }, Locale.ENGLISH));
+                                    { StatusSchema, e.getMessage() }, Locale.ENGLISH));
 
                         }
-                        finally
-                        {
-                            httpClient.close();
-                        }
+
 
                     }
 
@@ -1838,7 +1699,7 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
 
     @Override
     public boolean updateCasewithReply(TY_CasePatchInfo patchInfo, TY_Case_SrvCloud_Reply caseReply,
-            TY_DestinationProps desProps) throws EX_ESMAPI, IOException
+                                       TY_DestinationProps desProps) throws EX_ESMAPI, IOException
     {
         boolean caseUpdated = false;
 
@@ -1853,17 +1714,12 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                     {
                         if (StringUtils.hasText(patchInfo.getCaseGuid()) && StringUtils.hasText(patchInfo.getETag()))
                         {
-                            HttpClient httpclient = HttpClients.createDefault();
+                            // HttpClient httpclient = HttpClients.createDefault(); // migrated to WebClient
                             String casePOSTURL = getPOSTURL4BaseUrl(CL_URLUtility
                                     .getUrl4DestinationAPI(dS.getCaseDetailsUrlPathString(), desProps.getBaseUrl()));
                             if (StringUtils.hasText(casePOSTURL))
                             {
                                 casePOSTURL = casePOSTURL + patchInfo.getCaseGuid();
-
-                                HttpPatch httpPatch = new HttpPatch(casePOSTURL);
-                                httpPatch.setHeader(HttpHeaders.AUTHORIZATION, desProps.getAuthToken());
-                                httpPatch.addHeader("Content-Type", "application/json");
-                                httpPatch.addHeader(GC_Constants.gc_IFMatch, patchInfo.getETag());
 
                                 // Remove Description Note Type from Payload before Persisting
                                 // Important as the Description or Default text Type Should not be persisted
@@ -1884,24 +1740,26 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                                 String requestBody = objMapper.writeValueAsString(caseReply);
                                 log.info(requestBody);
 
-                                StringEntity entity = new StringEntity(requestBody, ContentType.APPLICATION_JSON);
-                                httpPatch.setEntity(entity);
-
                                 // PATCH Case in Service Cloud
                                 try
                                 {
                                     // Fire the Url
-                                    HttpResponse response = httpclient.execute(httpPatch);
+                                    ResponseEntity<String> wcResponse = srvCloudWebClient.patch()
+                                            .uri(casePOSTURL)
+                                            .header(HttpHeaders.AUTHORIZATION, desProps.getAuthToken())
+                                            .header("Content-Type", "application/json")
+                                            .header(GC_Constants.gc_IFMatch, patchInfo.getETag())
+                                            .bodyValue(requestBody)
+                                            .exchangeToMono(r -> r.toEntity(String.class)).block();
                                     // verify the valid error code first
-                                    int statusCode = response.getStatusLine().getStatusCode();
+                                    int statusCode = wcResponse != null ? wcResponse.getStatusCode().value() : 0;
                                     if (statusCode != HttpStatus.SC_OK)
                                     {
-                                        HttpEntity entityResp = response.getEntity();
-                                        String apiOutput = EntityUtils.toString(entityResp);
+                                        String apiOutput = wcResponse != null ? wcResponse.getBody() : "";
                                         log.error(apiOutput);
                                         // Error Updating Case id - {0}. HTTP Status - {1}. Details : {2}.
                                         throw new EX_ESMAPI(msgSrc.getMessage("ERR_CASE_REPLY_UPDATE", new Object[]
-                                        { patchInfo.getCaseId(), statusCode, apiOutput }, Locale.ENGLISH));
+                                                { patchInfo.getCaseId(), statusCode, apiOutput }, Locale.ENGLISH));
 
                                     }
                                     else
@@ -1910,10 +1768,10 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                                     }
 
                                 }
-                                catch (IOException e)
+                                catch (Exception e)
                                 {
                                     throw new EX_ESMAPI(msgSrc.getMessage("ERR_NOTES_POST", new Object[]
-                                    { e.getLocalizedMessage() }, Locale.ENGLISH));
+                                            { e.getLocalizedMessage() }, Locale.ENGLISH));
                                 }
                             }
 
@@ -1947,37 +1805,21 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
 
             ResponseEntity<String> response = srvCloudWebClient.post().uri(casePOSTURL)
                     .header(HttpHeaders.AUTHORIZATION, desProps.getAuthToken()).contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(payload).exchangeToMono(res -> res.toEntity(String.class)).block();
+                    .bodyValue(payload).retrieve().toEntity(String.class).block();
 
             if (response == null)
             {
-                throw new EX_ESMAPI(msgSrc.getMessage("ERR_CASE_POST_SRV", new Object[]
-                { "No response received" }, Locale.ENGLISH));
+                throw new EX_ESMAPI(msgSrc.getMessage("ERR_NOTES_POST", new Object[]
+                        { "No response received" }, Locale.ENGLISH));
             }
 
             if (!response.getStatusCode().is2xxSuccessful())
             {
                 log.error("Case Creation Failed. Status : {}, Response : {}", response.getStatusCode().value(),
                         response.getBody());
-                String errorMsg = response.getBody();
-                try
-                {
-                    JsonNode errNode = objectMapper.readTree(response.getBody());
-                    JsonNode details = errNode.path("error").path("details");
-                    if (details.isArray() && details.size() > 0 && details.get(0).hasNonNull("message"))
-                    {
-                        errorMsg = details.get(0).path("message").asText();
-                    }
-                    else if (errNode.path("error").hasNonNull("message"))
-                    {
-                        errorMsg = errNode.path("error").path("message").asText();
-                    }
-                }
-                catch (Exception ignored)
-                {
-                }
-                throw new EX_ESMAPI(msgSrc.getMessage("ERR_CASE_POST_SRV", new Object[]
-                { response.getStatusCode().value() + " - " + errorMsg }, Locale.ENGLISH));
+
+                throw new EX_ESMAPI(msgSrc.getMessage("ERR_NOTES_POST", new Object[]
+                        { response.getBody() }, Locale.ENGLISH));
             }
 
             JsonNode responseNode = objectMapper.readTree(response.getBody());
@@ -1990,8 +1832,8 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
         }
         catch (JsonProcessingException e)
         {
-            throw new EX_ESMAPI(msgSrc.getMessage("ERR_CASE_POST_SRV", new Object[]
-            { e.getLocalizedMessage() }, Locale.ENGLISH));
+            throw new EX_ESMAPI(msgSrc.getMessage("ERR_NEW_NOTES_JSON", new Object[]
+                    { e.getLocalizedMessage() }, Locale.ENGLISH));
         }
         catch (EX_ESMAPI e)
         {
@@ -1999,8 +1841,8 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
         }
         catch (Exception e)
         {
-            throw new EX_ESMAPI(msgSrc.getMessage("ERR_CASE_POST_SRV", new Object[]
-            { e.getLocalizedMessage() }, Locale.ENGLISH));
+            throw new EX_ESMAPI(msgSrc.getMessage("ERR_NOTES_POST", new Object[]
+                    { e.getLocalizedMessage() }, Locale.ENGLISH));
         }
     }
 
@@ -2018,8 +1860,8 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                 if (StringUtils.hasText(desProps.getAuthToken()))
                 {
                     JsonNode jsonNode = null;
-                    HttpResponse response = null;
-                    CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+                    // HttpResponse response = null; // migrated to WebClient
+                    // CloseableHttpClient httpClient = HttpClientBuilder.create().build(); // migrated to WebClient
                     final String urlAttrib = "url";
 
                     if (StringUtils.hasText(caseGuid) && StringUtils.hasText(dS.getPrevAttPathString())
@@ -2029,7 +1871,7 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                         log.info("Fetching Attachments for Case GUID : " + caseGuid);
 
                         String urlLink = StringsUtility.replaceURLwithParams(dS.getPrevAttPathString(), new String[]
-                        { caseGuid }, GC_Constants.gc_UrlReplParam);
+                                { caseGuid }, GC_Constants.gc_UrlReplParam);
 
                         urlLink = CL_URLUtility.getUrl4DestinationAPI(urlLink, desProps.getBaseUrl());
 
@@ -2042,21 +1884,21 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                                 URL url = new URL(urlLink);
                                 URI uri = new URI(url.getProtocol(), url.getUserInfo(), IDN.toASCII(url.getHost()),
                                         url.getPort(), url.getPath(), url.getQuery(), url.getRef());
-                                String correctEncodedURL = uri.toASCIIString();
 
-                                HttpGet httpGet = new HttpGet(correctEncodedURL);
-                                httpGet.setHeader(HttpHeaders.AUTHORIZATION, desProps.getAuthToken());
-                                httpGet.addHeader("accept", "application/json");
+
                                 // Fire the Url
-                                response = httpClient.execute(httpGet);
+                                ResponseEntity<String> wcResponse = srvCloudWebClient.get()
+                                        .uri(uri)
+                                        .header(HttpHeaders.AUTHORIZATION, desProps.getAuthToken())
+                                        .header("accept", "application/json")
+                                        .exchangeToMono(r -> r.toEntity(String.class)).block();
 
                                 // verify the valid error code first
-                                int statusCode = response.getStatusLine().getStatusCode();
+                                int statusCode = wcResponse != null ? wcResponse.getStatusCode().value() : 0;
                                 if (statusCode == HttpStatus.SC_OK)
                                 {
 
-                                    HttpEntity entity = response.getEntity();
-                                    String apiOutput = EntityUtils.toString(entity);
+                                    String apiOutput = wcResponse.getBody();
 
                                     ObjectMapper mapper = new ObjectMapper();
                                     jsonNode = mapper.readTree(apiOutput);
@@ -2216,7 +2058,7 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                                                                     if (!type.equals(
                                                                             GC_Constants.gc_AttachmentTypeInternal)
                                                                             && !type.equals(
-                                                                                    GC_Constants.gc_AttachmentTypeEmail)
+                                                                            GC_Constants.gc_AttachmentTypeEmail)
 
                                                                     )
                                                                     {
@@ -2245,22 +2087,19 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                             catch (Exception e)
                             {
                                 throw new EX_ESMAPI(msgSrc.getMessage("ERR_CASE_DET_FETCH", new Object[]
-                                { caseGuid, e.getMessage() }, Locale.ENGLISH));
+                                        { caseGuid, e.getMessage() }, Locale.ENGLISH));
 
                             }
-                            finally
-                            {
-                                httpClient.close();
-                            }
+
 
                             if (CollectionUtils.isNotEmpty(prevAtt))
                             {
                                 for (TY_PreviousAttachments attDet : prevAtt)
                                 {
                                     // Get Attachment GUID and Generate S3 Link for D/l
-                                    httpClient = HttpClientBuilder.create().build();
+                                    // httpClient = HttpClientBuilder.create().build(); // migrated to WebClient
                                     urlLink = StringsUtility.replaceURLwithParams(dS.getDlAttPathString(), new String[]
-                                    { attDet.getId() }, GC_Constants.gc_UrlReplParam);
+                                            { attDet.getId() }, GC_Constants.gc_UrlReplParam);
 
                                     if (StringUtils.hasText(urlLink))
                                     {
@@ -2273,21 +2112,21 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                                             URI uri = new URI(url.getProtocol(), url.getUserInfo(),
                                                     IDN.toASCII(url.getHost()), url.getPort(), url.getPath(),
                                                     url.getQuery(), url.getRef());
-                                            String correctEncodedURL = uri.toASCIIString();
 
-                                            HttpGet httpGet = new HttpGet(correctEncodedURL);
-                                            httpGet.setHeader(HttpHeaders.AUTHORIZATION, desProps.getAuthToken());
-                                            httpGet.addHeader("accept", "application/json");
+
                                             // Fire the Url
-                                            response = httpClient.execute(httpGet);
+                                            ResponseEntity<String> wcResponse2 = srvCloudWebClient.get()
+                                                    .uri(uri)
+                                                    .header(HttpHeaders.AUTHORIZATION, desProps.getAuthToken())
+                                                    .header("accept", "application/json")
+                                                    .exchangeToMono(r -> r.toEntity(String.class)).block();
 
                                             // verify the valid error code first
-                                            int statusCode = response.getStatusLine().getStatusCode();
+                                            int statusCode = wcResponse2 != null ? wcResponse2.getStatusCode().value() : 0;
                                             if (statusCode == HttpStatus.SC_OK)
                                             {
                                                 // update attDet
-                                                HttpEntity entity = response.getEntity();
-                                                String apiOutput = EntityUtils.toString(entity);
+                                                String apiOutput = wcResponse2.getBody();
 
                                                 ObjectMapper mapper = new ObjectMapper();
                                                 jsonNode = mapper.readTree(apiOutput);
@@ -2325,13 +2164,10 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                                         catch (Exception e)
                                         {
                                             throw new EX_ESMAPI(msgSrc.getMessage("ERR_CASE_DET_FETCH", new Object[]
-                                            { caseGuid, e.getMessage() }, Locale.ENGLISH));
+                                                    { caseGuid, e.getMessage() }, Locale.ENGLISH));
 
                                         }
-                                        finally
-                                        {
-                                            httpClient.close();
-                                        }
+
                                     }
                                 }
                             }
@@ -2354,8 +2190,8 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
         if (StringUtils.hasText(caseId))
         {
             JsonNode jsonNode = null;
-            HttpResponse response = null;
-            CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+            // HttpResponse response = null; // migrated to WebClient
+            // CloseableHttpClient httpClient = HttpClientBuilder.create().build(); // migrated to WebClient
             String urlLink = null;
 
             if (StringUtils.hasText(caseId) && StringUtils.hasText(dS.getNotesReadUrlPathString()))
@@ -2365,31 +2201,31 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                 try
                 {
                     urlLink = StringsUtility.replaceURLwithParams(dS.getNotesReadUrlPathString(), new String[]
-                    { caseId }, GC_Constants.gc_UrlReplParam);
+                            { caseId }, GC_Constants.gc_UrlReplParam);
 
                     if (StringUtils.hasText(urlLink))
                     {
                         urlLink = CL_URLUtility.getUrl4DestinationAPI(urlLink, desProps.getBaseUrl());
-                        HttpGet httpGet = new HttpGet(urlLink);
-                        httpGet.setHeader(HttpHeaders.AUTHORIZATION, desProps.getAuthToken());
-                        httpGet.addHeader("accept", "application/json");
 
                         // Fire the Url
-                        response = httpClient.execute(httpGet);
+                        ResponseEntity<String> wcResponse = srvCloudWebClient.get()
+                                .uri(URI.create(urlLink))
+                                .header(HttpHeaders.AUTHORIZATION, desProps.getAuthToken())
+                                .header("accept", "application/json")
+                                .exchangeToMono(r -> r.toEntity(String.class)).block();
 
                         // verify the valid error code first
-                        int statusCode = response.getStatusLine().getStatusCode();
+                        int statusCode = wcResponse != null ? wcResponse.getStatusCode().value() : 0;
                         if (statusCode != HttpStatus.SC_OK)
                         {
                             String msg = msgSrc.getMessage("ERR_CASE_NOTESF_FETCH", new Object[]
-                            { caseId }, Locale.ENGLISH);
+                                    { caseId }, Locale.ENGLISH);
                             log.error(msg);
                             throw new EX_ESMAPI(msg);
                         }
 
                         // Try and Get Entity from Response
-                        HttpEntity entity = response.getEntity();
-                        String apiOutput = EntityUtils.toString(entity);
+                        String apiOutput = wcResponse.getBody();
 
                         // Conerting to JSON
                         ObjectMapper mapper = new ObjectMapper();
@@ -2493,12 +2329,8 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                 catch (Exception e)
                 {
                     throw new EX_ESMAPI(msgSrc.getMessage("ERR_CASE_NOTESF_FETCH", new Object[]
-                    { caseId, e.getMessage() }, Locale.ENGLISH));
+                            { caseId, e.getMessage() }, Locale.ENGLISH));
 
-                }
-                finally
-                {
-                    httpClient.close();
                 }
 
             }
@@ -2523,41 +2355,40 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                             && StringUtils.hasText(caseDetails.getCnfStatusCode()))
                     {
 
-                        HttpClient httpclient = HttpClients.createDefault();
+                        // HttpClient httpclient = HttpClients.createDefault(); // migrated to WebClient
                         String casePOSTURL = getPOSTURL4BaseUrl(CL_URLUtility.getUrl4DestinationAPI(
                                 dS.getCaseDetailsUrlPathString(), caseDetails.getDesProps().getBaseUrl()))
                                 + caseDetails.getCaseGuid();
                         if (StringUtils.hasText(casePOSTURL))
                         {
-                            HttpPatch httpPatch = new HttpPatch(casePOSTURL);
-                            httpPatch.setHeader(HttpHeaders.AUTHORIZATION, caseDetails.getDesProps().getAuthToken());
-                            httpPatch.addHeader("Content-Type", "application/json");
-                            httpPatch.addHeader(GC_Constants.gc_IFMatch, caseDetails.getETag());
                             ObjectMapper objMapper = new ObjectMapper();
 
                             TY_Case_SrvCloud_Confirm caseConfirmPayload = new TY_Case_SrvCloud_Confirm(
                                     caseDetails.getCnfStatusCode());
 
                             String requestBody = objMapper.writeValueAsString(caseConfirmPayload);
-                            StringEntity entity = new StringEntity(requestBody, ContentType.APPLICATION_JSON);
-                            httpPatch.setEntity(entity);
 
                             // PATCH Case in Service Cloud
                             try
                             {
                                 // Fire the Url
-                                HttpResponse response = httpclient.execute(httpPatch);
+                                ResponseEntity<String> wcResponse = srvCloudWebClient.patch()
+                                        .uri(casePOSTURL)
+                                        .header(HttpHeaders.AUTHORIZATION, caseDetails.getDesProps().getAuthToken())
+                                        .header("Content-Type", "application/json")
+                                        .header(GC_Constants.gc_IFMatch, caseDetails.getETag())
+                                        .bodyValue(requestBody)
+                                        .exchangeToMono(r -> r.toEntity(String.class)).block();
                                 // verify the valid error code first
-                                int statusCode = response.getStatusLine().getStatusCode();
+                                int statusCode = wcResponse != null ? wcResponse.getStatusCode().value() : 0;
                                 if (statusCode != HttpStatus.SC_OK)
                                 {
-                                    HttpEntity entityResp = response.getEntity();
-                                    String apiOutput = EntityUtils.toString(entityResp);
+                                    String apiOutput = wcResponse != null ? wcResponse.getBody() : "";
                                     log.error(apiOutput);
                                     // ERR_CASE_CONFIRM= Error Confirming Case id - {0}. HTTP Status - {1}. Details
                                     // : {2}.
                                     throw new EX_ESMAPI(msgSrc.getMessage("ERR_CASE_CONFIRM", new Object[]
-                                    { caseDetails.getCaseId(), statusCode, apiOutput }, Locale.ENGLISH));
+                                            { caseDetails.getCaseId(), statusCode, apiOutput }, Locale.ENGLISH));
 
                                 }
                                 else
@@ -2569,7 +2400,7 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                             catch (Exception e)
                             {
                                 throw new EX_ESMAPI(msgSrc.getMessage("ERR_CASE_CONFIRM", new Object[]
-                                { caseDetails.getCaseId(), HttpStatus.SC_EXPECTATION_FAILED, e.getLocalizedMessage() },
+                                                { caseDetails.getCaseId(), HttpStatus.SC_EXPECTATION_FAILED, e.getLocalizedMessage() },
                                         Locale.ENGLISH));
                             }
 
@@ -2595,8 +2426,8 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
             if (StringUtils.hasText(desProps.getAuthToken()))
             {
                 JsonNode jsonNode = null;
-                HttpResponse response = null;
-                CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+                // HttpResponse response = null; // migrated to WebClient
+                // CloseableHttpClient httpClient = HttpClientBuilder.create().build(); // migrated to WebClient
                 String urlLink = null;
 
                 try
@@ -2612,18 +2443,17 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                         URL url = new URL(urlLink);
                         URI uri = new URI(url.getProtocol(), url.getUserInfo(), IDN.toASCII(url.getHost()),
                                 url.getPort(), url.getPath(), url.getQuery(), url.getRef());
-                        String correctEncodedURL = uri.toASCIIString();
 
-                        HttpGet httpGet = new HttpGet(correctEncodedURL);
-
-                        httpGet.setHeader(HttpHeaders.AUTHORIZATION, desProps.getAuthToken());
-                        httpGet.addHeader("accept", "application/json");
 
                         // Fire the Url
-                        response = httpClient.execute(httpGet);
+                        ResponseEntity<String> wcResponse = srvCloudWebClient.get()
+                                .uri(uri)
+                                .header(HttpHeaders.AUTHORIZATION, desProps.getAuthToken())
+                                .header("accept", "application/json")
+                                .exchangeToMono(r -> r.toEntity(String.class)).block();
 
                         // verify the valid error code first
-                        int statusCode = response.getStatusLine().getStatusCode();
+                        int statusCode = wcResponse != null ? wcResponse.getStatusCode().value() : 0;
                         if (statusCode != org.apache.http.HttpStatus.SC_OK)
                         {
 
@@ -2633,19 +2463,18 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                                 // ERR_MIME_TYPES_API=Error Reading Allowed Mime Type Value(s) from SDocument
                                 // Service API. Details - {0}.
                                 throw new EX_ESMAPI(msgSrc.getMessage("ERR_MIME_TYPES_API", new Object[]
-                                { "Not FOUND any Status Values" }, Locale.ENGLISH));
+                                        { "Not FOUND any Status Values" }, Locale.ENGLISH));
                             }
                             else
                             {
                                 throw new EX_ESMAPI(msgSrc.getMessage("ERR_MIME_TYPES_APII", new Object[]
-                                { statusCode }, Locale.ENGLISH));
+                                        { statusCode }, Locale.ENGLISH));
                             }
 
                         }
 
                         // Try and Get Entity from Response
-                        HttpEntity entity = response.getEntity();
-                        String apiOutput = EntityUtils.toString(entity);
+                        String apiOutput = wcResponse.getBody();
                         // Lets see what we got from API
                         // log.info(apiOutput);
 
@@ -2741,13 +2570,10 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                 catch (Exception e)
                 {
                     throw new EX_ESMAPI(msgSrc.getMessage("ERR_STATUS_API", new Object[]
-                    { e.getMessage() }, Locale.ENGLISH));
+                            { e.getMessage() }, Locale.ENGLISH));
 
                 }
-                finally
-                {
-                    httpClient.close();
-                }
+
             }
 
         }
@@ -2757,7 +2583,7 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
 
     @Override
     public List<TY_CaseESS> getCases4Userv2(Ty_UserAccountEmployee userDetails, EnumCaseTypes caseType,
-            TY_DestinationProps desProps) throws IOException
+                                            TY_DestinationProps desProps) throws IOException
     {
 
         JsonNode jsonNode = null;
@@ -2765,336 +2591,331 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
 
         if (desProps != null)
         {
-            HttpResponse response = null;
-            CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+            // HttpResponse response = null; // migrated to WebClient
+            // CloseableHttpClient httpClient = HttpClientBuilder.create().build(); // migrated to WebClient
             String url = null;
 
-            try
+            if (StringUtils.hasLength(dS.getCasesSearch()) && StringUtils.hasText(desProps.getAuthToken()))
             {
-                if (StringUtils.hasLength(dS.getCasesSearch()) && StringUtils.hasText(desProps.getAuthToken()))
-                {
-                    log.info("Invoking Cases Search API v2: " + dS.getCasesSearch());
-                    url = CL_URLUtility.getUrl4DestinationAPI(dS.getCasesSearch(), desProps.getBaseUrl());
+                log.info("Invoking Cases Search API v2: " + dS.getCasesSearch());
+                url = CL_URLUtility.getUrl4DestinationAPI(dS.getCasesSearch(), desProps.getBaseUrl());
 
-                    if (userDetails != null)
+                if (userDetails != null)
+                {
+                    url = buildCasesUrl(url, userDetails);
+                    log.info("Cases Search API URL built: " + url);
+                }
+
+                try
+                {
+                    // Fire the Url
+                    ResponseEntity<String> wcResponse = srvCloudWebClient.get()
+                            .uri(URI.create(url))
+                            .header(HttpHeaders.AUTHORIZATION, desProps.getAuthToken())
+                            .header("accept", "application/json")
+                            .exchangeToMono(r -> r.toEntity(String.class)).block();
+
+                    // verify the valid error code first
+                    int statusCode = wcResponse != null ? wcResponse.getStatusCode().value() : 0;
+                    if (statusCode != HttpStatus.SC_OK)
                     {
-                        url = buildCasesUrl(url, userDetails);
-                        log.info("Cases Search API URL built: " + url);
+                        throw new RuntimeException("Failed with HTTP error code : " + statusCode);
+                    }
+                    else
+                    {
+                        log.info("Cases Search API v2 invoked successfully: " + statusCode);
                     }
 
-                    HttpGet httpGet = new HttpGet(url);
-                    httpGet.setHeader(HttpHeaders.AUTHORIZATION, desProps.getAuthToken());
-                    httpGet.addHeader("accept", "application/json");
+                    // Try and Get Entity from Response
+                    String apiOutput = wcResponse.getBody();
+                    // Lets see what we got from API
+                    // Log.info(apiOutput);
 
-                    try
+                    // Conerting to JSON
+                    ObjectMapper mapper = new ObjectMapper();
+                    jsonNode = mapper.readTree(apiOutput);
+
+                    if (jsonNode != null && CollectionUtils.isNotEmpty(statusTransitions.getStatusTransitions()))
                     {
-                        // Fire the Url
-                        response = httpClient.execute(httpGet);
 
-                        // verify the valid error code first
-                        int statusCode = response.getStatusLine().getStatusCode();
-                        if (statusCode != HttpStatus.SC_OK)
+                        JsonNode rootNode = jsonNode.path("value");
+                        if (rootNode != null)
                         {
-                            throw new RuntimeException("Failed with HTTP error code : " + statusCode);
-                        }
-                        else
-                        {
-                            log.info("Cases Search API v2 invoked successfully: " + statusCode);
-                        }
+                            log.info("Cases Bound!!");
+                            casesESSList = new ArrayList<TY_CaseESS>();
+                            List<TY_PortalStatusTransI> statusTransitionsList = statusTransitions
+                                    .getStatusTransitions();
 
-                        // Try and Get Entity from Response
-                        HttpEntity entity = response.getEntity();
-                        String apiOutput = EntityUtils.toString(entity);
-                        // Lets see what we got from API
-                        // Log.info(apiOutput);
-
-                        // Conerting to JSON
-                        ObjectMapper mapper = new ObjectMapper();
-                        jsonNode = mapper.readTree(apiOutput);
-
-                        if (jsonNode != null && CollectionUtils.isNotEmpty(statusTransitions.getStatusTransitions()))
-                        {
-
-                            JsonNode rootNode = jsonNode.path("value");
-                            if (rootNode != null)
+                            Iterator<Map.Entry<String, JsonNode>> payloadItr = jsonNode.fields();
+                            while (payloadItr.hasNext())
                             {
-                                log.info("Cases Bound!!");
-                                casesESSList = new ArrayList<TY_CaseESS>();
-                                List<TY_PortalStatusTransI> statusTransitionsList = statusTransitions
-                                        .getStatusTransitions();
+                                // log.info("Payload Iterator Bound");
+                                Map.Entry<String, JsonNode> payloadEnt = payloadItr.next();
+                                String payloadFieldName = payloadEnt.getKey();
+                                // log.info("Payload Field Scanned: " + payloadFieldName);
 
-                                Iterator<Map.Entry<String, JsonNode>> payloadItr = jsonNode.fields();
-                                while (payloadItr.hasNext())
+                                if (payloadFieldName.equals("value"))
                                 {
-                                    // log.info("Payload Iterator Bound");
-                                    Map.Entry<String, JsonNode> payloadEnt = payloadItr.next();
-                                    String payloadFieldName = payloadEnt.getKey();
-                                    // log.info("Payload Field Scanned: " + payloadFieldName);
-
-                                    if (payloadFieldName.equals("value"))
+                                    Iterator<JsonNode> casesItr = payloadEnt.getValue().elements();
+                                    // log.info("Cases Iterator Bound");
+                                    while (casesItr.hasNext())
                                     {
-                                        Iterator<JsonNode> casesItr = payloadEnt.getValue().elements();
-                                        // log.info("Cases Iterator Bound");
-                                        while (casesItr.hasNext())
+
+                                        JsonNode caseEnt = casesItr.next();
+                                        if (caseEnt != null)
                                         {
+                                            String caseid = null, caseguid = null, caseTypeI = null,
+                                                    mdgAccount = null, caseTypeDescription = null, subject = null,
+                                                    status = null, createdOn = null, accountId = null,
+                                                    contactId = null, origin = null, updatedOn = null;
+                                            boolean canConfirm = false;
 
-                                            JsonNode caseEnt = casesItr.next();
-                                            if (caseEnt != null)
+                                            // log.info("Cases Entity Bound - Reading Case...");
+                                            Iterator<String> fieldNames = caseEnt.fieldNames();
+                                            while (fieldNames.hasNext())
                                             {
-                                                String caseid = null, caseguid = null, caseTypeI = null,
-                                                        mdgAccount = null, caseTypeDescription = null, subject = null,
-                                                        status = null, createdOn = null, accountId = null,
-                                                        contactId = null, origin = null, updatedOn = null;
-                                                boolean canConfirm = false;
-
-                                                // log.info("Cases Entity Bound - Reading Case...");
-                                                Iterator<String> fieldNames = caseEnt.fieldNames();
-                                                while (fieldNames.hasNext())
+                                                String caseFieldName = fieldNames.next();
+                                                // log.info("Case Entity Field Scanned: " + caseFieldName);
+                                                if (caseFieldName.equals("id"))
                                                 {
-                                                    String caseFieldName = fieldNames.next();
-                                                    // log.info("Case Entity Field Scanned: " + caseFieldName);
-                                                    if (caseFieldName.equals("id"))
+                                                    // log.info("Case GUID Added : " +
+                                                    // caseEnt.get(caseFieldName).asText());
+                                                    if (StringUtils.hasText(caseEnt.get(caseFieldName).asText()))
                                                     {
-                                                        // log.info("Case GUID Added : " +
-                                                        // caseEnt.get(caseFieldName).asText());
-                                                        if (StringUtils.hasText(caseEnt.get(caseFieldName).asText()))
-                                                        {
-                                                            caseguid = caseEnt.get(caseFieldName).asText();
-                                                        }
+                                                        caseguid = caseEnt.get(caseFieldName).asText();
                                                     }
-
-                                                    if (caseFieldName.equals("displayId"))
-                                                    {
-                                                        // log.info("Case Id Added : " +
-                                                        // caseEnt.get(caseFieldName).asText());
-                                                        if (StringUtils.hasText(caseEnt.get(caseFieldName).asText()))
-                                                        {
-                                                            caseid = caseEnt.get(caseFieldName).asText();
-                                                        }
-                                                    }
-
-                                                    if (caseFieldName.equals("caseType"))
-                                                    {
-                                                        // log.info("Case Type Added : " +
-                                                        // caseEnt.get(caseFieldName).asText());
-                                                        if (StringUtils.hasText(caseEnt.get(caseFieldName).asText()))
-                                                        {
-                                                            caseTypeI = caseEnt.get(caseFieldName).asText();
-                                                        }
-                                                    }
-
-                                                    if (caseFieldName.equals("caseTypeDescription"))
-                                                    {
-                                                        // log.info("Case Type Description Added : " +
-                                                        // caseEnt.get(caseFieldName).asText());
-                                                        if (StringUtils.hasText(caseEnt.get(caseFieldName).asText()))
-                                                        {
-                                                            caseTypeDescription = caseEnt.get(caseFieldName).asText();
-                                                        }
-                                                    }
-
-                                                    if (caseFieldName.equals("subject"))
-                                                    {
-                                                        // log.info("Case Subject Added : " +
-                                                        // caseEnt.get(caseFieldName).asText());
-                                                        if (StringUtils.hasText(caseEnt.get(caseFieldName).asText()))
-                                                        {
-                                                            subject = caseEnt.get(caseFieldName).asText();
-                                                        }
-                                                    }
-
-                                                    if (caseFieldName.equals("origin"))
-                                                    {
-                                                        // log.info("Case Subject Added : " +
-                                                        // caseEnt.get(caseFieldName).asText());
-                                                        if (StringUtils.hasText(caseEnt.get(caseFieldName).asText()))
-                                                        {
-                                                            origin = caseEnt.get(caseFieldName).asText();
-                                                        }
-                                                    }
-
-                                                    if (caseFieldName.equals("statusDescription"))
-                                                    {
-                                                        // log.info("Case Status Added : " +
-                                                        // caseEnt.get(caseFieldName).asText());
-                                                        if (StringUtils.hasText(caseEnt.get(caseFieldName).asText()))
-                                                        {
-                                                            status = caseEnt.get(caseFieldName).asText();
-                                                            if (StringUtils.hasText(status))
-                                                            {
-                                                                String locStatus = status;
-                                                                Optional<TY_PortalStatusTransI> transO = statusTransitionsList
-                                                                        .stream().filter(l -> l.getFromStatus()
-                                                                                .equals(locStatus))
-                                                                        .findFirst();
-                                                                if (transO.isPresent())
-                                                                {
-                                                                    canConfirm = transO.get().getConfirmAllowed();
-                                                                }
-                                                            }
-
-                                                        }
-                                                    }
-
-                                                    if (caseFieldName.equals("statusDescription"))
-                                                    {
-                                                        // log.info("Case Status Added : " +
-                                                        // caseEnt.get(caseFieldName).asText());
-                                                        if (StringUtils.hasText(caseEnt.get(caseFieldName).asText()))
-                                                        {
-                                                            status = caseEnt.get(caseFieldName).asText();
-                                                        }
-                                                    }
-
-                                                    if (caseFieldName.equals("adminData"))
-                                                    {
-                                                        // log.info("Inside Admin Data: " );
-
-                                                        JsonNode admEnt = caseEnt.path("adminData");
-                                                        if (admEnt != null)
-                                                        {
-                                                            // log.info("AdminData Node Bound");
-
-                                                            Iterator<String> fieldNamesAdm = admEnt.fieldNames();
-                                                            while (fieldNamesAdm.hasNext())
-                                                            {
-                                                                String admFieldName = fieldNamesAdm.next();
-                                                                if (admFieldName.equals("createdOn"))
-                                                                {
-                                                                    // log.info( "Created On : " +
-                                                                    // admEnt.get(admFieldName).asText());
-                                                                    createdOn = admEnt.get(admFieldName).asText();
-                                                                }
-
-                                                                if (admFieldName.equals("updatedOn"))
-                                                                {
-
-                                                                    updatedOn = admEnt.get(admFieldName).asText();
-                                                                }
-                                                            }
-
-                                                        }
-                                                    }
-
-                                                    if (caseFieldName.equals("account"))
-                                                    {
-                                                        // log.info("Inside Account: " );
-
-                                                        JsonNode accEnt = caseEnt.path("account");
-                                                        if (accEnt != null)
-                                                        {
-                                                            // log.info("Account Node Bound");
-
-                                                            Iterator<String> fieldNamesAcc = accEnt.fieldNames();
-                                                            while (fieldNamesAcc.hasNext())
-                                                            {
-                                                                String accFieldName = fieldNamesAcc.next();
-                                                                if (accFieldName.equals("id"))
-                                                                {
-
-                                                                    mdgAccount = accEnt.get(accFieldName).asText();
-                                                                }
-                                                            }
-
-                                                        }
-                                                    }
-
-                                                    if (caseFieldName.equals("individualCustomer")
-                                                            && (!StringUtils.hasText(accountId)))
-                                                    {
-                                                        // log.info("Inside Account: " );
-
-                                                        JsonNode accEnt = caseEnt.path("individualCustomer");
-                                                        if (accEnt != null)
-                                                        {
-                                                            // log.info("Account Node Bound");
-
-                                                            Iterator<String> fieldNamesAcc = accEnt.fieldNames();
-                                                            while (fieldNamesAcc.hasNext())
-                                                            {
-                                                                String accFieldName = fieldNamesAcc.next();
-                                                                if (accFieldName.equals("id"))
-                                                                {
-                                                                    // log.info(
-                                                                    // "Account ID : " +
-                                                                    // accEnt.get(accFieldName).asText());
-                                                                    accountId = accEnt.get(accFieldName).asText();
-                                                                }
-                                                            }
-
-                                                        }
-                                                    }
-
-                                                    if (caseFieldName.equals("reporter"))
-                                                    {
-                                                        // log.info("Inside Reporter: " );
-
-                                                        JsonNode repEnt = caseEnt.path("reporter");
-                                                        if (repEnt != null)
-                                                        {
-                                                            // log.info("Reporter Node Bound");
-
-                                                            Iterator<String> fieldNamesRep = repEnt.fieldNames();
-                                                            while (fieldNamesRep.hasNext())
-                                                            {
-                                                                String repFieldName = fieldNamesRep.next();
-                                                                if (repFieldName.equals("id"))
-                                                                {
-                                                                    // log.info(
-                                                                    // "Reporter ID : " +
-                                                                    // repEnt.get(repFieldName).asText());
-                                                                    contactId = repEnt.get(repFieldName).asText();
-                                                                }
-                                                            }
-
-                                                        }
-                                                    }
-
                                                 }
 
-                                                if (StringUtils.hasText(caseid) && StringUtils.hasText(caseguid))
+                                                if (caseFieldName.equals("displayId"))
                                                 {
-                                                    OffsetDateTime odtC = null;
-                                                    Date dateC = null;
-                                                    String dateFormattedC = null;
-
-                                                    OffsetDateTime odtU = null;
-                                                    Date dateU = null;
-                                                    String dateFormattedU = null;
-
-                                                    if (StringUtils.hasText(createdOn))
+                                                    // log.info("Case Id Added : " +
+                                                    // caseEnt.get(caseFieldName).asText());
+                                                    if (StringUtils.hasText(caseEnt.get(caseFieldName).asText()))
                                                     {
-                                                        // Parse the date-time string into OffsetDateTime
-                                                        odtC = OffsetDateTime.parse(createdOn);
-                                                        // Convert OffsetDateTime into Instant
-                                                        Instant instant = odtC.toInstant();
-                                                        // If at all, you need java.util.Date
-                                                        dateC = Date.from(instant);
-
-                                                        SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy");
-                                                        dateFormattedC = sdf.format(dateC);
+                                                        caseid = caseEnt.get(caseFieldName).asText();
                                                     }
-
-                                                    if (StringUtils.hasText(updatedOn))
-                                                    {
-                                                        // Parse the date-time string into OffsetDateTime
-                                                        odtU = OffsetDateTime.parse(updatedOn);
-                                                        // Convert OffsetDateTime into Instant
-                                                        Instant instant = odtU.toInstant();
-                                                        // If at all, you need java.util.Date
-                                                        dateU = Date.from(instant);
-
-                                                        SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy");
-                                                        dateFormattedU = sdf.format(dateU);
-                                                    }
-
-                                                    casesESSList.add(new TY_CaseESS(caseguid, caseid, caseTypeI,
-                                                            caseTypeDescription, subject, status, accountId, contactId,
-                                                            mdgAccount, createdOn, dateC, dateFormattedC, odtC,
-                                                            updatedOn, dateU, dateFormattedU, odtU, origin,
-                                                            canConfirm));
-
                                                 }
+
+                                                if (caseFieldName.equals("caseType"))
+                                                {
+                                                    // log.info("Case Type Added : " +
+                                                    // caseEnt.get(caseFieldName).asText());
+                                                    if (StringUtils.hasText(caseEnt.get(caseFieldName).asText()))
+                                                    {
+                                                        caseTypeI = caseEnt.get(caseFieldName).asText();
+                                                    }
+                                                }
+
+                                                if (caseFieldName.equals("caseTypeDescription"))
+                                                {
+                                                    // log.info("Case Type Description Added : " +
+                                                    // caseEnt.get(caseFieldName).asText());
+                                                    if (StringUtils.hasText(caseEnt.get(caseFieldName).asText()))
+                                                    {
+                                                        caseTypeDescription = caseEnt.get(caseFieldName).asText();
+                                                    }
+                                                }
+
+                                                if (caseFieldName.equals("subject"))
+                                                {
+                                                    // log.info("Case Subject Added : " +
+                                                    // caseEnt.get(caseFieldName).asText());
+                                                    if (StringUtils.hasText(caseEnt.get(caseFieldName).asText()))
+                                                    {
+                                                        subject = caseEnt.get(caseFieldName).asText();
+                                                    }
+                                                }
+
+                                                if (caseFieldName.equals("origin"))
+                                                {
+                                                    // log.info("Case Subject Added : " +
+                                                    // caseEnt.get(caseFieldName).asText());
+                                                    if (StringUtils.hasText(caseEnt.get(caseFieldName).asText()))
+                                                    {
+                                                        origin = caseEnt.get(caseFieldName).asText();
+                                                    }
+                                                }
+
+                                                if (caseFieldName.equals("statusDescription"))
+                                                {
+                                                    // log.info("Case Status Added : " +
+                                                    // caseEnt.get(caseFieldName).asText());
+                                                    if (StringUtils.hasText(caseEnt.get(caseFieldName).asText()))
+                                                    {
+                                                        status = caseEnt.get(caseFieldName).asText();
+                                                        if (StringUtils.hasText(status))
+                                                        {
+                                                            String locStatus = status;
+                                                            Optional<TY_PortalStatusTransI> transO = statusTransitionsList
+                                                                    .stream().filter(l -> l.getFromStatus()
+                                                                            .equals(locStatus))
+                                                                    .findFirst();
+                                                            if (transO.isPresent())
+                                                            {
+                                                                canConfirm = transO.get().getConfirmAllowed();
+                                                            }
+                                                        }
+
+                                                    }
+                                                }
+
+                                                if (caseFieldName.equals("statusDescription"))
+                                                {
+                                                    // log.info("Case Status Added : " +
+                                                    // caseEnt.get(caseFieldName).asText());
+                                                    if (StringUtils.hasText(caseEnt.get(caseFieldName).asText()))
+                                                    {
+                                                        status = caseEnt.get(caseFieldName).asText();
+                                                    }
+                                                }
+
+                                                if (caseFieldName.equals("adminData"))
+                                                {
+                                                    // log.info("Inside Admin Data: " );
+
+                                                    JsonNode admEnt = caseEnt.path("adminData");
+                                                    if (admEnt != null)
+                                                    {
+                                                        // log.info("AdminData Node Bound");
+
+                                                        Iterator<String> fieldNamesAdm = admEnt.fieldNames();
+                                                        while (fieldNamesAdm.hasNext())
+                                                        {
+                                                            String admFieldName = fieldNamesAdm.next();
+                                                            if (admFieldName.equals("createdOn"))
+                                                            {
+                                                                // log.info( "Created On : " +
+                                                                // admEnt.get(admFieldName).asText());
+                                                                createdOn = admEnt.get(admFieldName).asText();
+                                                            }
+
+                                                            if (admFieldName.equals("updatedOn"))
+                                                            {
+
+                                                                updatedOn = admEnt.get(admFieldName).asText();
+                                                            }
+                                                        }
+
+                                                    }
+                                                }
+
+                                                if (caseFieldName.equals("account"))
+                                                {
+                                                    // log.info("Inside Account: " );
+
+                                                    JsonNode accEnt = caseEnt.path("account");
+                                                    if (accEnt != null)
+                                                    {
+                                                        // log.info("Account Node Bound");
+
+                                                        Iterator<String> fieldNamesAcc = accEnt.fieldNames();
+                                                        while (fieldNamesAcc.hasNext())
+                                                        {
+                                                            String accFieldName = fieldNamesAcc.next();
+                                                            if (accFieldName.equals("id"))
+                                                            {
+
+                                                                mdgAccount = accEnt.get(accFieldName).asText();
+                                                            }
+                                                        }
+
+                                                    }
+                                                }
+
+                                                if (caseFieldName.equals("individualCustomer")
+                                                        && (!StringUtils.hasText(accountId)))
+                                                {
+                                                    // log.info("Inside Account: " );
+
+                                                    JsonNode accEnt = caseEnt.path("individualCustomer");
+                                                    if (accEnt != null)
+                                                    {
+                                                        // log.info("Account Node Bound");
+
+                                                        Iterator<String> fieldNamesAcc = accEnt.fieldNames();
+                                                        while (fieldNamesAcc.hasNext())
+                                                        {
+                                                            String accFieldName = fieldNamesAcc.next();
+                                                            if (accFieldName.equals("id"))
+                                                            {
+                                                                // log.info(
+                                                                // "Account ID : " +
+                                                                // accEnt.get(accFieldName).asText());
+                                                                accountId = accEnt.get(accFieldName).asText();
+                                                            }
+                                                        }
+
+                                                    }
+                                                }
+
+                                                if (caseFieldName.equals("reporter"))
+                                                {
+                                                    // log.info("Inside Reporter: " );
+
+                                                    JsonNode repEnt = caseEnt.path("reporter");
+                                                    if (repEnt != null)
+                                                    {
+                                                        // log.info("Reporter Node Bound");
+
+                                                        Iterator<String> fieldNamesRep = repEnt.fieldNames();
+                                                        while (fieldNamesRep.hasNext())
+                                                        {
+                                                            String repFieldName = fieldNamesRep.next();
+                                                            if (repFieldName.equals("id"))
+                                                            {
+                                                                // log.info(
+                                                                // "Reporter ID : " +
+                                                                // repEnt.get(repFieldName).asText());
+                                                                contactId = repEnt.get(repFieldName).asText();
+                                                            }
+                                                        }
+
+                                                    }
+                                                }
+
+                                            }
+
+                                            if (StringUtils.hasText(caseid) && StringUtils.hasText(caseguid))
+                                            {
+                                                OffsetDateTime odtC = null;
+                                                Date dateC = null;
+                                                String dateFormattedC = null;
+
+                                                OffsetDateTime odtU = null;
+                                                Date dateU = null;
+                                                String dateFormattedU = null;
+
+                                                if (StringUtils.hasText(createdOn))
+                                                {
+                                                    // Parse the date-time string into OffsetDateTime
+                                                    odtC = OffsetDateTime.parse(createdOn);
+                                                    // Convert OffsetDateTime into Instant
+                                                    Instant instant = odtC.toInstant();
+                                                    // If at all, you need java.util.Date
+                                                    dateC = Date.from(instant);
+
+                                                    SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy");
+                                                    dateFormattedC = sdf.format(dateC);
+                                                }
+
+                                                if (StringUtils.hasText(updatedOn))
+                                                {
+                                                    // Parse the date-time string into OffsetDateTime
+                                                    odtU = OffsetDateTime.parse(updatedOn);
+                                                    // Convert OffsetDateTime into Instant
+                                                    Instant instant = odtU.toInstant();
+                                                    // If at all, you need java.util.Date
+                                                    dateU = Date.from(instant);
+
+                                                    SimpleDateFormat sdf = new SimpleDateFormat("dd/M/yyyy");
+                                                    dateFormattedU = sdf.format(dateU);
+                                                }
+
+                                                casesESSList.add(new TY_CaseESS(caseguid, caseid, caseTypeI,
+                                                        caseTypeDescription, subject, status, accountId, contactId,
+                                                        mdgAccount, createdOn, dateC, dateFormattedC, odtC,
+                                                        updatedOn, dateU, dateFormattedU, odtU, origin,
+                                                        canConfirm));
 
                                             }
 
@@ -3103,24 +2924,21 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
                                     }
 
                                 }
-                            }
 
+                            }
                         }
 
                     }
-                    catch (IOException e)
-                    {
 
-                        e.printStackTrace();
-                    }
-
+                }
+                catch (IOException e)
+                {
+                    throw new EX_ESMAPI(msgSrc.getMessage("ERR_CASES_FOR_USERS_GET", new Object[]
+                            {  e.getMessage() }, Locale.ENGLISH));
                 }
 
             }
-            finally
-            {
-                httpClient.close();
-            }
+
         }
 
         return casesESSList;
@@ -3153,21 +2971,21 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
         if (StringUtils.hasText(userDetails.getAccountId()))
         {
 
-            filters.add(GC_Constants.gc_IndividualCustomerId + " eq " + userDetails.getAccountId());
+            filters.add(GC_Constants.gc_IndividualCustomerId + " eq '" + userDetails.getAccountId() + "'");
         }
 
         // employeeId -> employee.id
         if (StringUtils.hasText(userDetails.getEmployeeId()))
         {
 
-            filters.add(GC_Constants.gc_EmployeeId + " eq " + userDetails.getEmployeeId());
+            filters.add(GC_Constants.gc_EmployeeId + " eq '" + userDetails.getEmployeeId() + "'");
         }
 
         // mdgAccount -> account.id
         if (StringUtils.hasText(userDetails.getMdgAccount()))
         {
 
-            filters.add(GC_Constants.gc_AccountId + " eq " + userDetails.getMdgAccount());
+            filters.add(GC_Constants.gc_AccountId + " eq '" + userDetails.getMdgAccount() + "'");
         }
 
         if (filters.isEmpty())
@@ -3181,7 +2999,13 @@ public class CL_SrvCloudAPIBTPDest implements IF_SrvCloudAPI
         // Encode spaces as %20 instead of +
         userFilter = URLEncoder.encode(userFilter, StandardCharsets.UTF_8).replace("+", "%20");
 
-        return baseUrl.replace("{USER_FILTER}", userFilter);
+        String result = baseUrl.replace("{USER_FILTER}", userFilter);
+        if (result.contains("{USER_FILTER}"))
+        {
+            throw new EX_ESMAPI(
+                    "Cases search URL template missing {USER_FILTER} placeholder: " + baseUrl);
+        }
+        return result;
     }
 
 }
