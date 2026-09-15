@@ -16,6 +16,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
@@ -83,7 +84,8 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
     private MessageSource msgSrc;
 
     @Autowired
-    private WebClient webClient;
+    @Qualifier("srvCloudWebClient")
+    private WebClient srvCloudWebClient;
 
     @Autowired
     private TY_PortalStatusTransitions statusTransitions;
@@ -122,9 +124,9 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
             URI uri = new URI(url.getProtocol(), url.getUserInfo(), IDN.toASCII(url.getHost()), url.getPort(),
                     url.getPath(), url.getQuery(), url.getRef());
 
-            String correctEncodedURL = uri.toASCIIString();
 
-            ResponseEntity<String> response = webClient.get().uri(correctEncodedURL)
+
+            ResponseEntity<String> response = srvCloudWebClient.get().uri(uri)
                     .header(HttpHeaders.AUTHORIZATION, srvCloudUrls.getToken())
                     .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                     .exchangeToMono(clientResponse -> clientResponse.toEntity(String.class)).block();
@@ -211,9 +213,9 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
             URI uri = new URI(url.getProtocol(), url.getUserInfo(), IDN.toASCII(url.getHost()), url.getPort(),
                     url.getPath(), url.getQuery(), url.getRef());
 
-            String correctEncodedURL = uri.toASCIIString();
+            //String correctEncodedURL = uri.toASCIIString();
 
-            ResponseEntity<String> response = webClient.get().uri(correctEncodedURL)
+            ResponseEntity<String> response = srvCloudWebClient.get().uri(uri)
                     .header(HttpHeaders.AUTHORIZATION, srvCloudUrls.getToken())
                     .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                     .exchangeToMono(clientResponse -> clientResponse.toEntity(String.class)).block();
@@ -313,7 +315,7 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
 
             log.info(requestBody);
 
-            ResponseEntity<String> response = webClient.post().uri(accPOSTURL)
+            ResponseEntity<String> response = srvCloudWebClient.post().uri(accPOSTURL)
                     .header(HttpHeaders.AUTHORIZATION, "Basic " + encoding)
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE).bodyValue(requestBody)
                     .exchangeToMono(r -> r.toEntity(String.class)).block();
@@ -428,9 +430,7 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
             URL url = new URL(urlLink);
             URI uri = new URI(url.getProtocol(), url.getUserInfo(), IDN.toASCII(url.getHost()), url.getPort(),
                     url.getPath(), url.getQuery(), url.getRef());
-
             String correctEncodedURL = uri.toASCIIString();
-
             // 🔥 Use generic GET executor
             JsonNode jsonNode = executeGet(correctEncodedURL, srvCloudUrls.getToken(), "ERR_CATALOG_READ", new Object[]
             { catalogID });
@@ -568,7 +568,7 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
 
             log.info(requestBody);
 
-            ResponseEntity<String> response = webClient.post().uri(docPOSTURL)
+            ResponseEntity<String> response = srvCloudWebClient.post().uri(docPOSTURL)
                     .header(HttpHeaders.AUTHORIZATION, srvCloudUrls.getToken())
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE).bodyValue(requestBody)
                     .exchangeToMono(r -> r.toEntity(String.class)).block();
@@ -658,7 +658,7 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
 
             byte[] fileBytes = file.getBytes();
 
-            ResponseEntity<String> response = webClient.put().uri(url).bodyValue(fileBytes)
+            ResponseEntity<String> response = srvCloudWebClient.put().uri(URI.create(url)).bodyValue(fileBytes)
                     .exchangeToMono(r -> r.toEntity(String.class)).block();
 
             if (response == null)
@@ -704,7 +704,7 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
         try
         {
 
-            ResponseEntity<String> response = webClient.put().uri(url).bodyValue(blob)
+            ResponseEntity<String> response = srvCloudWebClient.put().uri(URI.create(url)).bodyValue(blob)
                     .exchangeToMono(r -> r.toEntity(String.class)).block();
 
             if (response == null)
@@ -769,9 +769,9 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
             URI uri = new URI(url.getProtocol(), url.getUserInfo(), IDN.toASCII(url.getHost()), url.getPort(),
                     url.getPath(), url.getQuery(), url.getRef());
 
-            String correctEncodedURL = uri.toASCIIString();
+            //String correctEncodedURL = uri.toASCIIString();
 
-            ResponseEntity<String> response = webClient.get().uri(correctEncodedURL)
+            ResponseEntity<String> response = srvCloudWebClient.get().uri(uri)
                     .header(HttpHeaders.AUTHORIZATION, srvCloudUrls.getToken()).accept(MediaType.APPLICATION_JSON)
                     .exchangeToMono(r -> r.toEntity(String.class)).block();
 
@@ -846,7 +846,7 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
 
             String urlLink = srvCloudUrls.getVhlpUrl() + fieldName;
 
-            ResponseEntity<String> response = webClient.get().uri(urlLink)
+            ResponseEntity<String> response = srvCloudWebClient.get().uri(urlLink)
                     .header(HttpHeaders.AUTHORIZATION, srvCloudUrls.getToken()).accept(MediaType.APPLICATION_JSON)
                     .exchangeToMono(r -> r.toEntity(String.class)).block();
 
@@ -944,7 +944,7 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
 
             String urlLink = srvCloudUrls.getCaseDetailsUrl() + caseId;
 
-            ResponseEntity<String> response = webClient.get().uri(urlLink)
+            ResponseEntity<String> response = srvCloudWebClient.get().uri(urlLink)
                     .header(HttpHeaders.AUTHORIZATION, srvCloudUrls.getToken()).accept(MediaType.APPLICATION_JSON)
                     .exchangeToMono(r -> r.toEntity(String.class)).block();
 
@@ -1062,7 +1062,7 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
 
             String urlLink = srvCloudUrls.getStatusSchemaUrl() + statusSchema;
 
-            ResponseEntity<String> response = webClient.get().uri(urlLink)
+            ResponseEntity<String> response = srvCloudWebClient.get().uri(urlLink)
                     .header(HttpHeaders.AUTHORIZATION, srvCloudUrls.getToken()).accept(MediaType.APPLICATION_JSON)
                     .exchangeToMono(r -> r.toEntity(String.class)).block();
 
@@ -1174,7 +1174,7 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
 
             log.info(requestBody);
 
-            ResponseEntity<String> response = webClient.patch().uri(casePOSTURL)
+            ResponseEntity<String> response = srvCloudWebClient.patch().uri(casePOSTURL)
                     .header(HttpHeaders.AUTHORIZATION, "Basic " + encoding)
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                     .header(GC_Constants.gc_IFMatch, patchInfo.getETag()).bodyValue(requestBody)
@@ -1244,7 +1244,7 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
             URI uri = new URI(url.getProtocol(), url.getUserInfo(), IDN.toASCII(url.getHost()), url.getPort(),
                     url.getPath(), url.getQuery(), url.getRef());
 
-            ResponseEntity<String> response = webClient.get().uri(uri.toASCIIString())
+            ResponseEntity<String> response = srvCloudWebClient.get().uri(uri)
                     .header(HttpHeaders.AUTHORIZATION, srvCloudUrls.getToken())
                     .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                     .exchangeToMono(r -> r.toEntity(String.class)).block();
@@ -1335,7 +1335,7 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
                 URI dUri = new URI(dUrl.getProtocol(), dUrl.getUserInfo(), IDN.toASCII(dUrl.getHost()), dUrl.getPort(),
                         dUrl.getPath(), dUrl.getQuery(), dUrl.getRef());
 
-                ResponseEntity<String> dlResponse = webClient.get().uri(dUri.toASCIIString())
+                ResponseEntity<String> dlResponse = srvCloudWebClient.get().uri(dUri)
                         .header(HttpHeaders.AUTHORIZATION, srvCloudUrls.getToken())
                         .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                         .exchangeToMono(r -> r.toEntity(String.class)).block();
@@ -1391,7 +1391,7 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
             String urlLink = StringsUtility.replaceURLwithParams(srvCloudUrls.getNotesReadUrl(), new String[]
             { caseId }, GC_Constants.gc_UrlReplParam);
 
-            ResponseEntity<String> response = webClient.get().uri(urlLink)
+            ResponseEntity<String> response = srvCloudWebClient.get().uri(URI.create(urlLink))
                     .header(HttpHeaders.AUTHORIZATION, srvCloudUrls.getToken())
                     .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                     .exchangeToMono(r -> r.toEntity(String.class)).block();
@@ -1491,7 +1491,7 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
             URI uri = new URI(url.getProtocol(), url.getUserInfo(), IDN.toASCII(url.getHost()), url.getPort(),
                     url.getPath(), url.getQuery(), url.getRef());
 
-            ResponseEntity<String> response = webClient.get().uri(uri.toASCIIString())
+            ResponseEntity<String> response = srvCloudWebClient.get().uri(uri)
                     .header(HttpHeaders.AUTHORIZATION, desProps.getAuthToken())
                     .header(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                     .exchangeToMono(r -> r.toEntity(String.class)).block();
@@ -1596,7 +1596,7 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
             ObjectMapper mapper = new ObjectMapper();
             String requestBody = mapper.writeValueAsString(payload);
 
-            ResponseEntity<String> response = webClient.patch().uri(casePOSTURL)
+            ResponseEntity<String> response = srvCloudWebClient.patch().uri(casePOSTURL)
                     .header(HttpHeaders.AUTHORIZATION, srvCloudUrls.getToken())
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
                     .header(GC_Constants.gc_IFMatch, caseDetails.getETag()).bodyValue(requestBody)
@@ -1655,7 +1655,7 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
         try
         {
 
-            ResponseEntity<String> response = webClient.get().uri(url).header(HttpHeaders.AUTHORIZATION, authHeader)
+            ResponseEntity<String> response = srvCloudWebClient.get().uri(url).header(HttpHeaders.AUTHORIZATION, authHeader)
                     .accept(MediaType.APPLICATION_JSON).exchangeToMono(r -> r.toEntity(String.class)).block();
 
             if (response == null)
@@ -1696,7 +1696,6 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
             throw new EX_ESMAPI(e.getMessage());
         }
     }
-
     private JsonNode executePost(String url, String authHeader, Object body, int expectedStatus, String errorMsgKey)
             throws EX_ESMAPI
     {
@@ -1707,7 +1706,7 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
             ObjectMapper mapper = new ObjectMapper();
             String requestBody = mapper.writeValueAsString(body);
 
-            ResponseEntity<String> response = webClient.post().uri(url).header(HttpHeaders.AUTHORIZATION, authHeader)
+            ResponseEntity<String> response = srvCloudWebClient.post().uri(url).header(HttpHeaders.AUTHORIZATION, authHeader)
                     .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE).bodyValue(requestBody)
                     .exchangeToMono(r -> r.toEntity(String.class)).block();
 
@@ -1746,7 +1745,7 @@ public class CL_SrvCloudAPI implements IF_SrvCloudAPI
         try
         {
 
-            ResponseEntity<String> response = webClient.put().uri(url).bodyValue(data)
+            ResponseEntity<String> response = srvCloudWebClient.put().uri(url).bodyValue(data)
                     .exchangeToMono(r -> r.toEntity(String.class)).block();
 
             if (response == null)

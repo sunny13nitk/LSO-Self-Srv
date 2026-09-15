@@ -16,7 +16,8 @@ public class CL_URLUtility
         if (StringUtils.hasText(destUrlPrefix) && StringUtils.hasText(destinationAPI))
         {
             url = new String();
-            url += destUrlPrefix + destinationAPI;
+            url += destUrlPrefix.endsWith("/") ? destUrlPrefix + destinationAPI
+                                               : destUrlPrefix + "/" + destinationAPI;
             // String[] destAPIParts = destinationAPI.split(cons_pathSlash, cons_limit);
             // if (destAPIParts.length > 0)
             // {
